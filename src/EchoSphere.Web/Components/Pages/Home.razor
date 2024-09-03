@@ -1,0 +1,53 @@
+﻿@page "/"
+
+@inject ApiClient ApiClient
+
+<PageTitle>Home</PageTitle>
+
+<div>From user Id</div>
+<InputText @bind-Value="_fromUserId"/>
+
+<div>To user Id</div>
+<InputText @bind-Value="_toUserId"/>
+
+<div>Text</div>
+<InputText @bind-Value="_text"/>
+
+<div>
+	<button @onclick="SendMessage">Send message</button>
+	<button @onclick="GetMessages">Get messages</button>
+</div>
+
+<div>
+	@foreach (var text in _messages)
+	{
+		<div>@text</div>
+	}
+</div>
+
+@code {
+	private string? _fromUserId;
+	private string? _toUserId;
+	private string? _text;
+	private IReadOnlyList<string> _messages = [];
+
+	private Task SendMessage()
+	{
+		if (string.IsNullOrEmpty(_fromUserId) || string.IsNullOrEmpty(_toUserId) || string.IsNullOrEmpty(_text))
+		{
+			return Task.CompletedTask;
+		}
+
+		return ApiClient.SendMessage(_fromUserId, _toUserId, _text);
+	}
+
+	private async Task GetMessages()
+	{
+		if (string.IsNullOrEmpty(_fromUserId) || string.IsNullOrEmpty(_toUserId))
+		{
+			return;
+		}
+
+		_messages = await ApiClient.GetMessages(_fromUserId, _toUserId);
+	}
+}

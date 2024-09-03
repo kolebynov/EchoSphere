@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net9.0</TargetFramework>
+		<IsAspireHost>true</IsAspireHost>
+		<UserSecretsId>496138e0-3de2-407a-b67d-1bfb354b4e78</UserSecretsId>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Aspire.Hosting.AppHost" Version="8.2.0" />
+		<PackageReference Include="Aspire.Hosting.PostgreSQL" Version="8.2.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\EchoSphere.ApiService\EchoSphere.ApiService.csproj"/>
+		<ProjectReference Include="..\EchoSphere.UserMessagesService\EchoSphere.UserMessagesService.csproj" />
+		<ProjectReference Include="..\EchoSphere.Web\EchoSphere.Web.csproj"/>
+	</ItemGroup>
+
+</Project>

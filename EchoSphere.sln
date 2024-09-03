@@ -1,0 +1,86 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.0.0
+MinimumVisualStudioVersion = 17.8.0.0
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2B86BF74-1991-4852-A681-D3AD3F402161}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A519908E-3B25-41AC-9072-C25AD92B2ED1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{A1E5FE9C-0B1E-43D2-AC7C-3AC3C6858F8C}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		global.json = global.json
+		Rules.ruleset = Rules.ruleset
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.ApiService", "src\EchoSphere.ApiService\EchoSphere.ApiService.csproj", "{084C7B12-A7C9-434D-97D6-CE3ACD9EF031}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.AppHost", "src\EchoSphere.AppHost\EchoSphere.AppHost.csproj", "{99BB4481-0B83-4FEF-9774-D3C9B27D7D55}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.ServiceDefaults", "src\EchoSphere.ServiceDefaults\EchoSphere.ServiceDefaults.csproj", "{A99A36B7-4B3E-4101-9F11-3F3FC52B3C1A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.Web", "src\EchoSphere.Web\EchoSphere.Web.csproj", "{604A3990-2DCE-4032-A3D4-6183925DD4B0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.Tests", "tests\EchoSphere.Tests\EchoSphere.Tests.csproj", "{1E9270CD-E07E-4783-A730-889B81D6BC55}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.UserMessagesService", "src\EchoSphere.UserMessagesService\EchoSphere.UserMessagesService.csproj", "{F770F33B-F968-4306-A9F9-BC4EF24732C1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UserMessages", "UserMessages", "{2072193D-A7CE-4420-B47F-D680051CE395}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.UserMessagesClient", "src\EchoSphere.UserMessagesClient\EchoSphere.UserMessagesClient.csproj", "{19567022-ABE8-4D9C-B761-B0002DA286D0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{084C7B12-A7C9-434D-97D6-CE3ACD9EF031}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{084C7B12-A7C9-434D-97D6-CE3ACD9EF031}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{084C7B12-A7C9-434D-97D6-CE3ACD9EF031}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{084C7B12-A7C9-434D-97D6-CE3ACD9EF031}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99BB4481-0B83-4FEF-9774-D3C9B27D7D55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99BB4481-0B83-4FEF-9774-D3C9B27D7D55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99BB4481-0B83-4FEF-9774-D3C9B27D7D55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99BB4481-0B83-4FEF-9774-D3C9B27D7D55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A99A36B7-4B3E-4101-9F11-3F3FC52B3C1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A99A36B7-4B3E-4101-9F11-3F3FC52B3C1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A99A36B7-4B3E-4101-9F11-3F3FC52B3C1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A99A36B7-4B3E-4101-9F11-3F3FC52B3C1A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{604A3990-2DCE-4032-A3D4-6183925DD4B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{604A3990-2DCE-4032-A3D4-6183925DD4B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{604A3990-2DCE-4032-A3D4-6183925DD4B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{604A3990-2DCE-4032-A3D4-6183925DD4B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E9270CD-E07E-4783-A730-889B81D6BC55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E9270CD-E07E-4783-A730-889B81D6BC55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E9270CD-E07E-4783-A730-889B81D6BC55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E9270CD-E07E-4783-A730-889B81D6BC55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F770F33B-F968-4306-A9F9-BC4EF24732C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F770F33B-F968-4306-A9F9-BC4EF24732C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F770F33B-F968-4306-A9F9-BC4EF24732C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F770F33B-F968-4306-A9F9-BC4EF24732C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19567022-ABE8-4D9C-B761-B0002DA286D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19567022-ABE8-4D9C-B761-B0002DA286D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19567022-ABE8-4D9C-B761-B0002DA286D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19567022-ABE8-4D9C-B761-B0002DA286D0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BB53C7E6-FCAA-4D51-9D3C-7EEF3A93846D}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{084C7B12-A7C9-434D-97D6-CE3ACD9EF031} = {2B86BF74-1991-4852-A681-D3AD3F402161}
+		{99BB4481-0B83-4FEF-9774-D3C9B27D7D55} = {2B86BF74-1991-4852-A681-D3AD3F402161}
+		{A99A36B7-4B3E-4101-9F11-3F3FC52B3C1A} = {2B86BF74-1991-4852-A681-D3AD3F402161}
+		{604A3990-2DCE-4032-A3D4-6183925DD4B0} = {2B86BF74-1991-4852-A681-D3AD3F402161}
+		{1E9270CD-E07E-4783-A730-889B81D6BC55} = {A519908E-3B25-41AC-9072-C25AD92B2ED1}
+		{2072193D-A7CE-4420-B47F-D680051CE395} = {2B86BF74-1991-4852-A681-D3AD3F402161}
+		{F770F33B-F968-4306-A9F9-BC4EF24732C1} = {2072193D-A7CE-4420-B47F-D680051CE395}
+		{19567022-ABE8-4D9C-B761-B0002DA286D0} = {2072193D-A7CE-4420-B47F-D680051CE395}
+	EndGlobalSection
+EndGlobal
