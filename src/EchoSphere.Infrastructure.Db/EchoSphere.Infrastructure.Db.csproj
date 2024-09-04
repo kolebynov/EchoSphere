@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="FluentMigrator.Runner.Postgres" Version="5.2.0"/>
+		<PackageReference Include="linq2db.AspNet" Version="5.4.1"/>
+		<PackageReference Include="Aspire.Npgsql" Version="8.2.0"/>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\EchoSphere.Infrastructure.Hosting\EchoSphere.Infrastructure.Hosting.csproj" />
+	</ItemGroup>
+
+</Project>

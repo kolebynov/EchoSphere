@@ -1,12 +1,12 @@
-using EchoSphere.UserMessagesService.Models;
+using EchoSphere.UsersApi.Models;
 using LinqToDB;
 using LinqToDB.Data;
 
-namespace EchoSphere.UserMessagesService;
+namespace EchoSphere.UsersApi;
 
 internal sealed class AppDataConnection : DataConnection
 {
-	public ITable<UserMessage> UserMessages => this.GetTable<UserMessage>();
+	public ITable<UserProfile> UserProfiles => this.GetTable<UserProfile>();
 
 	public AppDataConnection(DataOptions<AppDataConnection> options)
 		: base(options.Options)

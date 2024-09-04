@@ -14,7 +14,8 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\EchoSphere.ApiService\EchoSphere.ApiService.csproj"/>
-		<ProjectReference Include="..\EchoSphere.UserMessagesService\EchoSphere.UserMessagesService.csproj" />
+		<ProjectReference Include="..\EchoSphere.UserMessagesApi\EchoSphere.UserMessagesApi.csproj" />
+		<ProjectReference Include="..\EchoSphere.UsersApi\EchoSphere.UsersApi.csproj" />
 		<ProjectReference Include="..\EchoSphere.Web\EchoSphere.Web.csproj"/>
 	</ItemGroup>
 

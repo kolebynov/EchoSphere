@@ -2,12 +2,12 @@ syntax = "proto3";
 
 import "google/protobuf/empty.proto";
 
-option csharp_namespace = "EchoSphere.UserMessageService";
+option csharp_namespace = "EchoSphere.UserMessagesApi.Grpc";
 
-package usermessages;
+package user_messages;
 
-service MessageService {
-	rpc SendMessage (SendMessageRequest) returns (google.protobuf.Empty);
+service MessagesService {
+	rpc SendMessage (SendMessageRequest) returns (SendMessageResponse);
 
 	rpc GetUserMessages (GetUserMessagesRequest) returns (GetUserMessagesResponse);
 }
@@ -18,13 +18,18 @@ message SendMessageRequest {
 	string text = 3;
 }
 
+message SendMessageResponse {
+	int64 id = 1;
+}
+
 message GetUserMessagesRequest {
 	string from_user_id = 1;
 	string to_user_id = 2;
 }
 
 message UserMessageDto {
-	string text = 1;
+	int64 id = 1;
+	string text = 2;
 }
 
 message GetUserMessagesResponse {

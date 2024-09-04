@@ -14,15 +14,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Protobuf Include="..\EchoSphere.UserMessagesApi\Protos\usermessages.proto">
-			<GrpcServices>Client</GrpcServices>
-			<Access>Public</Access>
-			<ProtoCompile>True</ProtoCompile>
-			<CompileOutputs>True</CompileOutputs>
-			<OutputDir>obj\Debug/net9.0/</OutputDir>
-			<Generator>MSBuild:Compile</Generator>
-			<Link>Protos\usermessages.proto</Link>
-		</Protobuf>
+		<Protobuf Include="..\EchoSphere.UsersApi\Protos\users.proto" GrpcServices="Client" />
 	</ItemGroup>
 
 </Project>

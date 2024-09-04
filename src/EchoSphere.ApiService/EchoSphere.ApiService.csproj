@@ -8,6 +8,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\EchoSphere.ServiceDefaults\EchoSphere.ServiceDefaults.csproj"/>
 		<ProjectReference Include="..\EchoSphere.UserMessagesClient\EchoSphere.UserMessagesClient.csproj" />
+		<ProjectReference Include="..\EchoSphere.UsersClient\EchoSphere.UsersClient.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
