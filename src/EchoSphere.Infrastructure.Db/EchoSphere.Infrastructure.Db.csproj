@@ -1,9 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFramework>net9.0</TargetFramework>
-	</PropertyGroup>
-
 	<ItemGroup>
 		<PackageReference Include="FluentMigrator.Runner.Postgres" Version="5.2.0"/>
 		<PackageReference Include="linq2db.AspNet" Version="5.4.1"/>

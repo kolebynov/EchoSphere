@@ -1,0 +1,20 @@
+@inject ErrorPresenter ErrorPresenter;
+
+<ErrorBoundary @ref="_errorBoundary">
+	<ChildContent>
+		@ChildContent
+	</ChildContent>
+	<ErrorContent Context="exception">
+		@{
+			ErrorPresenter.DisplayError(exception, null, null);
+			Task.Delay(500).ContinueWith(_ => InvokeAsync(_errorBoundary.Recover));
+		}
+	</ErrorContent>
+</ErrorBoundary>
+
+@code {
+	private ErrorBoundary _errorBoundary = null!;
+
+	[Parameter]
+	public RenderFragment? ChildContent { get; set; }
+}

@@ -17,7 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.ApiService", "src\EchoSphere.ApiService\EchoSphere.ApiService.csproj", "{084C7B12-A7C9-434D-97D6-CE3ACD9EF031}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.ApiGateway", "src\EchoSphere.ApiGateway\EchoSphere.ApiGateway.csproj", "{084C7B12-A7C9-434D-97D6-CE3ACD9EF031}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.AppHost", "src\EchoSphere.AppHost\EchoSphere.AppHost.csproj", "{99BB4481-0B83-4FEF-9774-D3C9B27D7D55}"
 EndProject
@@ -27,15 +27,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.Web", "src\EchoS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.Tests", "tests\EchoSphere.Tests\EchoSphere.Tests.csproj", "{1E9270CD-E07E-4783-A730-889B81D6BC55}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.UserMessagesApi", "src\EchoSphere.UserMessagesApi\EchoSphere.UserMessagesApi.csproj", "{F770F33B-F968-4306-A9F9-BC4EF24732C1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.Messages.Api", "src\EchoSphere.Messages.Api\EchoSphere.Messages.Api.csproj", "{F770F33B-F968-4306-A9F9-BC4EF24732C1}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UserMessages", "UserMessages", "{2072193D-A7CE-4420-B47F-D680051CE395}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Messages", "Messages", "{2072193D-A7CE-4420-B47F-D680051CE395}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.UserMessagesClient", "src\EchoSphere.UserMessagesClient\EchoSphere.UserMessagesClient.csproj", "{19567022-ABE8-4D9C-B761-B0002DA286D0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.Messages.Client", "src\EchoSphere.Messages.Client\EchoSphere.Messages.Client.csproj", "{19567022-ABE8-4D9C-B761-B0002DA286D0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Users", "Users", "{16C0D833-9AC3-411C-ADBF-7496125A4F22}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.UsersApi", "src\EchoSphere.UsersApi\EchoSphere.UsersApi.csproj", "{96BAABF2-C1C9-4F0A-B41C-87E0D8FE7091}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.Users.Api", "src\EchoSphere.Users.Api\EchoSphere.Users.Api.csproj", "{96BAABF2-C1C9-4F0A-B41C-87E0D8FE7091}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Aspire", "Aspire", "{8968878C-C3A5-4B71-9E19-7BC2EFEC5EF7}"
 EndProject
@@ -45,7 +45,27 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.Infrastructure.D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.Infrastructure.Hosting", "src\EchoSphere.Infrastructure.Hosting\EchoSphere.Infrastructure.Hosting.csproj", "{BD027CA5-83DC-4B7D-866B-72D1C2009337}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.UsersClient", "src\EchoSphere.UsersClient\EchoSphere.UsersClient.csproj", "{B107DAB3-32BA-48B0-B7A3-5CFC69389D54}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.Users.Client", "src\EchoSphere.Users.Client\EchoSphere.Users.Client.csproj", "{B107DAB3-32BA-48B0-B7A3-5CFC69389D54}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Accounts", "Accounts", "{DAFC15A7-C7B4-4A74-A54C-742E949DE8B2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.Accounts.WebApp", "src\EchoSphere.Accounts.WebApp\EchoSphere.Accounts.WebApp.csproj", "{E3AD1409-6801-45F3-9895-A51599BEFB76}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.Accounts.WebApp.Client", "src\EchoSphere.Accounts.WebApp.Client\EchoSphere.Accounts.WebApp.Client.csproj", "{9ACFB04E-6C9B-4088-B2A0-496F73F83715}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.BlazorShared", "src\EchoSphere.BlazorShared\EchoSphere.BlazorShared.csproj", "{68A07EAF-217F-4438-9C02-0C93A1CFC32B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApiGateway", "ApiGateway", "{B15BEA9A-38DB-43E8-9EFA-3631B1817D7F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{84F702C5-B09D-406D-AA25-B8945999B2E4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.Messages.Abstractions", "src\EchoSphere.Messages.Abstractions\EchoSphere.Messages.Abstractions.csproj", "{F443AC3C-1AC0-4A8D-B88F-D091398739A8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.Users.Abstractions", "src\EchoSphere.Users.Abstractions\EchoSphere.Users.Abstractions.csproj", "{4E3763FB-F39F-4BD2-AE28-252043E19841}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.ApiGateway.Contracts", "src\EchoSphere.ApiGateway.Contracts\EchoSphere.ApiGateway.Contracts.csproj", "{F233861E-02BD-4322-9944-F3714601F3B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.ApiGateway.Client", "src\EchoSphere.ApiGateway.Client\EchoSphere.ApiGateway.Client.csproj", "{DEAF6558-6031-4C2E-8F3D-7F4041F511C1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -97,6 +117,34 @@ Global
 		{B107DAB3-32BA-48B0-B7A3-5CFC69389D54}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B107DAB3-32BA-48B0-B7A3-5CFC69389D54}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B107DAB3-32BA-48B0-B7A3-5CFC69389D54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3AD1409-6801-45F3-9895-A51599BEFB76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3AD1409-6801-45F3-9895-A51599BEFB76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3AD1409-6801-45F3-9895-A51599BEFB76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3AD1409-6801-45F3-9895-A51599BEFB76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9ACFB04E-6C9B-4088-B2A0-496F73F83715}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9ACFB04E-6C9B-4088-B2A0-496F73F83715}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9ACFB04E-6C9B-4088-B2A0-496F73F83715}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9ACFB04E-6C9B-4088-B2A0-496F73F83715}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68A07EAF-217F-4438-9C02-0C93A1CFC32B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68A07EAF-217F-4438-9C02-0C93A1CFC32B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68A07EAF-217F-4438-9C02-0C93A1CFC32B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68A07EAF-217F-4438-9C02-0C93A1CFC32B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F443AC3C-1AC0-4A8D-B88F-D091398739A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F443AC3C-1AC0-4A8D-B88F-D091398739A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F443AC3C-1AC0-4A8D-B88F-D091398739A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F443AC3C-1AC0-4A8D-B88F-D091398739A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4E3763FB-F39F-4BD2-AE28-252043E19841}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E3763FB-F39F-4BD2-AE28-252043E19841}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E3763FB-F39F-4BD2-AE28-252043E19841}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E3763FB-F39F-4BD2-AE28-252043E19841}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F233861E-02BD-4322-9944-F3714601F3B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F233861E-02BD-4322-9944-F3714601F3B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F233861E-02BD-4322-9944-F3714601F3B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F233861E-02BD-4322-9944-F3714601F3B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEAF6558-6031-4C2E-8F3D-7F4041F511C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEAF6558-6031-4C2E-8F3D-7F4041F511C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEAF6558-6031-4C2E-8F3D-7F4041F511C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEAF6558-6031-4C2E-8F3D-7F4041F511C1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -105,7 +153,6 @@ Global
 		SolutionGuid = {BB53C7E6-FCAA-4D51-9D3C-7EEF3A93846D}
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{084C7B12-A7C9-434D-97D6-CE3ACD9EF031} = {2B86BF74-1991-4852-A681-D3AD3F402161}
 		{604A3990-2DCE-4032-A3D4-6183925DD4B0} = {2B86BF74-1991-4852-A681-D3AD3F402161}
 		{1E9270CD-E07E-4783-A730-889B81D6BC55} = {A519908E-3B25-41AC-9072-C25AD92B2ED1}
 		{2072193D-A7CE-4420-B47F-D680051CE395} = {2B86BF74-1991-4852-A681-D3AD3F402161}
@@ -120,5 +167,16 @@ Global
 		{6CEC856C-2440-484F-A055-AB4EADDB9CA6} = {B05A24C9-6E4C-444C-B162-34ED1A9A9C3A}
 		{BD027CA5-83DC-4B7D-866B-72D1C2009337} = {B05A24C9-6E4C-444C-B162-34ED1A9A9C3A}
 		{B107DAB3-32BA-48B0-B7A3-5CFC69389D54} = {16C0D833-9AC3-411C-ADBF-7496125A4F22}
+		{DAFC15A7-C7B4-4A74-A54C-742E949DE8B2} = {2B86BF74-1991-4852-A681-D3AD3F402161}
+		{E3AD1409-6801-45F3-9895-A51599BEFB76} = {DAFC15A7-C7B4-4A74-A54C-742E949DE8B2}
+		{9ACFB04E-6C9B-4088-B2A0-496F73F83715} = {DAFC15A7-C7B4-4A74-A54C-742E949DE8B2}
+		{B15BEA9A-38DB-43E8-9EFA-3631B1817D7F} = {2B86BF74-1991-4852-A681-D3AD3F402161}
+		{084C7B12-A7C9-434D-97D6-CE3ACD9EF031} = {B15BEA9A-38DB-43E8-9EFA-3631B1817D7F}
+		{84F702C5-B09D-406D-AA25-B8945999B2E4} = {2B86BF74-1991-4852-A681-D3AD3F402161}
+		{68A07EAF-217F-4438-9C02-0C93A1CFC32B} = {84F702C5-B09D-406D-AA25-B8945999B2E4}
+		{F443AC3C-1AC0-4A8D-B88F-D091398739A8} = {2072193D-A7CE-4420-B47F-D680051CE395}
+		{4E3763FB-F39F-4BD2-AE28-252043E19841} = {16C0D833-9AC3-411C-ADBF-7496125A4F22}
+		{F233861E-02BD-4322-9944-F3714601F3B3} = {B15BEA9A-38DB-43E8-9EFA-3631B1817D7F}
+		{DEAF6558-6031-4C2E-8F3D-7F4041F511C1} = {B15BEA9A-38DB-43E8-9EFA-3631B1817D7F}
 	EndGlobalSection
 EndGlobal

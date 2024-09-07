@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+option csharp_namespace = "EchoSphere.Messages.Api.Grpc";
+
+package messages;
+
+service ChatServiceGrpc {
+	rpc GetUserChats (UserIdDto) returns (GetUserChatsResponse);
+
+	rpc GetChatMessages (ChatIdDto) returns (GetChatMessagesResponse);
+
+	rpc CreateChat (CreateChatRequest) returns (google.protobuf.Empty);
+
+	rpc SendMessage (SendMessageRequest) returns (google.protobuf.Empty);
+}
+
+message UserIdDto {
+	string value = 1;
+}
+
+message ChatIdDto {
+	string value = 1;
+}
+
+message ChatInfoDto {
+	string id = 1;
+	repeated string participants = 2;
+}
+
+message GetUserChatsResponse {
+	repeated ChatInfoDto chats = 1;
+}
+
+message ChatMessageDto {
+	int64 id = 1;
+	google.protobuf.Timestamp timestamp = 2;
+	string sender_id = 3;
+	string text = 4;
+}
+
+message GetChatMessagesResponse {
+	repeated ChatMessageDto messages = 1;
+}
+
+message CreateChatRequest {
+	repeated string participants = 1;
+}
+
+message SendMessageRequest {
+	string chat_id = 1;
+	string sender_id = 2;
+	string text = 3;
+}

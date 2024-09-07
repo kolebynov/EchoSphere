@@ -1,53 +1,83 @@
 ﻿@page "/"
+@using EchoSphere.ApiGateway.Client
+@using EchoSphere.ApiGateway.Contracts
+@using Microsoft.AspNetCore.Authorization
 
-@inject ApiClient ApiClient
+@inject IChatClient ChatClient;
+
+@attribute [Authorize]
 
 <PageTitle>Home</PageTitle>
 
-<div>From user Id</div>
-<InputText @bind-Value="_fromUserId"/>
+<MudForm ValidationDelay="500" @bind-IsValid="_anotherUserFormIsValid">
+	<MudTextField Label="Another user id" @bind-Value="_anotherUserId" Required/>
+	<MudButton Disabled="!_anotherUserFormIsValid" OnClick="CreateChat">Create chat</MudButton>
+</MudForm>
 
-<div>To user Id</div>
-<InputText @bind-Value="_toUserId"/>
-
-<div>Text</div>
-<InputText @bind-Value="_text"/>
+<MudForm ValidationDelay="500" @bind-IsValid="_sendMessageFormIsValid">
+	Chats:
+	<MudSelect T="ChatInfoDtoV1" Value="_selectedChat" ValueChanged="ChatChangeHandler" AnchorOrigin="Origin.BottomCenter"
+	           Variant="Variant.Outlined" IconSize="Size.Large" Required>
+		@foreach (var chatInfo in _chats)
+		{
+			<MudSelectItem Value="chatInfo">
+				<MudText Typo="Typo.body2">@chatInfo.Id</MudText>
+			</MudSelectItem>
+		}
+	</MudSelect>
+	<MudTextField Label="Text" @bind-Value="_messageText" Required/>
+	<MudButton Disabled="!_sendMessageFormIsValid" OnClick="SendMessage">Send message</MudButton>
+</MudForm>
 
 <div>
-	<button @onclick="SendMessage">Send message</button>
-	<button @onclick="GetMessages">Get messages</button>
-</div>
-
-<div>
-	@foreach (var text in _messages)
+	@foreach (var message in _messages)
 	{
-		<div>@text</div>
+		<div>
+			<span>@message.Timestamp: @message.Text</span>
+		</div>
 	}
 </div>
 
 @code {
-	private string? _fromUserId;
-	private string? _toUserId;
-	private string? _text;
-	private IReadOnlyList<string> _messages = [];
+	private string? _anotherUserId;
+	private bool _anotherUserFormIsValid;
+	private ChatInfoDtoV1? _selectedChat;
+	private string? _messageText;
+	private bool _sendMessageFormIsValid;
+	private IReadOnlyList<ChatInfoDtoV1> _chats = [];
+	private IReadOnlyList<ChatMessageDtoV1> _messages = [];
 
-	private Task SendMessage()
+	protected override async Task OnInitializedAsync()
 	{
-		if (string.IsNullOrEmpty(_fromUserId) || string.IsNullOrEmpty(_toUserId) || string.IsNullOrEmpty(_text))
-		{
-			return Task.CompletedTask;
-		}
-
-		return ApiClient.SendMessage(_fromUserId, _toUserId, _text);
+		_chats = await ChatClient.GetUserChats(CancellationToken.None);
 	}
 
-	private async Task GetMessages()
+	private async Task CreateChat()
 	{
-		if (string.IsNullOrEmpty(_fromUserId) || string.IsNullOrEmpty(_toUserId))
-		{
-			return;
-		}
+		await ChatClient.CreateChat(
+			new CreateChatRequestV1 { Participants = [Guid.Parse(_anotherUserId!)] },
+			CancellationToken.None);
+		_chats = await ChatClient.GetUserChats(CancellationToken.None);
+	}
 
-		_messages = await ApiClient.GetMessages(_fromUserId, _toUserId);
+	private async Task ChatChangeHandler(ChatInfoDtoV1 newChat)
+	{
+		_selectedChat = newChat;
+		await LoadMessages();
+	}
+
+	private async Task SendMessage()
+	{
+		await ChatClient.SendMessage(_selectedChat!.Id, new SendMessageRequestV1 { Text = _messageText! },
+			CancellationToken.None);
+		await LoadMessages();
+	}
+
+	private async Task LoadMessages()
+	{
+		if (_selectedChat != null)
+		{
+			_messages = await ChatClient.GetChatMessages(_selectedChat!.Id, CancellationToken.None);
+		}
 	}
 }

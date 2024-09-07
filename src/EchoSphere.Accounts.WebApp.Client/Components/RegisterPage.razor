@@ -1,0 +1,47 @@
+@page "/register"
+@using EchoSphere.Accounts.WebApp.Client.Contracts
+@using EchoSphere.BlazorShared
+
+@inject HttpClient HttpClient;
+@inject LongOperationExecutor LongOperationExecutor;
+@inject NavigationManager NavigationManager;
+
+<MudForm @bind-IsValid="_formIsValid" ValidationDelay="500">
+	<MudTextField Label="User name" @bind-Value="_userName" Required="true"/>
+	<MudTextField Label="Email" @bind-Value="_email" Required="true"/>
+	<MudTextField Label="Password" @bind-Value="_password" Required="true"/>
+	<MudButton OnClick="Register" Disabled="!_formIsValid">Register</MudButton>
+</MudForm>
+
+@code {
+	private string? _userName;
+	private string? _email;
+	private string? _password;
+	private bool _formIsValid;
+
+	private async Task Register()
+	{
+		if (!_formIsValid)
+		{
+			return;
+		}
+
+		var success = await LongOperationExecutor.ExecuteLongOperation(async () =>
+		{
+			using var response = await HttpClient.PostAsJsonAsync(
+				"register",
+				new RegisterRequest
+				{
+					UserName = _userName!,
+					Email = _email!,
+					Password = _password!,
+				});
+			response.EnsureSuccessStatusCode();
+		});
+
+		if (success)
+		{
+			NavigationManager.NavigateTo("/login");
+		}
+	}
+}

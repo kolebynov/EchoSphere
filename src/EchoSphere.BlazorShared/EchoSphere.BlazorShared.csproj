@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+	<ItemGroup>
+		<SupportedPlatform Include="browser"/>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.8" />
+		<PackageReference Include="MudBlazor" Version="7.8.0"/>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="wwwroot\"/>
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Update="ErrorPresenter.ru.resx">
+			<DependentUpon>ErrorPresenter.cs</DependentUpon>
+		</EmbeddedResource>
+		<EmbeddedResource Update="ErrorPresenter.resx">
+			<DependentUpon>ErrorPresenter.cs</DependentUpon>
+		</EmbeddedResource>
+	</ItemGroup>
+
+</Project>

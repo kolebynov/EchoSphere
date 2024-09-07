@@ -1,0 +1,43 @@
+@implements IDisposable
+
+@inject LoaderOverlayService LoaderOverlayService;
+
+<MudOverlay Visible="_loaderVisibilityCounter > 0" DarkBackground AutoClose="false">
+	<MudProgressCircular Indeterminate="true" Color="Color.Primary"/>
+</MudOverlay>
+
+@code {
+	private int _loaderVisibilityCounter = 1;
+
+	public void Dispose()
+	{
+		LoaderOverlayService.OnLoaderShow -= ShowLoader;
+		LoaderOverlayService.OnLoaderHide -= HideLoader;
+	}
+
+	protected override void OnInitialized()
+	{
+		LoaderOverlayService.OnLoaderShow += ShowLoader;
+		LoaderOverlayService.OnLoaderHide += HideLoader;
+	}
+
+	protected override void OnAfterRender(bool firstRender)
+	{
+		if (firstRender)
+		{
+			HideLoader();
+		}
+	}
+
+	private void ShowLoader()
+	{
+		Interlocked.Increment(ref _loaderVisibilityCounter);
+		InvokeAsync(StateHasChanged);
+	}
+
+	private void HideLoader()
+	{
+		Interlocked.Decrement(ref _loaderVisibilityCounter);
+		Task.Delay(TimeSpan.FromMilliseconds(100)).ContinueWith(_ => InvokeAsync(StateHasChanged));
+	}
+}

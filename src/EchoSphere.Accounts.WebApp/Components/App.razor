@@ -1,0 +1,41 @@
+@{
+	var renderMode = InteractiveWebAssemblyWithoutPrerender;
+}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<base href="@HttpContext.Request.PathBase/"/>
+	<link rel="stylesheet" href="/_content/MudBlazor/MudBlazor.min.css"/>
+	<link rel="stylesheet" href="/EchoSphere.Accounts.WebApp.styles.css"/>
+	<link rel="stylesheet" href="/app.css"/>
+	<HeadOutlet @rendermode="renderMode"/>
+</head>
+
+<body>
+	<Routes @rendermode="renderMode"/>
+	<script src="/_framework/blazor.web.js" autostart="false"></script>
+	<script>
+		Blazor.start({
+			webAssembly: {
+				loadBootResource: function (type, name, defaultUri, integrity) {
+					return defaultUri.startsWith('http://') || defaultUri.startsWith('https://')
+						? defaultUri
+						: '/' + defaultUri;
+				}
+			}
+		});
+	</script>
+	<script src="/_content/MudBlazor/MudBlazor.min.js"></script>
+</body>
+</html>
+
+@code {
+	private static readonly InteractiveServerRenderMode InteractiveServerWithoutPrerender = new(false);
+	private static readonly InteractiveWebAssemblyRenderMode InteractiveWebAssemblyWithoutPrerender = new(false);
+	private static readonly InteractiveAutoRenderMode InteractiveAutoWithoutPrerender = new(false);
+
+	[CascadingParameter] public HttpContext HttpContext { get; set; } = null!;
+}

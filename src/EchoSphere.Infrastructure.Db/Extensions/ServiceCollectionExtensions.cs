@@ -15,7 +15,7 @@ namespace EchoSphere.Infrastructure.Db.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-	public static IServiceCollection AddPostgresDb<TContext>(
+	public static IServiceCollection AddLinqToDb<TContext>(
 		this IServiceCollection services, IConfiguration configuration, string name, MappingSchema? mappingSchema,
 		Assembly migrationsAssembly)
 		where TContext : DataConnection
