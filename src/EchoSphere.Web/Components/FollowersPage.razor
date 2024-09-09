@@ -1,0 +1,41 @@
+@page "/followers"
+@using EchoSphere.ApiGateway.Client
+@using EchoSphere.ApiGateway.Contracts
+@using EchoSphere.BlazorShared
+
+@inject IFollowClient FollowClient;
+@inject IUserProfileClient UserProfileClient;
+@inject LongOperationExecutor LongOperationExecutor;
+
+<div>
+	@foreach (var follower in _followers)
+	{
+		<div style="border: 1px solid black; padding: 10px">
+			<div>@follower.FirstName @follower.SecondName</div>
+			<MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="() => FollowUser(follower.Id)">
+				Follow back
+			</MudButton>
+		</div>
+	}
+</div>
+
+@code {
+	private IReadOnlyList<UserProfileDtoV1> _followers = [];
+
+	protected override async Task OnInitializedAsync()
+	{
+		var followerIds = await LongOperationExecutor.ExecuteLongOperationAndReturnDefaultIfError(
+			() => FollowClient.GetFollowers("me", CancellationToken.None), []);
+		_followers = await followerIds.ToAsyncEnumerable()
+			.SelectAwait(fromUserId =>
+				new ValueTask<UserProfileDtoV1>(LongOperationExecutor.ExecuteLongOperationAndReturnDefaultIfError(
+					() => UserProfileClient.GetUserProfile(fromUserId, CancellationToken.None), null!)))
+			.ToArrayAsync();
+	}
+
+	private Task FollowUser(Guid followUserId)
+	{
+		return LongOperationExecutor.ExecuteLongOperation(
+			() => FollowClient.Follow(followUserId, CancellationToken.None));
+	}
+}

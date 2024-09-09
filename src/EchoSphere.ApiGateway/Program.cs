@@ -2,6 +2,9 @@ using EchoSphere.ApiGateway.Api;
 using EchoSphere.Messages.Abstractions;
 using EchoSphere.Messages.Client;
 using EchoSphere.Messages.Grpc;
+using EchoSphere.Posts.Abstractions;
+using EchoSphere.Posts.Client;
+using EchoSphere.Posts.Grpc;
 using EchoSphere.ServiceDefaults;
 using EchoSphere.Users.Abstractions;
 using EchoSphere.Users.Client;
@@ -35,10 +38,14 @@ builder.Services.AddProblemDetails();
 builder.Services.AddGrpcClient<ChatService.ChatServiceClient>(o => o.Address = new("http://MessagesApi"));
 builder.Services.AddGrpcClient<UserProfileService.UserProfileServiceClient>(o => o.Address = new("http://UsersApi"));
 builder.Services.AddGrpcClient<FriendService.FriendServiceClient>(o => o.Address = new("http://UsersApi"));
+builder.Services.AddGrpcClient<FollowService.FollowServiceClient>(o => o.Address = new("http://UsersApi"));
+builder.Services.AddGrpcClient<PostService.PostServiceClient>(o => o.Address = new("http://PostsApi"));
 
 builder.Services.AddScoped<IChatService, ChatGrpcClient>();
 builder.Services.AddScoped<IUserProfileService, UserProfileGrpcClient>();
 builder.Services.AddScoped<IFriendService, FriendGrpcClient>();
+builder.Services.AddScoped<IFollowService, FollowGrpcClient>();
+builder.Services.AddScoped<IPostService, PostGrpcClient>();
 
 var app = builder.Build();
 

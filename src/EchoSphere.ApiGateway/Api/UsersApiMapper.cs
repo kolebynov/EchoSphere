@@ -6,13 +6,13 @@ using EchoSphere.Users.Abstractions.Models;
 
 namespace EchoSphere.ApiGateway.Api;
 
-public static class UserApiMapper
+public static class UsersApiMapper
 {
-	public static IEndpointRouteBuilder MapUserApi(this IEndpointRouteBuilder routeBuilder)
+	public static IEndpointRouteBuilder MapUsersApi(this IEndpointRouteBuilder routeBuilder)
 	{
-		var userApi = routeBuilder.MapGroup("/users").RequireAuthorization();
+		var usersApi = routeBuilder.MapGroup("/users").RequireAuthorization();
 
-		userApi.MapGet(
+		usersApi.MapGet(
 			"/",
 			async (IUserProfileService userProfileService, CancellationToken cancellationToken) =>
 			{
@@ -26,7 +26,7 @@ public static class UserApiMapper
 					});
 			});
 
-		userApi.MapGet(
+		usersApi.MapGet(
 			"/{userId}",
 			async (IUserProfileService userProfileService, ClaimsPrincipal currentUser, string userId, CancellationToken cancellationToken) =>
 			{
@@ -39,7 +39,7 @@ public static class UserApiMapper
 				};
 			});
 
-		userApi.MapGet(
+		usersApi.MapGet(
 			"/{userId}/friends",
 			async (IFriendService friendService, ClaimsPrincipal currentUser, string userId,
 				CancellationToken cancellationToken) =>
@@ -48,13 +48,13 @@ public static class UserApiMapper
 				return friends.Select(x => x.Value);
 			});
 
-		userApi.MapPost(
+		usersApi.MapPost(
 			"/{toUserId:guid}/sendFriendInvite",
 			(IFriendService friendService, ClaimsPrincipal currentUser, Guid toUserId,
 				CancellationToken cancellationToken) =>
 				friendService.SendFriendInvite(currentUser.GetUserId(), new UserId(toUserId), cancellationToken));
 
-		userApi.MapGet(
+		usersApi.MapGet(
 			"/{userId}/friendInvites",
 			async (IFriendService friendService, ClaimsPrincipal currentUser, string userId,
 				CancellationToken cancellationToken) =>
@@ -70,7 +70,7 @@ public static class UserApiMapper
 				return invites.Select(x => x.Value);
 			});
 
-		userApi.MapPost(
+		usersApi.MapPost(
 			"/{userId}/friendInvites/{fromUserId:guid}/accept",
 			(IFriendService friendService, ClaimsPrincipal currentUser, string userId, Guid fromUserId,
 				CancellationToken cancellationToken) =>
@@ -85,7 +85,7 @@ public static class UserApiMapper
 				return friendService.AcceptFriendInvite(new UserId(fromUserId), currentUserId, cancellationToken);
 			});
 
-		userApi.MapPost(
+		usersApi.MapPost(
 			"/{userId}/friendInvites/{fromUserId:guid}/reject",
 			(IFriendService friendService, ClaimsPrincipal currentUser, string userId, Guid fromUserId,
 				CancellationToken cancellationToken) =>
@@ -100,9 +100,33 @@ public static class UserApiMapper
 				return friendService.RejectFriendInvite(new UserId(fromUserId), currentUserId, cancellationToken);
 			});
 
+		usersApi.MapPost(
+			"/{followUserId:guid}/follow",
+			(IFollowService followService, ClaimsPrincipal currentUser, Guid followUserId,
+				CancellationToken cancellationToken) =>
+			{
+				var currentUserId = currentUser.GetUserId();
+				if (currentUserId.Value == followUserId)
+				{
+					return ValueTask.CompletedTask;
+				}
+
+				return followService.Follow(currentUserId, new UserId(followUserId), cancellationToken);
+			});
+
+		usersApi.MapGet(
+			"/{userId}/followers",
+			async (IFollowService followService, ClaimsPrincipal currentUser, string userId,
+				CancellationToken cancellationToken) =>
+			{
+				var parsedUserId = ParseUserId(userId, currentUser);
+				var followers = await followService.GetFollowers(parsedUserId, cancellationToken);
+				return followers.Select(x => x.Value);
+			});
+
 		return routeBuilder;
 	}
 
-	private static UserId ParseUserId(string userId, ClaimsPrincipal currentUser) =>
+	public static UserId ParseUserId(string userId, ClaimsPrincipal currentUser) =>
 		userId.Equals("me", StringComparison.OrdinalIgnoreCase) ? currentUser.GetUserId() : new UserId(Guid.Parse(userId));
 }

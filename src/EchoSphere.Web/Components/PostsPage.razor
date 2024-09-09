@@ -1,0 +1,35 @@
+@page "/posts/{UserId}"
+@using EchoSphere.ApiGateway.Client
+@using EchoSphere.ApiGateway.Contracts
+@using EchoSphere.BlazorShared
+
+@inject IPostClient PostClient;
+@inject LongOperationExecutor LongOperationExecutor;
+
+<div>
+	@foreach (var post in _posts)
+	{
+		<div style="border: 1px solid black; padding: 10px">
+			<div>@post.Title</div>
+			<div>@post.Body</div>
+		</div>
+	}
+</div>
+
+@code {
+	private IReadOnlyList<PostDtoV1> _posts = [];
+
+	[Parameter]
+	public string? UserId { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		if (string.IsNullOrEmpty(UserId))
+		{
+			return;
+		}
+
+		_posts = await LongOperationExecutor.ExecuteLongOperationAndReturnDefaultIfError(
+			() => PostClient.GetUserPosts(UserId!, CancellationToken.None), []);
+	}
+}

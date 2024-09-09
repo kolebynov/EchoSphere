@@ -25,6 +25,12 @@ public sealed class InitialMigration : Migration
 				.ForeignKey(DataConstants.UserProfilesTableName, nameof(UserProfile.Id)).NotNullable()
 			.WithColumn(nameof(FriendInviteDb.ToUserId)).AsGuid().Indexed()
 				.ForeignKey(DataConstants.UserProfilesTableName, nameof(UserProfile.Id)).NotNullable();
+
+		Create.Table(DataConstants.FollowersTableName)
+			.WithColumn(nameof(FollowerDb.UserId)).AsGuid().Indexed()
+				.ForeignKey(DataConstants.UserProfilesTableName, nameof(UserProfile.Id)).NotNullable()
+			.WithColumn(nameof(FollowerDb.FollowerUserId)).AsGuid().Indexed()
+				.ForeignKey(DataConstants.UserProfilesTableName, nameof(UserProfile.Id)).NotNullable();
 	}
 
 	public override void Down()
@@ -32,5 +38,6 @@ public sealed class InitialMigration : Migration
 		Delete.Table(DataConstants.UserProfilesTableName);
 		Delete.Table(DataConstants.FriendsTableName);
 		Delete.Table(DataConstants.FriendInvitesTableName);
+		Delete.Table(DataConstants.FollowersTableName);
 	}
 }

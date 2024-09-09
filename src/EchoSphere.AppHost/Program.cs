@@ -6,6 +6,7 @@ var postgres = builder.AddPostgres("postgres")
 var userMessagesDb = postgres.AddDatabase("UserMessagesDb");
 var usersDb = postgres.AddDatabase("UsersDb");
 var accountsDb = postgres.AddDatabase("AccountsDb");
+var postsDb = postgres.AddDatabase("PostsDb");
 
 var userMessageApi = builder.AddProject<Projects.EchoSphere_Messages_Api>("MessagesApi")
 	.WithReference(userMessagesDb);
@@ -13,8 +14,12 @@ var userMessageApi = builder.AddProject<Projects.EchoSphere_Messages_Api>("Messa
 var usersApi = builder.AddProject<Projects.EchoSphere_Users_Api>("UsersApi")
 	.WithReference(usersDb);
 
+var postsApi = builder.AddProject<Projects.EchoSphere_Posts_Api>("PostsApi")
+	.WithReference(postsDb);
+
 var apiService = builder.AddProject<Projects.EchoSphere_ApiGateway>("ApiGateway")
 	.WithReference(userMessageApi)
+	.WithReference(postsApi)
 	.WithReference(usersApi);
 
 var accountsWebApp = builder.AddProject<Projects.EchoSphere_Accounts_WebApp>("AccountsWebApp")

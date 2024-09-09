@@ -23,6 +23,12 @@ service FriendService {
 	rpc RejectFriendInvite (FromToUserIds) returns (google.protobuf.Empty);
 }
 
+service FollowService {
+	rpc Follow (FromToUserIds) returns (google.protobuf.Empty);
+
+	rpc GetFollowers (echo_sphere.grpc_models.UserIdDto) returns (UserIdsDto);
+}
+
 message UserIdsDto {
 	repeated string ids = 1;
 }

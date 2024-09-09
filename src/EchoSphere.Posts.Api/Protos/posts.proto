@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "models.proto";
+
+package echo_sphere.posts.grpc;
+
+service PostService {
+	rpc PublishPost (PublishPostRequest) returns (PostIdDto);
+
+	rpc GetUserPosts(echo_sphere.grpc_models.UserIdDto) returns (PostsDto);
+}
+
+message PostIdDto {
+	string value = 1;
+}
+
+message PublishPostRequest {
+	string user_id = 1;
+	string title = 2;
+	string body = 3;
+}
+
+message PostDto {
+	string id = 1;
+	string title = 2;
+	string body = 3;
+}
+
+message PostsDto {
+	repeated PostDto posts = 1;
+}

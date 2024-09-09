@@ -11,10 +11,12 @@ namespace EchoSphere.Users.Api.Services;
 internal sealed class FriendService : IFriendService
 {
 	private readonly DataConnection _dataConnection;
+	private readonly IFollowService _followService;
 
-	public FriendService(DataConnection dataConnection)
+	public FriendService(DataConnection dataConnection, IFollowService followService)
 	{
 		_dataConnection = dataConnection;
+		_followService = followService;
 	}
 
 	public async ValueTask<IReadOnlyList<UserId>> GetFriends(UserId userId, CancellationToken cancellationToken)
@@ -66,6 +68,8 @@ internal sealed class FriendService : IFriendService
 		await using var transaction = await _dataConnection.BeginTransactionAsync(IsolationLevel.ReadCommitted, cancellationToken);
 		await friendInvites.DeleteAsync(friendInvitePredicate, cancellationToken);
 		await _dataConnection.InsertAsync(new FriendLinkDb { User1Id = user1Id, User2Id = user2Id }, token: cancellationToken);
+		await _followService.Follow(user1Id, user2Id, cancellationToken);
+		await _followService.Follow(user2Id, user1Id, cancellationToken);
 		await transaction.CommitAsync(cancellationToken);
 	}
 

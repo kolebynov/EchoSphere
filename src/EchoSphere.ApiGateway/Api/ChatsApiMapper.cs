@@ -8,12 +8,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EchoSphere.ApiGateway.Api;
 
-public static class ChatApiMapper
+public static class ChatsApiMapper
 {
-	public static IEndpointRouteBuilder MapChatApi(this IEndpointRouteBuilder routeBuilder)
+	public static IEndpointRouteBuilder MapChatsApi(this IEndpointRouteBuilder routeBuilder)
 	{
-		var chatApi = routeBuilder.MapGroup("/chats").RequireAuthorization();
-		chatApi.MapGet(
+		var chatsApi = routeBuilder.MapGroup("/chats").RequireAuthorization();
+		chatsApi.MapGet(
 			"/",
 			async (IChatService chatService, ClaimsPrincipal user, CancellationToken cancellationToken) =>
 			{
@@ -27,7 +27,7 @@ public static class ChatApiMapper
 					});
 			});
 
-		chatApi.MapPost(
+		chatsApi.MapPost(
 			"/",
 			async (IChatService chatService, ClaimsPrincipal user, [FromBody] CreateChatRequestV1 request,
 				CancellationToken cancellationToken) =>
@@ -38,7 +38,7 @@ public static class ChatApiMapper
 					cancellationToken)).Value;
 			});
 
-		chatApi.MapGet(
+		chatsApi.MapGet(
 			"/{chatId:guid}/messages",
 			async (IChatService chatService, Guid chatId, CancellationToken cancellationToken) =>
 			{
@@ -53,7 +53,7 @@ public static class ChatApiMapper
 					});
 			});
 
-		chatApi.MapPost(
+		chatsApi.MapPost(
 			"/{chatId:guid}/messages",
 			async (IChatService chatService, ClaimsPrincipal user, Guid chatId, [FromBody] SendMessageRequestV1 request,
 				CancellationToken cancellationToken) =>

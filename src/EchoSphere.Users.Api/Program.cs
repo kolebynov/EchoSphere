@@ -36,6 +36,11 @@ fluentMappingBuilder.Entity<FriendLinkDb>()
 	.Property(x => x.User1Id).HasConversionFunc(x => x.Value, x => new UserId(x))
 	.Property(x => x.User2Id).HasConversionFunc(x => x.Value, x => new UserId(x));
 
+fluentMappingBuilder.Entity<FollowerDb>()
+	.HasTableName(DataConstants.FollowersTableName)
+	.Property(x => x.UserId).HasConversionFunc(x => x.Value, x => new UserId(x))
+	.Property(x => x.FollowerUserId).HasConversionFunc(x => x.Value, x => new UserId(x));
+
 fluentMappingBuilder.Build();
 
 builder.Services.AddLinqToDb<AppDataConnection>(builder.Configuration, "UsersDb", mappingSchema,
@@ -43,6 +48,7 @@ builder.Services.AddLinqToDb<AppDataConnection>(builder.Configuration, "UsersDb"
 
 builder.Services.AddScoped<IFriendService, FriendService>();
 builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+builder.Services.AddScoped<IFollowService, FollowService>();
 
 // TODO: Remove later
 builder.Services.AddScopedAsyncInitializer(async (sp, ct) =>
@@ -70,5 +76,6 @@ var app = builder.Build();
 
 app.MapGrpcService<UserProfileServiceGrpc>();
 app.MapGrpcService<FriendServiceGrpc>();
+app.MapGrpcService<FollowServiceGrpc>();
 
 await app.InitAndRunAsync();

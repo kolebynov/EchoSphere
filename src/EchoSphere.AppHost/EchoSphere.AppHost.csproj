@@ -15,6 +15,7 @@
 		<ProjectReference Include="..\EchoSphere.Accounts.WebApp\EchoSphere.Accounts.WebApp.csproj" />
 		<ProjectReference Include="..\EchoSphere.ApiGateway\EchoSphere.ApiGateway.csproj" />
 		<ProjectReference Include="..\EchoSphere.Messages.Api\EchoSphere.Messages.Api.csproj" />
+		<ProjectReference Include="..\EchoSphere.Posts.Api\EchoSphere.Posts.Api.csproj" />
 		<ProjectReference Include="..\EchoSphere.Users.Api\EchoSphere.Users.Api.csproj" />
 		<ProjectReference Include="..\EchoSphere.Web\EchoSphere.Web.csproj"/>
 	</ItemGroup>
