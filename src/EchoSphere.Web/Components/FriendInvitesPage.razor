@@ -1,0 +1,50 @@
+@page "/friendInvites"
+@using EchoSphere.ApiGateway.Client
+@using EchoSphere.ApiGateway.Contracts
+@using EchoSphere.BlazorShared
+
+@inject IUserProfileClient UserProfileClient;
+@inject IFriendClient FriendClient;
+@inject LongOperationExecutor LongOperationExecutor;
+
+<div>
+	@foreach (var inviteFrom in _invitesFrom)
+	{
+		<div style="border: 1px solid black; padding: 10px">
+			<div>@inviteFrom.FirstName @inviteFrom.SecondName</div>
+			<MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="() => AcceptInvite(inviteFrom.Id)">
+				Accept
+			</MudButton>
+			<MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="() => RejectInvite(inviteFrom.Id)">
+				Reject
+			</MudButton>
+		</div>
+	}
+</div>
+
+@code {
+	private IReadOnlyList<UserProfileDtoV1> _invitesFrom = [];
+
+	protected override async Task OnInitializedAsync()
+	{
+		var invites = await LongOperationExecutor.ExecuteLongOperationAndReturnDefaultIfError(
+			() => FriendClient.GetFriendInvites(CancellationToken.None), []);
+		_invitesFrom = await invites.ToAsyncEnumerable()
+			.SelectAwait(fromUserId =>
+				new ValueTask<UserProfileDtoV1>(LongOperationExecutor.ExecuteLongOperationAndReturnDefaultIfError(
+					() => UserProfileClient.GetUserProfile(fromUserId, CancellationToken.None), null!)))
+			.ToArrayAsync();
+	}
+
+	private Task AcceptInvite(Guid fromUserId)
+	{
+		return LongOperationExecutor.ExecuteLongOperation(
+			() => FriendClient.AcceptFriendInvite(fromUserId, CancellationToken.None));
+	}
+
+	private Task RejectInvite(Guid fromUserId)
+	{
+		return LongOperationExecutor.ExecuteLongOperation(
+			() => FriendClient.RejectFriendInvite(fromUserId, CancellationToken.None));
+	}
+}

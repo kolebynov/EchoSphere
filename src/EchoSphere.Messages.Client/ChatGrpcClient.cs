@@ -1,15 +1,16 @@
+using EchoSphere.GrpcModels;
 using EchoSphere.Messages.Abstractions;
 using EchoSphere.Messages.Abstractions.Models;
-using EchoSphere.Messages.Api.Grpc;
+using EchoSphere.Messages.Grpc;
 using EchoSphere.Users.Abstractions.Models;
 
 namespace EchoSphere.Messages.Client;
 
-public sealed class ChatService : IChatService
+public sealed class ChatGrpcClient : IChatService
 {
-	private readonly ChatServiceGrpc.ChatServiceGrpcClient _serviceGrpcClient;
+	private readonly ChatService.ChatServiceClient _serviceGrpcClient;
 
-	public ChatService(ChatServiceGrpc.ChatServiceGrpcClient serviceGrpcClient)
+	public ChatGrpcClient(ChatService.ChatServiceClient serviceGrpcClient)
 	{
 		_serviceGrpcClient = serviceGrpcClient;
 	}
@@ -43,14 +44,15 @@ public sealed class ChatService : IChatService
 			.ToArray();
 	}
 
-	public async ValueTask CreateChat(IReadOnlyList<UserId> participants, CancellationToken cancellationToken)
+	public async ValueTask<ChatId> CreateChat(IReadOnlyList<UserId> participants, CancellationToken cancellationToken)
 	{
-		await _serviceGrpcClient.CreateChatAsync(
+		var chatId = await _serviceGrpcClient.CreateChatAsync(
 			new CreateChatRequest
 			{
 				Participants = { participants.Select(x => x.Value.ToString()) },
 			},
 			cancellationToken: cancellationToken);
+		return new ChatId(Guid.Parse(chatId.Value));
 	}
 
 	public async ValueTask SendMessage(ChatId chatId, UserId senderId, string text, CancellationToken cancellationToken)

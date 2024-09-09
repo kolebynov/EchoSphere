@@ -1,43 +1,43 @@
 syntax = "proto3";
 
-option csharp_namespace = "EchoSphere.Users.Api.Grpc";
+import "google/protobuf/empty.proto";
+import "models.proto";
 
-package users;
+package echo_sphere.users.grpc;
 
-service UsersService {
-	rpc CreateUser (CreateUserRequest) returns (CreateUserResponse);
+service UserProfileService {
+	rpc GetUserProfiles (google.protobuf.Empty) returns (GetUserProfilesResponse);
 
-	rpc GetUserProfiles(GetUserProfilesRequest) returns (GetUserProfilesResponse);
-
-	rpc GetUserByUserNameAndPassword (GetUserByUserNameAndPasswordRequest) returns (GetUserByUserNameAndPasswordResponse);
+	rpc GetUserProfile (echo_sphere.grpc_models.UserIdDto) returns (UserProfileDto);
 }
 
-message UserProfileDto {
-	string user_name = 1;
-	string email = 2;
+service FriendService {
+	rpc GetFriends (echo_sphere.grpc_models.UserIdDto) returns (UserIdsDto);
+
+	rpc SendFriendInvite (FromToUserIds) returns (google.protobuf.Empty);
+
+	rpc GetFriendInvites (echo_sphere.grpc_models.UserIdDto) returns (UserIdsDto);
+
+	rpc AcceptFriendInvite (FromToUserIds) returns (google.protobuf.Empty);
+
+	rpc RejectFriendInvite (FromToUserIds) returns (google.protobuf.Empty);
 }
 
-message CreateUserRequest {
-	string user_name = 1;
-	string email = 2;
-	string password = 3;
+message UserIdsDto {
+	repeated string ids = 1;
 }
 
-message CreateUserResponse {
-	string id = 1;
+message FromToUserIds {
+	string from_user_id = 1;
+	string to_user_id = 2;
 }
-
-message GetUserProfilesRequest {}
 
 message GetUserProfilesResponse {
 	repeated UserProfileDto profiles = 1;
 }
 
-message GetUserByUserNameAndPasswordRequest {
-	string user_name = 1;
-	string password = 2;
-}
-
-message GetUserByUserNameAndPasswordResponse {
-	optional UserProfileDto user = 1;
+message UserProfileDto {
+	string id = 1;
+	string first_name = 2;
+	string second_name = 3;
 }

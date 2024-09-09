@@ -22,6 +22,12 @@ builder.Services.AddOutputCache();
 builder.Services.AddRefitClient<IChatClient>()
 	.ConfigureHttpClient(client => client.BaseAddress = new("https+http://ApiGateway/api"))
 	.AddAccessToken();
+builder.Services.AddRefitClient<IUserProfileClient>()
+	.ConfigureHttpClient(client => client.BaseAddress = new("https+http://ApiGateway/api"))
+	.AddAccessToken();
+builder.Services.AddRefitClient<IFriendClient>()
+	.ConfigureHttpClient(client => client.BaseAddress = new("https+http://ApiGateway/api"))
+	.AddAccessToken();
 
 var app = builder.Build();
 

@@ -1,0 +1,24 @@
+@page "/chats"
+@using EchoSphere.ApiGateway.Client
+@using EchoSphere.ApiGateway.Contracts
+
+@inject IChatClient ChatClient;
+@inject NavigationManager NavigationManager;
+
+<div>
+	@foreach (var chat in _chats)
+	{
+		<div style="border: 1px solid black; padding: 10px" @onclick="@(() => NavigationManager.NavigateTo($"/chats/{chat.Id}"))">
+			<div>@chat.Id</div>
+		</div>
+	}
+</div>
+
+@code {
+	private IReadOnlyList<ChatInfoDtoV1> _chats = [];
+
+	protected override async Task OnInitializedAsync()
+	{
+		_chats = await ChatClient.GetUserChats(CancellationToken.None);
+	}
+}

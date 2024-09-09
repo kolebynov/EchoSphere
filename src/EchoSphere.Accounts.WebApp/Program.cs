@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using Duende.IdentityServer.AspNetIdentity;
 using EchoSphere.Accounts.WebApp.Client.Contracts;
 using EchoSphere.Accounts.WebApp.Client.Extensions;
 using EchoSphere.Accounts.WebApp.Components;
@@ -82,15 +81,24 @@ builder.Services.AddCommonClientAndServerServices();
 
 builder.Services.AddTransient<IProfileService, ProfileService>();
 
+// TODO: Remove later
 builder.Services.AddScopedAsyncInitializer(async (sp, _) =>
 {
 	var userManager = sp.GetRequiredService<UserManager<Account>>();
 	await userManager.CreateAsync(
 		new Account
 		{
-			UserName = "test",
-			Email = "test@test.com",
-			Id = Guid.NewGuid(),
+			Id = new Guid("cd2ecf42-deb8-4381-9567-3754cea3465a"),
+			UserName = "test1",
+			Email = "test1@test.com",
+		},
+		"1234");
+	await userManager.CreateAsync(
+		new Account
+		{
+			Id = new Guid("e6da2482-630f-4755-9b13-f4b4733c0ad5"),
+			UserName = "test2",
+			Email = "test2@test.com",
 		},
 		"1234");
 });

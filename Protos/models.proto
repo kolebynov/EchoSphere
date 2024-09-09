@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package echo_sphere.grpc_models;
+
+message UserIdDto {
+	string value = 1;
+}
+
+message ChatIdDto {
+	string value = 1;
+}

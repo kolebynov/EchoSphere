@@ -9,7 +9,7 @@ public interface IChatService
 
 	ValueTask<IReadOnlyList<ChatMessage>> GetChatMessages(ChatId chatId, CancellationToken cancellationToken);
 
-	ValueTask CreateChat(IReadOnlyList<UserId> participants, CancellationToken cancellationToken);
+	ValueTask<ChatId> CreateChat(IReadOnlyList<UserId> participants, CancellationToken cancellationToken);
 
 	ValueTask SendMessage(ChatId chatId, UserId senderId, string text, CancellationToken cancellationToken);
 }

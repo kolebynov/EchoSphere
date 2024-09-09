@@ -1,0 +1,51 @@
+@page "/friends"
+@using EchoSphere.ApiGateway.Client
+@using EchoSphere.ApiGateway.Contracts
+@using EchoSphere.BlazorShared
+
+@inject IUserProfileClient UserProfileClient;
+@inject IFriendClient FriendClient;
+@inject IChatClient ChatClient;
+@inject LongOperationExecutor LongOperationExecutor;
+@inject NavigationManager NavigationManager;
+
+<div>
+	@foreach (var friend in _friends)
+	{
+		<div style="border: 1px solid black; padding: 10px">
+			<div>@friend.FirstName @friend.SecondName</div>
+			<MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="() => StartChat(friend.Id)">Start chat</MudButton>
+		</div>
+	}
+</div>
+
+@code {
+	private IReadOnlyList<UserProfileDtoV1> _friends = [];
+
+	protected override async Task OnInitializedAsync()
+	{
+		var friendIds = await LongOperationExecutor.ExecuteLongOperationAndReturnDefaultIfError(
+			() => FriendClient.GetFriends("me", CancellationToken.None), []);
+		_friends = await friendIds.ToAsyncEnumerable()
+			.SelectAwait(fromUserId =>
+				new ValueTask<UserProfileDtoV1>(LongOperationExecutor.ExecuteLongOperationAndReturnDefaultIfError(
+					() => UserProfileClient.GetUserProfile(fromUserId, CancellationToken.None), null!)))
+			.ToArrayAsync();
+	}
+
+	private async Task StartChat(Guid friendUserId)
+	{
+		var chatId = await LongOperationExecutor.ExecuteLongOperationAndReturnDefaultIfError(
+			() => ChatClient.CreateChat(
+				new CreateChatRequestV1
+				{
+					Participants = [friendUserId]
+				}, CancellationToken.None),
+			Guid.Empty);
+
+		if (chatId != Guid.Empty)
+		{
+			NavigationManager.NavigateTo($"/chats/{chatId}");
+		}
+	}
+}

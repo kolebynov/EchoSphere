@@ -8,7 +8,15 @@
 
 <MudLayout>
 	<ErrorHandler>
-		@Body
+		<MudAppBar Color="Color.Primary">
+			<MudNavLink Href="users">Users</MudNavLink>
+			<MudNavLink Href="friendInvites">Invites</MudNavLink>
+			<MudNavLink Href="friends">Friends</MudNavLink>
+			<MudNavLink Href="chats">Chats</MudNavLink>
+		</MudAppBar>
+		<MudMainContent>
+			@Body
+		</MudMainContent>
 	</ErrorHandler>
 </MudLayout>
 

@@ -33,9 +33,9 @@ public static class ChatApiMapper
 				CancellationToken cancellationToken) =>
 			{
 				var currentUserId = user.GetUserId();
-				await chatService.CreateChat(
+				return (await chatService.CreateChat(
 					request.Participants.Select(x => new UserId(x)).Append(currentUserId).ToArray(),
-					cancellationToken);
+					cancellationToken)).Value;
 			});
 
 		chatApi.MapGet(

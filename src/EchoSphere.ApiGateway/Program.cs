@@ -1,11 +1,12 @@
 using EchoSphere.ApiGateway.Api;
 using EchoSphere.Messages.Abstractions;
-using EchoSphere.Messages.Api.Grpc;
 using EchoSphere.Messages.Client;
+using EchoSphere.Messages.Grpc;
 using EchoSphere.ServiceDefaults;
-using EchoSphere.Users.Api.Grpc;
+using EchoSphere.Users.Abstractions;
+using EchoSphere.Users.Client;
+using EchoSphere.Users.Grpc;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,10 +32,13 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddProblemDetails();
 
-builder.Services.AddGrpcClient<ChatServiceGrpc.ChatServiceGrpcClient>(o => o.Address = new("http://MessagesApi"));
-builder.Services.AddGrpcClient<UsersService.UsersServiceClient>(o => o.Address = new("http://UsersApi"));
+builder.Services.AddGrpcClient<ChatService.ChatServiceClient>(o => o.Address = new("http://MessagesApi"));
+builder.Services.AddGrpcClient<UserProfileService.UserProfileServiceClient>(o => o.Address = new("http://UsersApi"));
+builder.Services.AddGrpcClient<FriendService.FriendServiceClient>(o => o.Address = new("http://UsersApi"));
 
-builder.Services.AddScoped<IChatService, ChatService>();
+builder.Services.AddScoped<IChatService, ChatGrpcClient>();
+builder.Services.AddScoped<IUserProfileService, UserProfileGrpcClient>();
+builder.Services.AddScoped<IFriendService, FriendGrpcClient>();
 
 var app = builder.Build();
 

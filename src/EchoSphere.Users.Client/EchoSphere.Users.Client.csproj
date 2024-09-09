@@ -1,5 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+	<PropertyGroup>
+		<Protobuf_StandardImportsPath>$(Protobuf_StandardImportsPath);$(MSBuildProjectDirectory)\..\..\Protos</Protobuf_StandardImportsPath>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<PackageReference Include="Google.Protobuf" Version="3.28.0"/>
 		<PackageReference Include="Grpc.Net.Client" Version="2.65.0"/>
@@ -10,6 +14,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Protobuf Include="models.proto" GrpcServices="none"/>
 		<Protobuf Include="..\EchoSphere.Users.Api\Protos\users.proto">
 			<GrpcServices>Client</GrpcServices>
 			<Access>Public</Access>
@@ -19,6 +24,10 @@
 			<Generator>MSBuild:Compile</Generator>
 			<Link>Protos\users.proto</Link>
 		</Protobuf>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\EchoSphere.Users.Abstractions\EchoSphere.Users.Abstractions.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -1,29 +1,19 @@
 syntax = "proto3";
 
 import "google/protobuf/empty.proto";
-import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
+import "models.proto";
 
-option csharp_namespace = "EchoSphere.Messages.Api.Grpc";
+package echo_sphere.messages.grpc;
 
-package messages;
+service ChatService {
+	rpc GetUserChats (echo_sphere.grpc_models.UserIdDto) returns (GetUserChatsResponse);
 
-service ChatServiceGrpc {
-	rpc GetUserChats (UserIdDto) returns (GetUserChatsResponse);
+	rpc GetChatMessages (echo_sphere.grpc_models.ChatIdDto) returns (GetChatMessagesResponse);
 
-	rpc GetChatMessages (ChatIdDto) returns (GetChatMessagesResponse);
-
-	rpc CreateChat (CreateChatRequest) returns (google.protobuf.Empty);
+	rpc CreateChat (CreateChatRequest) returns (echo_sphere.grpc_models.ChatIdDto);
 
 	rpc SendMessage (SendMessageRequest) returns (google.protobuf.Empty);
-}
-
-message UserIdDto {
-	string value = 1;
-}
-
-message ChatIdDto {
-	string value = 1;
 }
 
 message ChatInfoDto {

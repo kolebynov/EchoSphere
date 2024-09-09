@@ -1,0 +1,54 @@
+@page "/chats/{ChatId:guid}"
+@using EchoSphere.ApiGateway.Client
+@using EchoSphere.ApiGateway.Contracts
+
+@inject IChatClient ChatClient;
+
+@if (ChatId == Guid.Empty)
+{
+	return;
+}
+
+<div>
+	<div style="max-height: 600px; overflow-y: auto">
+		@foreach (var message in _messages)
+		{
+			<div>
+				<span>@message.Timestamp: @message.Text</span>
+			</div>
+		}
+	</div>
+	<MudForm ValidationDelay="500" @bind-IsValid="_sendMessageFormIsValid">
+		<MudTextField Label="Text" @bind-Value="_messageText" Required/>
+		<MudButton Disabled="!_sendMessageFormIsValid" OnClick="SendMessage">Send message</MudButton>
+	</MudForm>
+</div>
+
+@code {
+	private IReadOnlyList<ChatMessageDtoV1> _messages = [];
+	private string? _messageText;
+	private bool _sendMessageFormIsValid;
+
+	[Parameter]
+	public Guid ChatId { get; set; }
+
+	protected override Task OnInitializedAsync()
+	{
+		return LoadMessages();
+	}
+
+	private async Task SendMessage()
+	{
+		await ChatClient.SendMessage(ChatId, new SendMessageRequestV1 { Text = _messageText! },
+			CancellationToken.None);
+		await LoadMessages();
+	}
+
+	private async Task LoadMessages()
+	{
+		if (ChatId != Guid.Empty)
+		{
+			_messages = await ChatClient.GetChatMessages(ChatId, CancellationToken.None);
+		}
+	}
+}

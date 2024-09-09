@@ -1,3 +1,3 @@
 namespace EchoSphere.Messages.Abstractions.Models;
 
-public record struct ChatId(Guid Value);
+public readonly record struct ChatId(Guid Value);

@@ -1,16 +1,18 @@
+using EchoSphere.GrpcModels;
 using EchoSphere.Messages.Abstractions;
 using EchoSphere.Messages.Abstractions.Models;
+using EchoSphere.Messages.Grpc;
 using EchoSphere.Users.Abstractions.Models;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 
-namespace EchoSphere.Messages.Api.Grpc;
+namespace EchoSphere.Messages.Api.GrpcServices;
 
-internal sealed class ChatServiceGrpcImpl : ChatServiceGrpc.ChatServiceGrpcBase
+internal sealed class ChatServiceGrpc : Grpc.ChatService.ChatServiceBase
 {
 	private readonly IChatService _chatService;
 
-	public ChatServiceGrpcImpl(IChatService chatService)
+	public ChatServiceGrpc(IChatService chatService)
 	{
 		_chatService = chatService;
 	}
@@ -46,10 +48,11 @@ internal sealed class ChatServiceGrpcImpl : ChatServiceGrpc.ChatServiceGrpcBase
 		return response;
 	}
 
-	public override async Task<Empty> CreateChat(CreateChatRequest request, ServerCallContext context)
+	public override async Task<ChatIdDto> CreateChat(CreateChatRequest request, ServerCallContext context)
 	{
-		await _chatService.CreateChat(request.Participants.Select(x => new UserId(Guid.Parse(x))).ToArray(), context.CancellationToken);
-		return new Empty();
+		var chatId = await _chatService.CreateChat(
+			request.Participants.Select(x => new UserId(Guid.Parse(x))).ToArray(), context.CancellationToken);
+		return new ChatIdDto { Value = chatId.Value.ToString() };
 	}
 
 	public override async Task<Empty> SendMessage(SendMessageRequest request, ServerCallContext context)

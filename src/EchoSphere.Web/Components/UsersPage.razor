@@ -1,0 +1,50 @@
+@page "/users"
+@using System.Security.Claims
+@using EchoSphere.ApiGateway.Client
+@using EchoSphere.ApiGateway.Contracts
+@using EchoSphere.BlazorShared
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject IUserProfileClient UserProfileClient;
+@inject IFriendClient FriendClient;
+@inject LongOperationExecutor LongOperationExecutor;
+@inject AuthenticationStateProvider AuthenticationStateProvider;
+
+<div>
+	@foreach (var userProfile in _userProfiles)
+	{
+		<div style="border: 1px solid black; padding: 10px">
+			<div>@userProfile.FirstName @userProfile.SecondName</div>
+			@if (userProfile.Id == CurrentUserId)
+			{
+				<div>You</div>
+			}
+			else
+			{
+				<MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="() => SendFriendInvite(userProfile.Id)">
+					Send friend invite
+				</MudButton>
+			}
+		</div>
+	}
+</div>
+
+@code {
+	private IReadOnlyList<UserProfileDtoV1> _userProfiles = [];
+	private ClaimsPrincipal _currentUser = null!;
+
+	protected override async Task OnInitializedAsync()
+	{
+		_currentUser = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+		_userProfiles = await LongOperationExecutor.ExecuteLongOperationAndReturnDefaultIfError(
+			() => UserProfileClient.GetUserProfiles(CancellationToken.None), []);
+	}
+
+	private Guid CurrentUserId => Guid.Parse(_currentUser.FindFirstValue("sub")!);
+
+	private Task SendFriendInvite(Guid toUser)
+	{
+		return LongOperationExecutor.ExecuteLongOperation(
+			() => FriendClient.SendFriendInvite(toUser, CancellationToken.None));
+	}
+}

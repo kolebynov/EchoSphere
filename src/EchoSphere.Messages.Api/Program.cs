@@ -5,7 +5,7 @@ using EchoSphere.Messages.Abstractions;
 using EchoSphere.Messages.Abstractions.Models;
 using EchoSphere.Messages.Api.Data;
 using EchoSphere.Messages.Api.Data.Models;
-using EchoSphere.Messages.Api.Grpc;
+using EchoSphere.Messages.Api.GrpcServices;
 using EchoSphere.Messages.Api.Services;
 using EchoSphere.ServiceDefaults;
 using EchoSphere.Users.Abstractions.Models;
@@ -43,6 +43,6 @@ builder.Services.AddScoped<IChatService, ChatService>();
 
 var app = builder.Build();
 
-app.MapGrpcService<ChatServiceGrpcImpl>();
+app.MapGrpcService<ChatServiceGrpc>();
 
 await app.InitAndRunAsync();

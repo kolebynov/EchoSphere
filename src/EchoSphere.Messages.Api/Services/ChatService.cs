@@ -51,7 +51,7 @@ internal sealed class ChatService : IChatService
 			.ToArrayAsync(cancellationToken);
 	}
 
-	public async ValueTask CreateChat(IReadOnlyList<UserId> participants, CancellationToken cancellationToken)
+	public async ValueTask<ChatId> CreateChat(IReadOnlyList<UserId> participants, CancellationToken cancellationToken)
 	{
 		var chatId = new ChatId(Guid.NewGuid());
 		await _dataContext.GetTable<ChatParticipantDb>()
@@ -62,6 +62,8 @@ internal sealed class ChatService : IChatService
 					UserId = userId,
 				}),
 				cancellationToken);
+
+		return chatId;
 	}
 
 	public async ValueTask SendMessage(ChatId chatId, UserId senderId, string text, CancellationToken cancellationToken)

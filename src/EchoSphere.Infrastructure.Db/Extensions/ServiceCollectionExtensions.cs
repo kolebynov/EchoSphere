@@ -31,6 +31,7 @@ public static class ServiceCollectionExtensions
 			});
 
 		services.AddTransient<IDataContext>(sp => sp.GetRequiredService<TContext>());
+		services.AddTransient<DataConnection>(sp => sp.GetRequiredService<TContext>());
 
 		services
 			.AddFluentMigratorCore()

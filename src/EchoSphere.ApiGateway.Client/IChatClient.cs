@@ -12,7 +12,7 @@ public interface IChatClient
 	Task<IReadOnlyList<ChatMessageDtoV1>> GetChatMessages(Guid chatId, CancellationToken cancellationToken);
 
 	[Post("/chats")]
-	Task CreateChat([Body] CreateChatRequestV1 request, CancellationToken cancellationToken);
+	Task<Guid> CreateChat([Body] CreateChatRequestV1 request, CancellationToken cancellationToken);
 
 	[Post("/chats/{chatId}/messages")]
 	Task SendMessage(Guid chatId, [Body] SendMessageRequestV1 request, CancellationToken cancellationToken);
