@@ -1,4 +1,5 @@
 using EchoSphere.GrpcModels;
+using EchoSphere.SharedModels.Extensions;
 using EchoSphere.Users.Abstractions;
 using EchoSphere.Users.Abstractions.Models;
 using EchoSphere.Users.Grpc;
@@ -14,19 +15,21 @@ public sealed class FollowGrpcClient : IFollowService
 		_serviceGrpcClient = serviceGrpcClient;
 	}
 
-	public async ValueTask Follow(UserId followerUserId, UserId followUserId, CancellationToken cancellationToken)
+	public async Task<Either<FollowError, Unit>> Follow(UserId followerUserId, UserId followUserId,
+		CancellationToken cancellationToken)
 	{
 		await _serviceGrpcClient.FollowAsync(
-			new FromToUserIds { FromUserId = followerUserId.Value.ToString(), ToUserId = followUserId.Value.ToString() },
+			new FromToUserIds { FromUserId = followerUserId.ToInnerString(), ToUserId = followUserId.ToInnerString() },
 			cancellationToken: cancellationToken);
+		return Unit.Default;
 	}
 
-	public async ValueTask<IReadOnlyList<UserId>> GetFollowers(UserId userId, CancellationToken cancellationToken)
+	public async Task<Option<IReadOnlyList<UserId>>> GetFollowers(UserId userId, CancellationToken cancellationToken)
 	{
 		var followers = await _serviceGrpcClient.GetFollowersAsync(
-			new UserIdDto { Value = userId.Value.ToString() }, cancellationToken: cancellationToken);
+			new UserIdDto { Value = userId.ToInnerString() }, cancellationToken: cancellationToken);
 		return followers.Ids
-			.Select(x => new UserId(Guid.Parse(x)))
+			.Select(IdValueExtensions.Parse<UserId>)
 			.ToArray();
 	}
 }

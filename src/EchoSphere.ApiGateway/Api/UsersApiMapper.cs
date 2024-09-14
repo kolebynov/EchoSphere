@@ -1,8 +1,11 @@
 using System.Security.Claims;
 using EchoSphere.ApiGateway.Contracts;
 using EchoSphere.ApiGateway.Extensions;
+using EchoSphere.SharedModels.Extensions;
 using EchoSphere.Users.Abstractions;
 using EchoSphere.Users.Abstractions.Models;
+using LanguageExt;
+using LanguageExt.UnsafeValueAccess;
 
 namespace EchoSphere.ApiGateway.Api;
 
@@ -30,7 +33,7 @@ public static class UsersApiMapper
 			"/{userId}",
 			async (IUserProfileService userProfileService, ClaimsPrincipal currentUser, string userId, CancellationToken cancellationToken) =>
 			{
-				var profile = await userProfileService.GetUserProfile(ParseUserId(userId, currentUser), cancellationToken);
+				var profile = (await userProfileService.GetUserProfile(ParseUserId(userId, currentUser), cancellationToken)).ValueUnsafe();
 				return new UserProfileDtoV1
 				{
 					Id = profile.Id.Value,
@@ -45,7 +48,7 @@ public static class UsersApiMapper
 				CancellationToken cancellationToken) =>
 			{
 				var friends = await friendService.GetFriends(ParseUserId(userId, currentUser), cancellationToken);
-				return friends.Select(x => x.Value);
+				return friends.ValueUnsafe().Select(x => x.Value);
 			});
 
 		usersApi.MapPost(
@@ -66,38 +69,44 @@ public static class UsersApiMapper
 					return [];
 				}
 
-				var invites = await friendService.GetFriendInvites(currentUserId, cancellationToken);
-				return invites.Select(x => x.Value);
+				var invites = (await friendService.GetFriendInvites(currentUserId, cancellationToken)).ValueUnsafe();
+				return invites.Select(x => new FriendInvitationDtoV1
+				{
+					Id = x.Id.Value,
+					FromUserId = x.FromUserId.Value,
+				});
 			});
 
 		usersApi.MapPost(
-			"/{userId}/friendInvites/{fromUserId:guid}/accept",
-			(IFriendService friendService, ClaimsPrincipal currentUser, string userId, Guid fromUserId,
+			"/{userId}/friendInvites/{invitationId:guid}/accept",
+			(IFriendService friendService, ClaimsPrincipal currentUser, string userId, Guid invitationId,
 				CancellationToken cancellationToken) =>
 			{
 				var currentUserId = currentUser.GetUserId();
 				var parsedUserId = ParseUserId(userId, currentUser);
 				if (currentUserId != parsedUserId)
 				{
-					return ValueTask.CompletedTask;
+					return Task.CompletedTask;
 				}
 
-				return friendService.AcceptFriendInvite(new UserId(fromUserId), currentUserId, cancellationToken);
+				return friendService.AcceptFriendInvite(new FriendInvitationId(invitationId), cancellationToken)
+					.Map(x => x.ValueUnsafe());
 			});
 
 		usersApi.MapPost(
-			"/{userId}/friendInvites/{fromUserId:guid}/reject",
-			(IFriendService friendService, ClaimsPrincipal currentUser, string userId, Guid fromUserId,
+			"/{userId}/friendInvites/{invitationId:guid}/reject",
+			(IFriendService friendService, ClaimsPrincipal currentUser, string userId, Guid invitationId,
 				CancellationToken cancellationToken) =>
 			{
 				var currentUserId = currentUser.GetUserId();
 				var parsedUserId = ParseUserId(userId, currentUser);
 				if (currentUserId != parsedUserId)
 				{
-					return ValueTask.CompletedTask;
+					return Task.CompletedTask;
 				}
 
-				return friendService.RejectFriendInvite(new UserId(fromUserId), currentUserId, cancellationToken);
+				return friendService.RejectFriendInvite(new FriendInvitationId(invitationId), cancellationToken)
+					.Map(x => x.ValueUnsafe());
 			});
 
 		usersApi.MapPost(
@@ -108,10 +117,11 @@ public static class UsersApiMapper
 				var currentUserId = currentUser.GetUserId();
 				if (currentUserId.Value == followUserId)
 				{
-					return ValueTask.CompletedTask;
+					return Task.CompletedTask;
 				}
 
-				return followService.Follow(currentUserId, new UserId(followUserId), cancellationToken);
+				return followService.Follow(currentUserId, new UserId(followUserId), cancellationToken)
+					.Map(x => x.ValueUnsafe());
 			});
 
 		usersApi.MapGet(
@@ -120,13 +130,16 @@ public static class UsersApiMapper
 				CancellationToken cancellationToken) =>
 			{
 				var parsedUserId = ParseUserId(userId, currentUser);
-				var followers = await followService.GetFollowers(parsedUserId, cancellationToken);
+				var followers = (await followService.GetFollowers(parsedUserId, cancellationToken)).ValueUnsafe();
 				return followers.Select(x => x.Value);
 			});
 
 		return routeBuilder;
 	}
 
+	// TODO: Return Option<UserId>
 	public static UserId ParseUserId(string userId, ClaimsPrincipal currentUser) =>
-		userId.Equals("me", StringComparison.OrdinalIgnoreCase) ? currentUser.GetUserId() : new UserId(Guid.Parse(userId));
+		userId.Equals("me", StringComparison.OrdinalIgnoreCase)
+			? currentUser.GetUserId()
+			: IdValueExtensions.Parse<UserId>(userId);
 }

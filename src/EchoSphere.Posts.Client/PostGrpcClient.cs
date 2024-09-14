@@ -2,6 +2,7 @@ using EchoSphere.GrpcModels;
 using EchoSphere.Posts.Abstractions;
 using EchoSphere.Posts.Abstractions.Models;
 using EchoSphere.Posts.Grpc;
+using EchoSphere.SharedModels.Extensions;
 using EchoSphere.Users.Abstractions.Models;
 
 namespace EchoSphere.Posts.Client;
@@ -20,22 +21,22 @@ public sealed class PostGrpcClient : IPostService
 		var postId = await _serviceGrpcClient.PublishPostAsync(
 			new PublishPostRequest
 			{
-				UserId = userId.Value.ToString(),
+				UserId = userId.ToInnerString(),
 				Title = title,
 				Body = body,
 			},
 			cancellationToken: cancellationToken);
-		return new PostId(Guid.Parse(postId.Value));
+		return IdValueExtensions.Parse<PostId>(postId.Value);
 	}
 
 	public async ValueTask<IReadOnlyList<Post>> GetUserPosts(UserId userId, CancellationToken cancellationToken)
 	{
 		var posts = await _serviceGrpcClient.GetUserPostsAsync(
-			new UserIdDto { Value = userId.Value.ToString() }, cancellationToken: cancellationToken);
+			new UserIdDto { Value = userId.ToInnerString() }, cancellationToken: cancellationToken);
 		return posts.Posts
 			.Select(x => new Post
 			{
-				Id = new PostId(Guid.Parse(x.Id)),
+				Id = IdValueExtensions.Parse<PostId>(x.Id),
 				Title = x.Title,
 				Body = x.Body,
 			})

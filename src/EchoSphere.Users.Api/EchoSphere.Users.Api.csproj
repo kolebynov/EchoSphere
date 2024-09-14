@@ -11,11 +11,14 @@
 
 	<ItemGroup>
 		<PackageReference Include="Grpc.AspNetCore" Version="2.65.0"/>
+		<PackageReference Include="Grpc.StatusProto" Version="2.65.0" />
+		<PackageReference Include="System.Linq.Async" Version="6.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\EchoSphere.Infrastructure.Db\EchoSphere.Infrastructure.Db.csproj"/>
 		<ProjectReference Include="..\EchoSphere.ServiceDefaults\EchoSphere.ServiceDefaults.csproj" />
+		<ProjectReference Include="..\EchoSphere.SharedModels.LinqToDb\EchoSphere.SharedModels.LinqToDb.csproj" />
 		<ProjectReference Include="..\EchoSphere.Users.Abstractions\EchoSphere.Users.Abstractions.csproj" />
 	</ItemGroup>
 

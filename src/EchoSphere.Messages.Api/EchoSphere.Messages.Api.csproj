@@ -17,5 +17,6 @@
 		<ProjectReference Include="..\EchoSphere.Infrastructure.Db\EchoSphere.Infrastructure.Db.csproj"/>
 		<ProjectReference Include="..\EchoSphere.Messages.Abstractions\EchoSphere.Messages.Abstractions.csproj"/>
 		<ProjectReference Include="..\EchoSphere.ServiceDefaults\EchoSphere.ServiceDefaults.csproj"/>
+		<ProjectReference Include="..\EchoSphere.SharedModels.LinqToDb\EchoSphere.SharedModels.LinqToDb.csproj" />
 	</ItemGroup>
 </Project>

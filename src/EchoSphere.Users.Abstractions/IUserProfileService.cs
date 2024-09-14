@@ -4,7 +4,10 @@ namespace EchoSphere.Users.Abstractions;
 
 public interface IUserProfileService
 {
-	ValueTask<IReadOnlyList<UserProfile>> GetUserProfiles(CancellationToken cancellationToken);
+	Task<IReadOnlyList<UserProfile>> GetUserProfiles(CancellationToken cancellationToken);
 
-	ValueTask<UserProfile> GetUserProfile(UserId userId, CancellationToken cancellationToken);
+	Task<Option<UserProfile>> GetUserProfile(UserId userId, CancellationToken cancellationToken);
+
+	Task<IReadOnlyList<(UserId UserId, bool Exists)>> CheckUsersExistence(
+		IReadOnlyList<UserId> userIds, CancellationToken cancellationToken);
 }

@@ -1,4 +1,5 @@
 using EchoSphere.GrpcModels;
+using EchoSphere.SharedModels.Extensions;
 using EchoSphere.Users.Abstractions;
 using EchoSphere.Users.Abstractions.Models;
 using EchoSphere.Users.Grpc;
@@ -16,46 +17,51 @@ internal sealed class FriendServiceGrpc : FriendService.FriendServiceBase
 		_friendService = friendService;
 	}
 
-	public override async Task<UserIdsDto> GetFriends(UserIdDto request, ServerCallContext context)
+	public override Task<UserIdsDto> GetFriends(UserIdDto request, ServerCallContext context) =>
+		_friendService.GetFriends(IdValueExtensions.Parse<UserId>(request.Value), context.CancellationToken)
+			.Map(friendsOpt => friendsOpt
+				.Map(friends => new UserIdsDto
+				{
+					Ids = { friends.Select(x => x.ToInnerString()) },
+				})
+				.IfNone(() => throw new RpcException(new Status(StatusCode.NotFound, "User not found."))));
+
+	public override Task<Empty> SendFriendInvite(FromToUserIds request, ServerCallContext context)
 	{
-		var friends = await _friendService.GetFriends(new UserId(Guid.Parse(request.Value)), context.CancellationToken);
-		return new UserIdsDto
-		{
-			Ids = { friends.Select(x => x.Value.ToString()) },
-		};
+		return _friendService
+			.SendFriendInvite(
+				IdValueExtensions.Parse<UserId>(request.FromUserId), IdValueExtensions.Parse<UserId>(request.ToUserId),
+				context.CancellationToken)
+			.Map(either => either
+				.Map(_ => new Empty())
+				.IfLeft(_ => throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid request."))));
 	}
 
-	public override async Task<Empty> SendFriendInvite(FromToUserIds request, ServerCallContext context)
-	{
-		await _friendService.SendFriendInvite(
-			new UserId(Guid.Parse(request.FromUserId)), new UserId(Guid.Parse(request.ToUserId)),
-			context.CancellationToken);
-		return new Empty();
-	}
+	public override Task<GetFriendInvitesResponse> GetFriendInvites(UserIdDto request, ServerCallContext context) =>
+		_friendService.GetFriendInvites(IdValueExtensions.Parse<UserId>(request.Value), context.CancellationToken)
+			.Map(invitesOpt => invitesOpt
+				.Map(invites => new GetFriendInvitesResponse
+				{
+					Invitations =
+					{
+						invites.Select(x => new FriendInvitationDto
+						{
+							Id = x.Id.ToInnerString(),
+							FromUserId = x.FromUserId.ToInnerString(),
+						}),
+					},
+				})
+				.IfNone(() => throw new RpcException(new Status(StatusCode.NotFound, "User not found."))));
 
-	public override async Task<UserIdsDto> GetFriendInvites(UserIdDto request, ServerCallContext context)
-	{
-		var invites =
-			await _friendService.GetFriendInvites(new UserId(Guid.Parse(request.Value)), context.CancellationToken);
-		return new UserIdsDto
-		{
-			Ids = { invites.Select(x => x.Value.ToString()) },
-		};
-	}
+	public override Task<Empty> AcceptFriendInvite(FriendInvitationIdDto request, ServerCallContext context) =>
+		_friendService.AcceptFriendInvite(IdValueExtensions.Parse<FriendInvitationId>(request.Value), context.CancellationToken)
+			.Map(either => either
+				.Map(_ => new Empty())
+				.IfLeft(_ => throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid request."))));
 
-	public override async Task<Empty> AcceptFriendInvite(FromToUserIds request, ServerCallContext context)
-	{
-		await _friendService.AcceptFriendInvite(
-			new UserId(Guid.Parse(request.FromUserId)), new UserId(Guid.Parse(request.ToUserId)),
-			context.CancellationToken);
-		return new Empty();
-	}
-
-	public override async Task<Empty> RejectFriendInvite(FromToUserIds request, ServerCallContext context)
-	{
-		await _friendService.RejectFriendInvite(
-			new UserId(Guid.Parse(request.FromUserId)), new UserId(Guid.Parse(request.ToUserId)),
-			context.CancellationToken);
-		return new Empty();
-	}
+	public override Task<Empty> RejectFriendInvite(FriendInvitationIdDto request, ServerCallContext context) =>
+		_friendService.RejectFriendInvite(IdValueExtensions.Parse<FriendInvitationId>(request.Value), context.CancellationToken)
+			.Map(either => either
+				.Map(_ => new Empty())
+				.IfLeft(_ => throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid request."))));
 }

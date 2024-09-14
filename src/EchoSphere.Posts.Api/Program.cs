@@ -7,6 +7,7 @@ using EchoSphere.Posts.Api.Data.Models;
 using EchoSphere.Posts.Api.GrpcServices;
 using EchoSphere.Posts.Api.Services;
 using EchoSphere.ServiceDefaults;
+using EchoSphere.SharedModels.LinqToDb.Extensions;
 using EchoSphere.Users.Abstractions.Models;
 using LinqToDB.Mapping;
 
@@ -21,11 +22,13 @@ var fluentMappingBuilder = new FluentMappingBuilder(mappingSchema);
 
 fluentMappingBuilder.Entity<PostDb>()
 	.HasTableName(DataConstants.PostsTableName)
-	.HasPrimaryKey(x => x.Id)
-	.Property(x => x.Id).HasConversionFunc(x => x.Value, x => new PostId(x))
-	.Property(x => x.UserId).HasConversionFunc(x => x.Value, x => new UserId(x));
+	.HasPrimaryKey(x => x.Id);
 
 fluentMappingBuilder.Build();
+
+mappingSchema
+	.AddGuidIdValueConverter<PostId>()
+	.AddGuidIdValueConverter<UserId>();
 
 builder.Services.AddLinqToDb<AppDataConnection>(builder.Configuration, "PostsDb", mappingSchema,
 	Assembly.GetExecutingAssembly());

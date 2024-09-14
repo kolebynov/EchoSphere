@@ -1,3 +1,5 @@
+using EchoSphere.SharedModels;
+
 namespace EchoSphere.Posts.Abstractions.Models;
 
-public readonly record struct PostId(Guid Value);
+public readonly record struct PostId(Guid Value) : IIdValue<Guid>;

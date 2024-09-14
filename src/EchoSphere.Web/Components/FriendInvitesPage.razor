@@ -11,11 +11,11 @@
 	@foreach (var inviteFrom in _invitesFrom)
 	{
 		<div style="border: 1px solid black; padding: 10px">
-			<div>@inviteFrom.FirstName @inviteFrom.SecondName</div>
-			<MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="() => AcceptInvite(inviteFrom.Id)">
+			<div>@inviteFrom.UserProfile.FirstName @inviteFrom.UserProfile.SecondName</div>
+			<MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="() => AcceptInvite(inviteFrom.InvitationId)">
 				Accept
 			</MudButton>
-			<MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="() => RejectInvite(inviteFrom.Id)">
+			<MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="() => RejectInvite(inviteFrom.InvitationId)">
 				Reject
 			</MudButton>
 		</div>
@@ -23,28 +23,29 @@
 </div>
 
 @code {
-	private IReadOnlyList<UserProfileDtoV1> _invitesFrom = [];
+	private IReadOnlyList<(Guid InvitationId, UserProfileDtoV1 UserProfile)> _invitesFrom = [];
 
 	protected override async Task OnInitializedAsync()
 	{
 		var invites = await LongOperationExecutor.ExecuteLongOperationAndReturnDefaultIfError(
 			() => FriendClient.GetFriendInvites(CancellationToken.None), []);
 		_invitesFrom = await invites.ToAsyncEnumerable()
-			.SelectAwait(fromUserId =>
-				new ValueTask<UserProfileDtoV1>(LongOperationExecutor.ExecuteLongOperationAndReturnDefaultIfError(
-					() => UserProfileClient.GetUserProfile(fromUserId, CancellationToken.None), null!)))
+			.SelectAwait(invitation =>
+				new ValueTask<(Guid, UserProfileDtoV1)>(
+					LongOperationExecutor.ExecuteLongOperationAndReturnDefaultIfError(
+						async () => (invitation.Id, await UserProfileClient.GetUserProfile(invitation.FromUserId, CancellationToken.None)), default)))
 			.ToArrayAsync();
 	}
 
-	private Task AcceptInvite(Guid fromUserId)
+	private Task AcceptInvite(Guid invitationId)
 	{
 		return LongOperationExecutor.ExecuteLongOperation(
-			() => FriendClient.AcceptFriendInvite(fromUserId, CancellationToken.None));
+			() => FriendClient.AcceptFriendInvite(invitationId, CancellationToken.None));
 	}
 
-	private Task RejectInvite(Guid fromUserId)
+	private Task RejectInvite(Guid invitationId)
 	{
 		return LongOperationExecutor.ExecuteLongOperation(
-			() => FriendClient.RejectFriendInvite(fromUserId, CancellationToken.None));
+			() => FriendClient.RejectFriendInvite(invitationId, CancellationToken.None));
 	}
 }

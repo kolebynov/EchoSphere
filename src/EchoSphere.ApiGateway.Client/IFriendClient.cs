@@ -1,3 +1,4 @@
+using EchoSphere.ApiGateway.Contracts;
 using Refit;
 
 namespace EchoSphere.ApiGateway.Client;
@@ -11,11 +12,11 @@ public interface IFriendClient
 	Task SendFriendInvite(Guid toUserId, CancellationToken cancellationToken);
 
 	[Get("/users/me/friendInvites")]
-	Task<IReadOnlyList<Guid>> GetFriendInvites(CancellationToken cancellationToken);
+	Task<IReadOnlyList<FriendInvitationDtoV1>> GetFriendInvites(CancellationToken cancellationToken);
 
-	[Post("/users/me/friendInvites/{fromUserId}/accept")]
-	Task AcceptFriendInvite(Guid fromUserId, CancellationToken cancellationToken);
+	[Post("/users/me/friendInvites/{invitationId}/accept")]
+	Task AcceptFriendInvite(Guid invitationId, CancellationToken cancellationToken);
 
-	[Post("/users/me/friendInvites/{fromUserId}/reject")]
-	Task RejectFriendInvite(Guid fromUserId, CancellationToken cancellationToken);
+	[Post("/users/me/friendInvites/{invitationId}/reject")]
+	Task RejectFriendInvite(Guid invitationId, CancellationToken cancellationToken);
 }

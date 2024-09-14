@@ -2,6 +2,7 @@ using EchoSphere.GrpcModels;
 using EchoSphere.Messages.Abstractions;
 using EchoSphere.Messages.Abstractions.Models;
 using EchoSphere.Messages.Grpc;
+using EchoSphere.SharedModels.Extensions;
 using EchoSphere.Users.Abstractions.Models;
 
 namespace EchoSphere.Messages.Client;
@@ -18,13 +19,13 @@ public sealed class ChatGrpcClient : IChatService
 	public async ValueTask<IReadOnlyList<ChatInfo>> GetUserChats(UserId userId, CancellationToken cancellationToken)
 	{
 		var response = await _serviceGrpcClient.GetUserChatsAsync(
-			new UserIdDto { Value = userId.Value.ToString() },
+			new UserIdDto { Value = userId.ToInnerString() },
 			cancellationToken: cancellationToken);
 		return response.Chats
 			.Select(x => new ChatInfo
 			{
-				Id = new ChatId(Guid.Parse(x.Id)),
-				Participants = x.Participants.Select(y => new UserId(Guid.Parse(y))).ToArray(),
+				Id = IdValueExtensions.Parse<ChatId>(x.Id),
+				Participants = x.Participants.Select(y => IdValueExtensions.Parse<UserId>(y)).ToArray(),
 			})
 			.ToArray();
 	}
@@ -32,13 +33,13 @@ public sealed class ChatGrpcClient : IChatService
 	public async ValueTask<IReadOnlyList<ChatMessage>> GetChatMessages(ChatId chatId, CancellationToken cancellationToken)
 	{
 		var response = await _serviceGrpcClient.GetChatMessagesAsync(
-			new ChatIdDto { Value = chatId.Value.ToString() }, cancellationToken: cancellationToken);
+			new ChatIdDto { Value = chatId.ToInnerString() }, cancellationToken: cancellationToken);
 		return response.Messages
 			.Select(x => new ChatMessage
 			{
 				Id = new MessageId(x.Id),
 				Timestamp = x.Timestamp.ToDateTimeOffset(),
-				SenderId = new UserId(Guid.Parse(x.SenderId)),
+				SenderId = IdValueExtensions.Parse<UserId>(x.SenderId),
 				Text = x.Text,
 			})
 			.ToArray();
@@ -49,10 +50,10 @@ public sealed class ChatGrpcClient : IChatService
 		var chatId = await _serviceGrpcClient.CreateChatAsync(
 			new CreateChatRequest
 			{
-				Participants = { participants.Select(x => x.Value.ToString()) },
+				Participants = { participants.Select(x => x.ToInnerString()) },
 			},
 			cancellationToken: cancellationToken);
-		return new ChatId(Guid.Parse(chatId.Value));
+		return IdValueExtensions.Parse<ChatId>(chatId.Value);
 	}
 
 	public async ValueTask SendMessage(ChatId chatId, UserId senderId, string text, CancellationToken cancellationToken)
@@ -60,8 +61,8 @@ public sealed class ChatGrpcClient : IChatService
 		await _serviceGrpcClient.SendMessageAsync(
 			new SendMessageRequest
 			{
-				ChatId = chatId.Value.ToString(),
-				SenderId = senderId.Value.ToString(),
+				ChatId = chatId.ToInnerString(),
+				SenderId = senderId.ToInnerString(),
 				Text = text,
 			},
 			cancellationToken: cancellationToken);

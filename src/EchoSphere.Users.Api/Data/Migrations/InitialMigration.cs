@@ -21,9 +21,10 @@ public sealed class InitialMigration : Migration
 				.ForeignKey(DataConstants.UserProfilesTableName, nameof(UserProfile.Id)).NotNullable();
 
 		Create.Table(DataConstants.FriendInvitesTableName)
-			.WithColumn(nameof(FriendInviteDb.FromUserId)).AsGuid().Indexed()
+			.WithColumn(nameof(FriendInvitationDb.Id)).AsGuid().PrimaryKey().NotNullable()
+			.WithColumn(nameof(FriendInvitationDb.FromUserId)).AsGuid().Indexed()
 				.ForeignKey(DataConstants.UserProfilesTableName, nameof(UserProfile.Id)).NotNullable()
-			.WithColumn(nameof(FriendInviteDb.ToUserId)).AsGuid().Indexed()
+			.WithColumn(nameof(FriendInvitationDb.ToUserId)).AsGuid().Indexed()
 				.ForeignKey(DataConstants.UserProfilesTableName, nameof(UserProfile.Id)).NotNullable();
 
 		Create.Table(DataConstants.FollowersTableName)

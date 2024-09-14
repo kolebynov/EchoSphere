@@ -1,4 +1,5 @@
 using EchoSphere.GrpcModels;
+using EchoSphere.SharedModels.Extensions;
 using EchoSphere.Users.Abstractions;
 using EchoSphere.Users.Abstractions.Models;
 using EchoSphere.Users.Grpc;
@@ -14,42 +15,50 @@ public sealed class FriendGrpcClient : IFriendService
 		_serviceGrpcClient = serviceGrpcClient;
 	}
 
-	public async ValueTask<IReadOnlyList<UserId>> GetFriends(UserId userId, CancellationToken cancellationToken)
+	public async Task<Option<IReadOnlyList<UserId>>> GetFriends(UserId userId, CancellationToken cancellationToken)
 	{
 		var friends = await _serviceGrpcClient.GetFriendsAsync(
-			new UserIdDto { Value = userId.Value.ToString() }, cancellationToken: cancellationToken);
+			new UserIdDto { Value = userId.ToInnerString() }, cancellationToken: cancellationToken);
 		return friends.Ids
-			.Select(x => new UserId(Guid.Parse(x)))
+			.Select(x => IdValueExtensions.Parse<UserId>(x))
 			.ToArray();
 	}
 
-	public async ValueTask SendFriendInvite(UserId fromUserId, UserId toUserId, CancellationToken cancellationToken)
+	public async Task<Either<SendFriendInviteError, Unit>> SendFriendInvite(UserId fromUserId, UserId toUserId, CancellationToken cancellationToken)
 	{
 		await _serviceGrpcClient.SendFriendInviteAsync(
-			new FromToUserIds { FromUserId = fromUserId.Value.ToString(), ToUserId = toUserId.Value.ToString() },
+			new FromToUserIds { FromUserId = fromUserId.ToInnerString(), ToUserId = toUserId.ToInnerString() },
 			cancellationToken: cancellationToken);
+		return Unit.Default;
 	}
 
-	public async ValueTask<IReadOnlyList<UserId>> GetFriendInvites(UserId userId, CancellationToken cancellationToken)
+	public async Task<Option<IReadOnlyList<FriendInvitation>>> GetFriendInvites(UserId userId, CancellationToken cancellationToken)
 	{
 		var invites = await _serviceGrpcClient.GetFriendInvitesAsync(
-			new UserIdDto { Value = userId.Value.ToString() }, cancellationToken: cancellationToken);
-		return invites.Ids
-			.Select(x => new UserId(Guid.Parse(x)))
-			.ToArray();
+			new UserIdDto { Value = userId.ToInnerString() }, cancellationToken: cancellationToken);
+
+		return Some<IReadOnlyList<FriendInvitation>>(invites.Invitations
+			.Select(x => new FriendInvitation
+			{
+				Id = IdValueExtensions.Parse<FriendInvitationId>(x.Id),
+				FromUserId = IdValueExtensions.Parse<UserId>(x.FromUserId),
+			})
+			.ToArray());
 	}
 
-	public async ValueTask AcceptFriendInvite(UserId fromUserId, UserId toUserId, CancellationToken cancellationToken)
+	public async Task<Either<FriendInviteError, Unit>> AcceptFriendInvite(FriendInvitationId invitationId, CancellationToken cancellationToken)
 	{
 		await _serviceGrpcClient.AcceptFriendInviteAsync(
-			new FromToUserIds { FromUserId = fromUserId.Value.ToString(), ToUserId = toUserId.Value.ToString() },
+			new FriendInvitationIdDto { Value = invitationId.ToInnerString() },
 			cancellationToken: cancellationToken);
+		return Unit.Default;
 	}
 
-	public async ValueTask RejectFriendInvite(UserId fromUserId, UserId toUserId, CancellationToken cancellationToken)
+	public async Task<Either<FriendInviteError, Unit>> RejectFriendInvite(FriendInvitationId invitationId, CancellationToken cancellationToken)
 	{
 		await _serviceGrpcClient.RejectFriendInviteAsync(
-			new FromToUserIds { FromUserId = fromUserId.Value.ToString(), ToUserId = toUserId.Value.ToString() },
+			new FriendInvitationIdDto { Value = invitationId.ToInnerString() },
 			cancellationToken: cancellationToken);
+		return Unit.Default;
 	}
 }

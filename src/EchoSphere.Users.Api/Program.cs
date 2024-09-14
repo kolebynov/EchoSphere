@@ -2,6 +2,7 @@ using System.Reflection;
 using EchoSphere.Infrastructure.Db.Extensions;
 using EchoSphere.Infrastructure.Hosting.Extensions;
 using EchoSphere.ServiceDefaults;
+using EchoSphere.SharedModels.LinqToDb.Extensions;
 using EchoSphere.Users.Abstractions;
 using EchoSphere.Users.Abstractions.Models;
 using EchoSphere.Users.Api.Data;
@@ -19,29 +20,28 @@ builder.Services.AddGrpc();
 builder.Services.AddAsyncInitialization();
 
 var mappingSchema = new MappingSchema();
+
 var fluentMappingBuilder = new FluentMappingBuilder(mappingSchema);
 
 fluentMappingBuilder.Entity<UserProfile>()
 	.HasTableName(DataConstants.UserProfilesTableName)
-	.HasPrimaryKey(x => x.Id)
-	.Property(x => x.Id).HasConversionFunc(x => x.Value, x => new UserId(x));
+	.HasPrimaryKey(x => x.Id);
 
-fluentMappingBuilder.Entity<FriendInviteDb>()
+fluentMappingBuilder.Entity<FriendInvitationDb>()
 	.HasTableName(DataConstants.FriendInvitesTableName)
-	.Property(x => x.FromUserId).HasConversionFunc(x => x.Value, x => new UserId(x))
-	.Property(x => x.ToUserId).HasConversionFunc(x => x.Value, x => new UserId(x));
+	.HasPrimaryKey(x => x.Id);
 
 fluentMappingBuilder.Entity<FriendLinkDb>()
-	.HasTableName(DataConstants.FriendsTableName)
-	.Property(x => x.User1Id).HasConversionFunc(x => x.Value, x => new UserId(x))
-	.Property(x => x.User2Id).HasConversionFunc(x => x.Value, x => new UserId(x));
+	.HasTableName(DataConstants.FriendsTableName);
 
 fluentMappingBuilder.Entity<FollowerDb>()
-	.HasTableName(DataConstants.FollowersTableName)
-	.Property(x => x.UserId).HasConversionFunc(x => x.Value, x => new UserId(x))
-	.Property(x => x.FollowerUserId).HasConversionFunc(x => x.Value, x => new UserId(x));
+	.HasTableName(DataConstants.FollowersTableName);
 
 fluentMappingBuilder.Build();
+
+mappingSchema
+	.AddGuidIdValueConverter<FriendInvitationId>()
+	.AddGuidIdValueConverter<UserId>();
 
 builder.Services.AddLinqToDb<AppDataConnection>(builder.Configuration, "UsersDb", mappingSchema,
 	Assembly.GetExecutingAssembly());

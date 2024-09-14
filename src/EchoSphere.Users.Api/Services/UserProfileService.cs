@@ -13,12 +13,23 @@ internal sealed class UserProfileService : IUserProfileService
 		_dataContext = dataContext;
 	}
 
-	public async ValueTask<IReadOnlyList<UserProfile>> GetUserProfiles(CancellationToken cancellationToken)
-	{
-		return await _dataContext.GetTable<UserProfile>()
-			.ToArrayAsync(cancellationToken);
-	}
+	public async Task<IReadOnlyList<UserProfile>> GetUserProfiles(CancellationToken cancellationToken) =>
+		await _dataContext.GetTable<UserProfile>().ToArrayAsync(cancellationToken);
 
-	public ValueTask<UserProfile> GetUserProfile(UserId userId, CancellationToken cancellationToken) =>
-		new(_dataContext.GetTable<UserProfile>().FirstAsync(x => x.Id == userId, cancellationToken));
+	public Task<Option<UserProfile>> GetUserProfile(UserId userId, CancellationToken cancellationToken) =>
+		_dataContext.GetTable<UserProfile>().FirstOrDefaultAsync(x => x.Id == userId, cancellationToken).Map(Optional);
+
+	public async Task<IReadOnlyList<(UserId UserId, bool Exists)>> CheckUsersExistence(
+		IReadOnlyList<UserId> userIds, CancellationToken cancellationToken)
+	{
+		var foundUsers = await _dataContext.GetTable<UserProfile>()
+			.Where(x => userIds.Contains(x.Id))
+			.Select(x => x.Id)
+			.AsAsyncEnumerable()
+			.ToHashSetAsync(cancellationToken);
+
+		return userIds
+			.Select(x => (x, foundUsers.Contains(x)))
+			.ToArray();
+	}
 }
