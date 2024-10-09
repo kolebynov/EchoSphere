@@ -1,22 +1,25 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 	<PropertyGroup>
-		<Protobuf_StandardImportsPath>$(Protobuf_StandardImportsPath);$(MSBuildProjectDirectory)\..\..\Protos</Protobuf_StandardImportsPath>
+		<Protobuf_StandardImportsPath>$(Protobuf_StandardImportsPath);$(MSBuildProjectDirectory)\..\EchoSphere.GrpcShared</Protobuf_StandardImportsPath>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Protobuf Include="models.proto" GrpcServices="none"/>
-		<Protobuf Include="Protos\messages.proto" GrpcServices="Server"/>
+		<Protobuf Include="Protos\*.proto" GrpcServices="Server"/>
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Grpc.AspNetCore" Version="2.65.0"/>
+		<PackageReference Include="Grpc.AspNetCore" Version="2.66.0" />
+		<PackageReference Include="Grpc.StatusProto" Version="2.66.0" />
 		<PackageReference Include="System.Linq.Async" Version="6.0.1"/>
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\EchoSphere.Domain.AspNetCore\EchoSphere.Domain.AspNetCore.csproj" />
+		<ProjectReference Include="..\EchoSphere.GrpcShared\EchoSphere.GrpcShared.csproj" />
 		<ProjectReference Include="..\EchoSphere.Infrastructure.Db\EchoSphere.Infrastructure.Db.csproj"/>
 		<ProjectReference Include="..\EchoSphere.Messages.Abstractions\EchoSphere.Messages.Abstractions.csproj"/>
 		<ProjectReference Include="..\EchoSphere.ServiceDefaults\EchoSphere.ServiceDefaults.csproj"/>
-		<ProjectReference Include="..\EchoSphere.SharedModels.LinqToDb\EchoSphere.SharedModels.LinqToDb.csproj" />
+		<ProjectReference Include="..\EchoSphere.Domain.LinqToDb\EchoSphere.Domain.LinqToDb.csproj" />
+		<ProjectReference Include="..\EchoSphere.Users.Client\EchoSphere.Users.Client.csproj" />
 	</ItemGroup>
 </Project>

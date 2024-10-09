@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<ItemGroup>
+		<Protobuf Include="SharedProtos\contracts.proto" GrpcServices="Both" />
+		<Protobuf Include="SharedProtos\errors.proto" GrpcServices="Both"/>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Grpc.StatusProto" Version="2.66.0"/>
+		<PackageReference Include="Grpc.Tools" Version="2.66.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\EchoSphere.Domain.Abstractions\EchoSphere.Domain.Abstractions.csproj" />
+	</ItemGroup>
+</Project>

@@ -75,9 +75,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.Posts.Api", "src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.Posts.Client", "src\EchoSphere.Posts.Client\EchoSphere.Posts.Client.csproj", "{2102A507-EC71-4919-9B29-E9751DA9666D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.SharedModels", "src\EchoSphere.SharedModels\EchoSphere.SharedModels.csproj", "{AEE98BD7-AE90-4BF7-A621-7A6EC294DEEB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.Domain.Abstractions", "src\EchoSphere.Domain.Abstractions\EchoSphere.Domain.Abstractions.csproj", "{AEE98BD7-AE90-4BF7-A621-7A6EC294DEEB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.SharedModels.LinqToDb", "src\EchoSphere.SharedModels.LinqToDb\EchoSphere.SharedModels.LinqToDb.csproj", "{9C3ABF43-834C-4B68-BA2E-2B4FB796D308}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.Domain.LinqToDb", "src\EchoSphere.Domain.LinqToDb\EchoSphere.Domain.LinqToDb.csproj", "{9C3ABF43-834C-4B68-BA2E-2B4FB796D308}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.GrpcClientShared", "src\EchoSphere.GrpcClientShared\EchoSphere.GrpcClientShared.csproj", "{BB06A71E-CABE-43A0-B01C-328B14A0694B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.GrpcShared", "src\EchoSphere.GrpcShared\EchoSphere.GrpcShared.csproj", "{405B3D54-6B57-4037-9A55-684378739383}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.Domain.AspNetCore", "src\EchoSphere.Domain.AspNetCore\EchoSphere.Domain.AspNetCore.csproj", "{7EA6C148-4E32-4822-BC69-0E897A87513D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -177,6 +183,18 @@ Global
 		{9C3ABF43-834C-4B68-BA2E-2B4FB796D308}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C3ABF43-834C-4B68-BA2E-2B4FB796D308}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C3ABF43-834C-4B68-BA2E-2B4FB796D308}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB06A71E-CABE-43A0-B01C-328B14A0694B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB06A71E-CABE-43A0-B01C-328B14A0694B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB06A71E-CABE-43A0-B01C-328B14A0694B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB06A71E-CABE-43A0-B01C-328B14A0694B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{405B3D54-6B57-4037-9A55-684378739383}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{405B3D54-6B57-4037-9A55-684378739383}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{405B3D54-6B57-4037-9A55-684378739383}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{405B3D54-6B57-4037-9A55-684378739383}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7EA6C148-4E32-4822-BC69-0E897A87513D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7EA6C148-4E32-4822-BC69-0E897A87513D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EA6C148-4E32-4822-BC69-0E897A87513D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7EA6C148-4E32-4822-BC69-0E897A87513D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -216,5 +234,8 @@ Global
 		{2102A507-EC71-4919-9B29-E9751DA9666D} = {9578D2CD-13EB-4FF1-8048-48C7B7526995}
 		{AEE98BD7-AE90-4BF7-A621-7A6EC294DEEB} = {84F702C5-B09D-406D-AA25-B8945999B2E4}
 		{9C3ABF43-834C-4B68-BA2E-2B4FB796D308} = {84F702C5-B09D-406D-AA25-B8945999B2E4}
+		{BB06A71E-CABE-43A0-B01C-328B14A0694B} = {84F702C5-B09D-406D-AA25-B8945999B2E4}
+		{405B3D54-6B57-4037-9A55-684378739383} = {84F702C5-B09D-406D-AA25-B8945999B2E4}
+		{7EA6C148-4E32-4822-BC69-0E897A87513D} = {84F702C5-B09D-406D-AA25-B8945999B2E4}
 	EndGlobalSection
 EndGlobal

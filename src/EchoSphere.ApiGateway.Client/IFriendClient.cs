@@ -11,12 +11,12 @@ public interface IFriendClient
 	[Post("/users/{toUserId}/sendFriendInvite")]
 	Task SendFriendInvite(Guid toUserId, CancellationToken cancellationToken);
 
-	[Get("/users/me/friendInvites")]
+	[Get("/friendInvites")]
 	Task<IReadOnlyList<FriendInvitationDtoV1>> GetFriendInvites(CancellationToken cancellationToken);
 
-	[Post("/users/me/friendInvites/{invitationId}/accept")]
+	[Post("/friendInvites/{invitationId}/accept")]
 	Task AcceptFriendInvite(Guid invitationId, CancellationToken cancellationToken);
 
-	[Post("/users/me/friendInvites/{invitationId}/reject")]
+	[Post("/friendInvites/{invitationId}/reject")]
 	Task RejectFriendInvite(Guid invitationId, CancellationToken cancellationToken);
 }

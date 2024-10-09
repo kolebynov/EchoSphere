@@ -1,55 +1,65 @@
-using EchoSphere.GrpcModels;
-using EchoSphere.SharedModels.Extensions;
+using EchoSphere.Domain.Abstractions.Extensions;
+using EchoSphere.Domain.Abstractions.Models;
+using EchoSphere.GrpcClientShared;
+using EchoSphere.GrpcShared.Errors;
+using EchoSphere.GrpcShared.Extensions;
 using EchoSphere.Users.Abstractions;
+using EchoSphere.Users.Abstractions.Extensions;
 using EchoSphere.Users.Abstractions.Models;
 using EchoSphere.Users.Grpc;
-using Google.Protobuf.WellKnownTypes;
 
 namespace EchoSphere.Users.Client;
 
-public sealed class UserProfileGrpcClient : IUserProfileService
+internal sealed class UserProfileGrpcClient : IUserProfileService
 {
-	private readonly UserProfileService.UserProfileServiceClient _serviceGrpcClient;
+	private readonly GrpcCallExecutor<UserProfileService.UserProfileServiceClient> _grpcExecutor;
 
-	public UserProfileGrpcClient(UserProfileService.UserProfileServiceClient serviceGrpcClient)
+	public UserProfileGrpcClient(GrpcCallExecutor<UserProfileService.UserProfileServiceClient> grpcExecutor)
 	{
-		_serviceGrpcClient = serviceGrpcClient;
+		_grpcExecutor = grpcExecutor;
 	}
 
-	public async Task<IReadOnlyList<UserProfile>> GetUserProfiles(CancellationToken cancellationToken)
-	{
-		var profiles = await _serviceGrpcClient.GetUserProfilesAsync(new Empty(), cancellationToken: cancellationToken);
-		return profiles.Profiles
-			.Select(x => new UserProfile
+	public Task<IReadOnlyList<UserProfile>> GetUserProfiles(CancellationToken cancellationToken) =>
+		_grpcExecutor.ExecuteAsync<IReadOnlyList<UserProfile>>(
+			async client =>
 			{
-				Id = IdValueExtensions.Parse<UserId>(x.Id),
-				FirstName = x.FirstName,
-				SecondName = x.SecondName,
-			})
-			.ToArray();
-	}
+				var profiles = await client.GetUserProfilesAsync(GrpcExtensions.EmptyInstance, cancellationToken: cancellationToken);
+				return profiles.Profiles
+					.Select(x => new UserProfile
+					{
+						Id = IdValueExtensions.Parse<UserId>(x.Id),
+						FirstName = x.FirstName,
+						SecondName = x.SecondName,
+					})
+					.ToArray();
+			});
 
-	public async Task<Option<UserProfile>> GetUserProfile(UserId userId, CancellationToken cancellationToken)
-	{
-		var profile = await _serviceGrpcClient.GetUserProfileAsync(
-			new UserIdDto { Value = userId.ToInnerString() }, cancellationToken: cancellationToken);
-		return new UserProfile
-		{
-			Id = IdValueExtensions.Parse<UserId>(profile.Id),
-			FirstName = profile.FirstName,
-			SecondName = profile.SecondName,
-		};
-	}
+	public Task<Option<UserProfile>> GetUserProfile(UserId userId, CancellationToken cancellationToken) =>
+		_grpcExecutor
+			.ExecuteAsync<Option<UserProfile>, NotFoundError>(
+				async client =>
+				{
+					var profile = await client.GetUserProfileAsync(userId.ToDto(), cancellationToken: cancellationToken);
+					return new UserProfile
+					{
+						Id = IdValueExtensions.Parse<UserId>(profile.Id),
+						FirstName = profile.FirstName,
+						SecondName = profile.SecondName,
+					};
+				})
+			.IfLeft(_ => None);
 
-	public async Task<IReadOnlyList<(UserId UserId, bool Exists)>> CheckUsersExistence(
-		IReadOnlyList<UserId> userIds, CancellationToken cancellationToken)
-	{
-		var usersExistence = await _serviceGrpcClient.CheckUsersExistenceAsync(
-			new UserIdsDto { Ids = { userIds.Select(x => x.ToInnerString()) } },
-			cancellationToken: cancellationToken);
+	public Task<IReadOnlyList<(UserId UserId, bool Exists)>> CheckUsersExistence(
+		IReadOnlyList<UserId> userIds, CancellationToken cancellationToken) =>
+		_grpcExecutor.ExecuteAsync<IReadOnlyList<(UserId UserId, bool Exists)>>(
+			async client =>
+			{
+				var usersExistence = await client.CheckUsersExistenceAsync(
+					new UserIdsDto { Ids = { userIds.Select(x => x.ToInnerString()) } },
+					cancellationToken: cancellationToken);
 
-		return usersExistence.UsersExistence
-			.Select(x => (IdValueExtensions.Parse<UserId>(x.UserId), x.Exists))
-			.ToArray();
-	}
+				return usersExistence.UsersExistence
+					.Select(x => (IdValueExtensions.Parse<UserId>(x.UserId), x.Exists))
+					.ToArray();
+			});
 }

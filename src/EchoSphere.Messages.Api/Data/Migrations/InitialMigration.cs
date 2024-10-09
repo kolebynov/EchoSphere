@@ -24,5 +24,6 @@ public sealed class InitialMigration : Migration
 	public override void Down()
 	{
 		Delete.Table(DataConstants.ChatParticipantsTableName);
+		Delete.Table(DataConstants.ChatMessagesTableName);
 	}
 }

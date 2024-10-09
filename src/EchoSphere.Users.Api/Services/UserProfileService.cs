@@ -1,3 +1,4 @@
+using EchoSphere.Domain.Abstractions.Models;
 using EchoSphere.Users.Abstractions;
 using EchoSphere.Users.Abstractions.Models;
 using LinqToDB;

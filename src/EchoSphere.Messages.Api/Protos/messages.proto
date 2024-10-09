@@ -2,18 +2,18 @@ syntax = "proto3";
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
-import "models.proto";
+import "SharedProtos/contracts.proto";
 
 package echo_sphere.messages.grpc;
 
 service ChatService {
-	rpc GetUserChats (echo_sphere.grpc_models.UserIdDto) returns (GetUserChatsResponse);
+	rpc GetCurrentUserChats (google.protobuf.Empty) returns (GetUserChatsResponse);
 
-	rpc GetChatMessages (echo_sphere.grpc_models.ChatIdDto) returns (GetChatMessagesResponse);
+	rpc GetChatMessages (echo_sphere.grpc_shared.contracts.ChatIdDto) returns (GetChatMessagesResponse);
 
-	rpc CreateChat (CreateChatRequest) returns (echo_sphere.grpc_models.ChatIdDto);
+	rpc CreateChat (CreateChatRequest) returns (echo_sphere.grpc_shared.contracts.ChatIdDto);
 
-	rpc SendMessage (SendMessageRequest) returns (google.protobuf.Empty);
+	rpc SendMessage (SendMessageRequest) returns (echo_sphere.grpc_shared.contracts.MessageIdDto);
 }
 
 message ChatInfoDto {
@@ -23,6 +23,18 @@ message ChatInfoDto {
 
 message GetUserChatsResponse {
 	repeated ChatInfoDto chats = 1;
+}
+
+message CreateChatErrorDto {
+	oneof error {
+		string participant_not_found = 1;
+	}
+}
+
+message SendMessageErrorDto {
+	oneof error {
+		google.protobuf.Empty chat_not_found = 1;
+	}
 }
 
 message ChatMessageDto {
@@ -42,6 +54,5 @@ message CreateChatRequest {
 
 message SendMessageRequest {
 	string chat_id = 1;
-	string sender_id = 2;
-	string text = 3;
+	string text = 2;
 }

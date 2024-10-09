@@ -1,13 +1,19 @@
-using EchoSphere.GrpcModels;
-using EchoSphere.SharedModels.Extensions;
+using EchoSphere.Domain.Abstractions.Extensions;
+using EchoSphere.Domain.Abstractions.Models;
+using EchoSphere.GrpcShared.Contracts;
+using EchoSphere.GrpcShared.Errors;
+using EchoSphere.GrpcShared.Extensions;
 using EchoSphere.Users.Abstractions;
+using EchoSphere.Users.Abstractions.Extensions;
 using EchoSphere.Users.Abstractions.Models;
 using EchoSphere.Users.Grpc;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EchoSphere.Users.Api.GrpcServices;
 
+[Authorize]
 internal sealed class FriendServiceGrpc : FriendService.FriendServiceBase
 {
 	private readonly IFriendService _friendService;
@@ -18,50 +24,51 @@ internal sealed class FriendServiceGrpc : FriendService.FriendServiceBase
 	}
 
 	public override Task<UserIdsDto> GetFriends(UserIdDto request, ServerCallContext context) =>
-		_friendService.GetFriends(IdValueExtensions.Parse<UserId>(request.Value), context.CancellationToken)
-			.Map(friendsOpt => friendsOpt
-				.Map(friends => new UserIdsDto
-				{
-					Ids = { friends.Select(x => x.ToInnerString()) },
-				})
-				.IfNone(() => throw new RpcException(new Status(StatusCode.NotFound, "User not found."))));
+		_friendService.GetFriends(request.ToModel(), context.CancellationToken)
+			.MapAsync(friends => new UserIdsDto
+			{
+				Ids = { friends.Select(x => x.ToInnerString()) },
+			})
+			.IfNone(() => throw NotFoundError.Instance.ToStatusRpcException());
 
-	public override Task<Empty> SendFriendInvite(FromToUserIds request, ServerCallContext context)
-	{
-		return _friendService
-			.SendFriendInvite(
-				IdValueExtensions.Parse<UserId>(request.FromUserId), IdValueExtensions.Parse<UserId>(request.ToUserId),
-				context.CancellationToken)
-			.Map(either => either
-				.Map(_ => new Empty())
-				.IfLeft(_ => throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid request."))));
-	}
+	public override Task<Empty> SendFriendInvite(UserIdDto request, ServerCallContext context) =>
+		_friendService
+			.SendFriendInvite(IdValueExtensions.Parse<UserId>(request.Value), context.CancellationToken)
+			.MapAsync(_ => GrpcExtensions.EmptyInstance)
+			.IfLeft(err => throw err
+				.Match(
+					() => new SendFriendInviteErrorDto { CurrentUserNotFound = GrpcExtensions.EmptyInstance },
+					() => new SendFriendInviteErrorDto { ToUserNotFound = GrpcExtensions.EmptyInstance },
+					() => new SendFriendInviteErrorDto { AlreadySent = GrpcExtensions.EmptyInstance },
+					() => new SendFriendInviteErrorDto { AlreadyFriend = GrpcExtensions.EmptyInstance })
+				.ToStatusRpcException());
 
-	public override Task<GetFriendInvitesResponse> GetFriendInvites(UserIdDto request, ServerCallContext context) =>
-		_friendService.GetFriendInvites(IdValueExtensions.Parse<UserId>(request.Value), context.CancellationToken)
-			.Map(invitesOpt => invitesOpt
-				.Map(invites => new GetFriendInvitesResponse
+	public override Task<GetFriendInvitesResponse> GetCurrentUserFriendInvites(Empty request, ServerCallContext context) =>
+		_friendService.GetCurrentUserFriendInvites(context.CancellationToken)
+			.MapAsync(invites => new GetFriendInvitesResponse
+			{
+				Invitations =
 				{
-					Invitations =
+					invites.Select(x => new FriendInvitationDto
 					{
-						invites.Select(x => new FriendInvitationDto
-						{
-							Id = x.Id.ToInnerString(),
-							FromUserId = x.FromUserId.ToInnerString(),
-						}),
-					},
-				})
-				.IfNone(() => throw new RpcException(new Status(StatusCode.NotFound, "User not found."))));
+						Id = x.Id.ToInnerString(),
+						FromUserId = x.FromUserId.ToInnerString(),
+					}),
+				},
+			})
+			.IfNone(() => throw NotFoundError.Instance.ToStatusRpcException());
 
 	public override Task<Empty> AcceptFriendInvite(FriendInvitationIdDto request, ServerCallContext context) =>
 		_friendService.AcceptFriendInvite(IdValueExtensions.Parse<FriendInvitationId>(request.Value), context.CancellationToken)
-			.Map(either => either
-				.Map(_ => new Empty())
-				.IfLeft(_ => throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid request."))));
+			.MapAsync(_ => GrpcExtensions.EmptyInstance)
+			.IfLeft(err => throw err
+				.Match(() => new FriendInviteErrorDto { InvitationNotFound = GrpcExtensions.EmptyInstance })
+				.ToStatusRpcException());
 
 	public override Task<Empty> RejectFriendInvite(FriendInvitationIdDto request, ServerCallContext context) =>
 		_friendService.RejectFriendInvite(IdValueExtensions.Parse<FriendInvitationId>(request.Value), context.CancellationToken)
-			.Map(either => either
-				.Map(_ => new Empty())
-				.IfLeft(_ => throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid request."))));
+			.MapAsync(_ => GrpcExtensions.EmptyInstance)
+			.IfLeft(err => throw err
+				.Match(() => new FriendInviteErrorDto { InvitationNotFound = GrpcExtensions.EmptyInstance })
+				.ToStatusRpcException());
 }

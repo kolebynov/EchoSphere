@@ -1,16 +1,16 @@
 using Dusharp;
-using EchoSphere.Users.Abstractions.Models;
+using EchoSphere.Domain.Abstractions.Models;
 
 namespace EchoSphere.Users.Abstractions;
 
 [Union]
-public partial class FollowError
+public partial struct FollowError
 {
 	[UnionCase]
-	public static partial FollowError InvalidFollowerId();
+	public static partial FollowError CurrentUserNotFound();
 
 	[UnionCase]
-	public static partial FollowError InvalidFollowId();
+	public static partial FollowError FollowUserNotFound();
 
 	[UnionCase]
 	public static partial FollowError AlreadyFollowed();
@@ -18,8 +18,7 @@ public partial class FollowError
 
 public interface IFollowService
 {
-	Task<Either<FollowError, Unit>> Follow(UserId followerUserId, UserId followUserId,
-		CancellationToken cancellationToken);
+	Task<Either<FollowError, Unit>> Follow(UserId followUserId, CancellationToken cancellationToken);
 
 	Task<Option<IReadOnlyList<UserId>>> GetFollowers(UserId userId, CancellationToken cancellationToken);
 }

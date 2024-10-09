@@ -1,9 +1,9 @@
 using System.Security.Claims;
 using EchoSphere.ApiGateway.Contracts;
 using EchoSphere.ApiGateway.Extensions;
+using EchoSphere.Domain.Abstractions.Models;
 using EchoSphere.Messages.Abstractions;
-using EchoSphere.Messages.Abstractions.Models;
-using EchoSphere.Users.Abstractions.Models;
+using EchoSphere.Users.Abstractions.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EchoSphere.ApiGateway.Api;
@@ -15,51 +15,54 @@ public static class ChatsApiMapper
 		var chatsApi = routeBuilder.MapGroup("/chats").RequireAuthorization();
 		chatsApi.MapGet(
 			"/",
-			async (IChatService chatService, ClaimsPrincipal user, CancellationToken cancellationToken) =>
+			(IChatService chatService, CancellationToken cancellationToken) =>
 			{
-				var currentUserId = user.GetUserId();
-				var chats = await chatService.GetUserChats(currentUserId, cancellationToken);
-				return chats
-					.Select(x => new ChatInfoDtoV1
-					{
-						Id = x.Id.Value,
-						Participants = x.Participants.Select(y => y.Value).ToArray(),
-					});
+				return chatService.GetCurrentUserChats(cancellationToken)
+					.MapAsync(chats => Results.Ok(chats
+						.Select(x => new ChatInfoDtoV1
+						{
+							Id = x.Id.Value,
+							Participants = x.Participants.Select(y => y.Value).ToArray(),
+						})))
+					.IfNone(() => Results.Problem(statusCode: 404));
 			});
 
 		chatsApi.MapPost(
 			"/",
-			async (IChatService chatService, ClaimsPrincipal user, [FromBody] CreateChatRequestV1 request,
+			(IChatService chatService, [FromBody] CreateChatRequestV1 request,
 				CancellationToken cancellationToken) =>
 			{
-				var currentUserId = user.GetUserId();
-				return (await chatService.CreateChat(
-					request.Participants.Select(x => new UserId(x)).Append(currentUserId).ToArray(),
-					cancellationToken)).Value;
+				return chatService
+					.CreateChat(request.Participants.Select(x => new UserId(x)).ToArray(), cancellationToken)
+					.MapAsync(chatId => Results.Ok(chatId.Value))
+					.IfLeft(err => err.Match(userId => Results.Problem(statusCode: 400, type: "participant_not_found", detail: $"Participant {userId} not found")));
 			});
 
 		chatsApi.MapGet(
 			"/{chatId:guid}/messages",
-			async (IChatService chatService, Guid chatId, CancellationToken cancellationToken) =>
+			(IChatService chatService, Guid chatId, CancellationToken cancellationToken) =>
 			{
-				var messages = await chatService.GetChatMessages(new ChatId(chatId), cancellationToken);
-				return messages
-					.Select(x => new ChatMessageDtoV1
-					{
-						Id = x.Id.Value,
-						Timestamp = x.Timestamp,
-						SenderId = x.SenderId.Value,
-						Text = x.Text,
-					});
+				return chatService.GetChatMessages(new ChatId(chatId), cancellationToken)
+					.MapAsync(messages => Results.Ok(messages
+						.Select(x => new ChatMessageDtoV1
+						{
+							Id = x.Id.Value,
+							Timestamp = x.Timestamp,
+							SenderId = x.SenderId.Value,
+							Text = x.Text,
+						})))
+					.IfNone(() => Results.Problem(statusCode: 404));
 			});
 
 		chatsApi.MapPost(
 			"/{chatId:guid}/messages",
-			async (IChatService chatService, ClaimsPrincipal user, Guid chatId, [FromBody] SendMessageRequestV1 request,
+			(IChatService chatService, Guid chatId, [FromBody] SendMessageRequestV1 request,
 				CancellationToken cancellationToken) =>
 			{
-				var currentUserId = user.GetUserId();
-				await chatService.SendMessage(new ChatId(chatId), currentUserId, request.Text, cancellationToken);
+				return chatService.SendMessage(new ChatId(chatId), request.Text, cancellationToken)
+					.MapAsync(messageId => Results.Ok(messageId.Value))
+					.IfLeft(err => err.Match(
+						() => Results.Problem(statusCode: 404)));
 			});
 
 		return routeBuilder;

@@ -10,4 +10,11 @@
       <ProjectReference Include="..\EchoSphere.Users.Abstractions\EchoSphere.Users.Abstractions.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Dusharp" Version="0.5.2">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+    </ItemGroup>
+
 </Project>

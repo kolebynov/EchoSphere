@@ -1,4 +1,5 @@
 var builder = DistributedApplication.CreateBuilder(args);
+var profileName = builder.Configuration["DOTNET_LAUNCH_PROFILE"] ?? "http";
 
 var postgres = builder.AddPostgres("postgres")
 	.WithImageTag("latest");
@@ -8,11 +9,12 @@ var usersDb = postgres.AddDatabase("UsersDb");
 var accountsDb = postgres.AddDatabase("AccountsDb");
 var postsDb = postgres.AddDatabase("PostsDb");
 
-var userMessageApi = builder.AddProject<Projects.EchoSphere_Messages_Api>("MessagesApi")
-	.WithReference(userMessagesDb);
-
 var usersApi = builder.AddProject<Projects.EchoSphere_Users_Api>("UsersApi")
 	.WithReference(usersDb);
+
+var userMessageApi = builder.AddProject<Projects.EchoSphere_Messages_Api>("MessagesApi")
+	.WithReference(userMessagesDb)
+	.WithReference(usersApi);
 
 var postsApi = builder.AddProject<Projects.EchoSphere_Posts_Api>("PostsApi")
 	.WithReference(postsDb);
@@ -26,7 +28,7 @@ var accountsWebApp = builder.AddProject<Projects.EchoSphere_Accounts_WebApp>("Ac
 	.WithExternalHttpEndpoints()
 	.WithReference(accountsDb);
 
-var accountsEndpoint = accountsWebApp.GetEndpoint("http");
+var accountsEndpoint = accountsWebApp.GetEndpoint(profileName);
 
 var webApp = builder.AddProject<Projects.EchoSphere_Web>("webfrontend")
 	.WithExternalHttpEndpoints()
@@ -34,7 +36,7 @@ var webApp = builder.AddProject<Projects.EchoSphere_Web>("webfrontend")
 	.WithEnvironment("IdentityUrl", accountsEndpoint)
 	.WithReference(accountsWebApp);
 
-var webAppEndpoint = webApp.GetEndpoint("http");
+var webAppEndpoint = webApp.GetEndpoint(profileName);
 accountsWebApp.WithEnvironment("WebAppClient", webAppEndpoint);
 webApp.WithEnvironment("CallBackUrl", webAppEndpoint);
 

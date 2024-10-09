@@ -1,3 +1,5 @@
+using EchoSphere.Domain.Abstractions.Models;
+
 namespace EchoSphere.Users.Abstractions.Models;
 
 public sealed class UserProfile

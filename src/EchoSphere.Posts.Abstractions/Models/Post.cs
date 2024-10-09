@@ -1,3 +1,5 @@
+using EchoSphere.Domain.Abstractions.Models;
+
 namespace EchoSphere.Posts.Abstractions.Models;
 
 public sealed class Post

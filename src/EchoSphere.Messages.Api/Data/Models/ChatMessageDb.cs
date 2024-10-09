@@ -1,5 +1,4 @@
-using EchoSphere.Messages.Abstractions.Models;
-using EchoSphere.Users.Abstractions.Models;
+using EchoSphere.Domain.Abstractions.Models;
 
 namespace EchoSphere.Messages.Api.Data.Models;
 

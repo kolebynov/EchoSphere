@@ -1,16 +1,17 @@
 using Dusharp;
+using EchoSphere.Domain.Abstractions.Models;
 using EchoSphere.Users.Abstractions.Models;
 
 namespace EchoSphere.Users.Abstractions;
 
 [Union]
-public partial class SendFriendInviteError
+public partial struct SendFriendInviteError
 {
 	[UnionCase]
-	public static partial SendFriendInviteError InvalidFromUserId();
+	public static partial SendFriendInviteError CurrentUserNotFound();
 
 	[UnionCase]
-	public static partial SendFriendInviteError InvalidToUserId();
+	public static partial SendFriendInviteError ToUserNotFound();
 
 	[UnionCase]
 	public static partial SendFriendInviteError AlreadySent();
@@ -20,20 +21,19 @@ public partial class SendFriendInviteError
 }
 
 [Union]
-public partial class FriendInviteError
+public partial struct FriendInviteError
 {
 	[UnionCase]
-	public static partial FriendInviteError InvalidInvitationId();
+	public static partial FriendInviteError InvitationNotFound();
 }
 
 public interface IFriendService
 {
 	Task<Option<IReadOnlyList<UserId>>> GetFriends(UserId userId, CancellationToken cancellationToken);
 
-	Task<Either<SendFriendInviteError, Unit>> SendFriendInvite(UserId fromUserId, UserId toUserId,
-		CancellationToken cancellationToken);
+	Task<Either<SendFriendInviteError, Unit>> SendFriendInvite(UserId toUserId, CancellationToken cancellationToken);
 
-	Task<Option<IReadOnlyList<FriendInvitation>>> GetFriendInvites(UserId userId, CancellationToken cancellationToken);
+	Task<Option<IReadOnlyList<FriendInvitation>>> GetCurrentUserFriendInvites(CancellationToken cancellationToken);
 
 	Task<Either<FriendInviteError, Unit>> AcceptFriendInvite(
 		FriendInvitationId invitationId, CancellationToken cancellationToken);

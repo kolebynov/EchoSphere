@@ -1,8 +1,10 @@
 using System.Reflection;
+using EchoSphere.Domain.Abstractions.Models;
+using EchoSphere.Domain.AspNetCore.Extensions;
+using EchoSphere.Domain.LinqToDb.Extensions;
 using EchoSphere.Infrastructure.Db.Extensions;
 using EchoSphere.Infrastructure.Hosting.Extensions;
 using EchoSphere.ServiceDefaults;
-using EchoSphere.SharedModels.LinqToDb.Extensions;
 using EchoSphere.Users.Abstractions;
 using EchoSphere.Users.Abstractions.Models;
 using EchoSphere.Users.Api.Data;
@@ -40,11 +42,13 @@ fluentMappingBuilder.Entity<FollowerDb>()
 fluentMappingBuilder.Build();
 
 mappingSchema
-	.AddGuidIdValueConverter<FriendInvitationId>()
-	.AddGuidIdValueConverter<UserId>();
+	.AddIdValueConverter<Guid, FriendInvitationId>()
+	.AddIdValueConverter<Guid, UserId>();
 
 builder.Services.AddLinqToDb<AppDataConnection>(builder.Configuration, "UsersDb", mappingSchema,
 	Assembly.GetExecutingAssembly());
+
+builder.Services.AddDomainServices();
 
 builder.Services.AddScoped<IFriendService, FriendService>();
 builder.Services.AddScoped<IUserProfileService, UserProfileService>();
@@ -73,6 +77,9 @@ builder.Services.AddScopedAsyncInitializer(async (sp, ct) =>
 });
 
 var app = builder.Build();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapGrpcService<UserProfileServiceGrpc>();
 app.MapGrpcService<FriendServiceGrpc>();

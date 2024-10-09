@@ -1,0 +1,7 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<ItemGroup>
+		<PackageReference Include="Grpc.AspNetCore.Server.ClientFactory" Version="2.66.0"/>
+		<PackageReference Include="Grpc.StatusProto" Version="2.66.0"/>
+		<PackageReference Include="LanguageExt.Core" Version="4.4.9"/>
+	</ItemGroup>
+</Project>

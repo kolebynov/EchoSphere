@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Protobuf_StandardImportsPath>$(Protobuf_StandardImportsPath);$(MSBuildProjectDirectory)\..\..\Protos</Protobuf_StandardImportsPath>
+		<Protobuf_StandardImportsPath>$(Protobuf_StandardImportsPath);$(MSBuildProjectDirectory)\..\EchoSphere.GrpcShared</Protobuf_StandardImportsPath>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Google.Protobuf" Version="3.28.0"/>
-		<PackageReference Include="Grpc.Net.Client" Version="2.65.0"/>
+		<PackageReference Include="Google.Protobuf" Version="3.28.2" />
+		<PackageReference Include="Grpc.Net.Client" Version="2.66.0" />
 		<PackageReference Include="Grpc.Tools" Version="2.66.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -14,7 +14,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Protobuf Include="models.proto" GrpcServices="none"/>
 		<Protobuf Include="..\EchoSphere.Messages.Api\Protos\messages.proto">
 			<GrpcServices>Client</GrpcServices>
 			<Access>Public</Access>
@@ -27,6 +26,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\EchoSphere.GrpcClientShared\EchoSphere.GrpcClientShared.csproj" />
+		<ProjectReference Include="..\EchoSphere.GrpcShared\EchoSphere.GrpcShared.csproj" />
 		<ProjectReference Include="..\EchoSphere.Messages.Abstractions\EchoSphere.Messages.Abstractions.csproj"/>
 	</ItemGroup>
 

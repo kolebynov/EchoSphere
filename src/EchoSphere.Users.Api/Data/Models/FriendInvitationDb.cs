@@ -1,3 +1,4 @@
+using EchoSphere.Domain.Abstractions.Models;
 using EchoSphere.Users.Abstractions.Models;
 
 namespace EchoSphere.Users.Api.Data.Models;

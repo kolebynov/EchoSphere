@@ -1,12 +1,17 @@
-using EchoSphere.GrpcModels;
+using EchoSphere.Domain.Abstractions.Extensions;
+using EchoSphere.Domain.Abstractions.Models;
+using EchoSphere.GrpcShared.Contracts;
+using EchoSphere.GrpcShared.Errors;
+using EchoSphere.GrpcShared.Extensions;
 using EchoSphere.Posts.Abstractions;
 using EchoSphere.Posts.Grpc;
-using EchoSphere.SharedModels.Extensions;
-using EchoSphere.Users.Abstractions.Models;
+using EchoSphere.Users.Abstractions.Extensions;
 using Grpc.Core;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EchoSphere.Posts.Api.GrpcServices;
 
+[Authorize]
 internal sealed class PostServiceGrpc : PostService.PostServiceBase
 {
 	private readonly IPostService _postService;
@@ -16,22 +21,22 @@ internal sealed class PostServiceGrpc : PostService.PostServiceBase
 		_postService = postService;
 	}
 
-	public override async Task<PostIdDto> PublishPost(PublishPostRequest request, ServerCallContext context)
-	{
-		var postId = await _postService.PublishPost(IdValueExtensions.Parse<UserId>(request.UserId), request.Title, request.Body,
-			context.CancellationToken);
-		return new PostIdDto { Value = postId.ToInnerString() };
-	}
+	public override Task<PostIdDto> PublishPost(PublishPostRequest request, ServerCallContext context) =>
+		_postService
+			.PublishPost(request.Title, request.Body, context.CancellationToken)
+			.MapAsync(postId => postId.ToDto())
+			.IfLeft(err => throw err
+				.Match(() => new PublishPostErrorDto { InvalidUser = GrpcExtensions.EmptyInstance })
+				.ToStatusRpcException());
 
-	public override async Task<PostsDto> GetUserPosts(UserIdDto request, ServerCallContext context)
-	{
-		var posts = await _postService.GetUserPosts(IdValueExtensions.Parse<UserId>(request.Value), context.CancellationToken);
-		return new PostsDto
-		{
-			Posts =
+	public override Task<PostsDto> GetUserPosts(UserIdDto request, ServerCallContext context) =>
+		_postService.GetUserPosts(IdValueExtensions.Parse<UserId>(request.Value), context.CancellationToken)
+			.MapAsync(posts => new PostsDto
 			{
-				posts.Select(x => new PostDto { Id = x.Id.ToInnerString(), Title = x.Title, Body = x.Body }),
-			},
-		};
-	}
+				Posts =
+				{
+					posts.Select(x => new PostDto { Id = x.Id.ToInnerString(), Title = x.Title, Body = x.Body }),
+				},
+			})
+			.IfNone(() => throw NotFoundError.Instance.ToStatusRpcException());
 }

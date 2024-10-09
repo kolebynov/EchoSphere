@@ -1,13 +1,17 @@
-using EchoSphere.GrpcModels;
-using EchoSphere.SharedModels.Extensions;
+using EchoSphere.Domain.Abstractions.Extensions;
+using EchoSphere.Domain.Abstractions.Models;
+using EchoSphere.GrpcShared.Contracts;
+using EchoSphere.GrpcShared.Errors;
+using EchoSphere.GrpcShared.Extensions;
 using EchoSphere.Users.Abstractions;
-using EchoSphere.Users.Abstractions.Models;
 using EchoSphere.Users.Grpc;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EchoSphere.Users.Api.GrpcServices;
 
+[Authorize]
 internal sealed class UserProfileServiceGrpc : UserProfileService.UserProfileServiceBase
 {
 	private readonly ILogger<UserProfileServiceGrpc> _logger;
@@ -20,15 +24,14 @@ internal sealed class UserProfileServiceGrpc : UserProfileService.UserProfileSer
 	}
 
 	public override Task<UserProfileDto> GetUserProfile(UserIdDto request, ServerCallContext context) =>
-		_userProfileService.GetUserProfile(IdValueExtensions.Parse<UserId>(request.Value), context.CancellationToken)
-			.Map(userProfileOpt => userProfileOpt
-				.Map(userProfile => new UserProfileDto
-				{
-					Id = userProfile.Id.ToInnerString(),
-					FirstName = userProfile.FirstName,
-					SecondName = userProfile.SecondName,
-				})
-				.IfNone(() => throw new RpcException(new Status(StatusCode.NotFound, "User not found."))));
+		_userProfileService.GetUserProfile(request.ToModel(), context.CancellationToken)
+			.MapAsync(userProfile => new UserProfileDto
+			{
+				Id = userProfile.Id.ToInnerString(),
+				FirstName = userProfile.FirstName,
+				SecondName = userProfile.SecondName,
+			})
+			.IfNone(() => throw NotFoundError.Instance.ToStatusRpcException());
 
 	public override async Task<GetUserProfilesResponse> GetUserProfiles(Empty request, ServerCallContext context)
 	{
@@ -49,7 +52,7 @@ internal sealed class UserProfileServiceGrpc : UserProfileService.UserProfileSer
 
 	public override Task<CheckUsersExistenceResponse> CheckUsersExistence(UserIdsDto request, ServerCallContext context) =>
 		_userProfileService
-			.CheckUsersExistence(request.Ids.Select(x => IdValueExtensions.Parse<UserId>(x)).ToArray(), context.CancellationToken)
+			.CheckUsersExistence(request.Ids.Select(IdValueExtensions.Parse<UserId>).ToArray(), context.CancellationToken)
 			.Map(usersExistence => new CheckUsersExistenceResponse
 			{
 				UsersExistence =

@@ -1,21 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Dusharp" Version="0.3.0">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-      <PackageReference Include="LanguageExt.Core" Version="4.4.9" />
-    </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Dusharp" Version="0.5.2">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\EchoSphere.SharedModels\EchoSphere.SharedModels.csproj" />
-    </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\EchoSphere.Domain.Abstractions\EchoSphere.Domain.Abstractions.csproj" />
+	</ItemGroup>
 
 </Project>

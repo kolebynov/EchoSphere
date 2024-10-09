@@ -1,24 +1,25 @@
 syntax = "proto3";
 
 import "google/protobuf/empty.proto";
-import "models.proto";
+import "SharedProtos/contracts.proto";
 
 package echo_sphere.posts.grpc;
 
 service PostService {
-	rpc PublishPost (PublishPostRequest) returns (PostIdDto);
+	rpc PublishPost (PublishPostRequest) returns (echo_sphere.grpc_shared.contracts.PostIdDto);
 
-	rpc GetUserPosts(echo_sphere.grpc_models.UserIdDto) returns (PostsDto);
-}
-
-message PostIdDto {
-	string value = 1;
+	rpc GetUserPosts(echo_sphere.grpc_shared.contracts.UserIdDto) returns (PostsDto);
 }
 
 message PublishPostRequest {
-	string user_id = 1;
 	string title = 2;
 	string body = 3;
+}
+
+message PublishPostErrorDto {
+	oneof error {
+		google.protobuf.Empty invalid_user = 1;
+	}
 }
 
 message PostDto {

@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<ItemGroup>
-		<PackageReference Include="FluentMigrator.Runner.Postgres" Version="5.2.0"/>
+		<PackageReference Include="FluentMigrator.Runner.Postgres" Version="6.2.0" />
 		<PackageReference Include="linq2db.AspNet" Version="5.4.1"/>
-		<PackageReference Include="Aspire.Npgsql" Version="8.2.0"/>
+		<PackageReference Include="Aspire.Npgsql" Version="8.2.1" />
 	</ItemGroup>
 
 	<ItemGroup>

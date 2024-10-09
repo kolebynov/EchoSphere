@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package echo_sphere.grpc_shared.contracts;
+
+message UserIdDto {
+	string value = 1;
+}
+
+message ChatIdDto {
+	string value = 1;
+}
+
+message MessageIdDto {
+	int64 value = 1;
+}
+
+message PostIdDto {
+	string value = 1;
+}

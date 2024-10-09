@@ -35,6 +35,10 @@ public static class ApplicationBuildingExtensions
 			.AddCookie(options =>
 			{
 				options.ExpireTimeSpan = TimeSpan.FromMinutes(sessionCookieLifetime);
+				options.Events.OnValidatePrincipal += context =>
+				{
+					return Task.CompletedTask;
+				};
 			})
 			.AddOpenIdConnect(options =>
 			{

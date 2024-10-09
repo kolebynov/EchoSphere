@@ -1,24 +1,24 @@
 syntax = "proto3";
 
 import "google/protobuf/empty.proto";
-import "models.proto";
+import "SharedProtos/contracts.proto";
 
 package echo_sphere.users.grpc;
 
 service UserProfileService {
 	rpc GetUserProfiles (google.protobuf.Empty) returns (GetUserProfilesResponse);
 
-	rpc GetUserProfile (echo_sphere.grpc_models.UserIdDto) returns (UserProfileDto);
+	rpc GetUserProfile (echo_sphere.grpc_shared.contracts.UserIdDto) returns (UserProfileDto);
 
 	rpc CheckUsersExistence (UserIdsDto) returns (CheckUsersExistenceResponse);
 }
 
 service FriendService {
-	rpc GetFriends (echo_sphere.grpc_models.UserIdDto) returns (UserIdsDto);
+	rpc GetFriends (echo_sphere.grpc_shared.contracts.UserIdDto) returns (UserIdsDto);
 
-	rpc SendFriendInvite (FromToUserIds) returns (google.protobuf.Empty);
+	rpc SendFriendInvite (echo_sphere.grpc_shared.contracts.UserIdDto) returns (google.protobuf.Empty);
 
-	rpc GetFriendInvites (echo_sphere.grpc_models.UserIdDto) returns (GetFriendInvitesResponse);
+	rpc GetCurrentUserFriendInvites (google.protobuf.Empty) returns (GetFriendInvitesResponse);
 
 	rpc AcceptFriendInvite (FriendInvitationIdDto) returns (google.protobuf.Empty);
 
@@ -26,18 +26,21 @@ service FriendService {
 }
 
 service FollowService {
-	rpc Follow (FromToUserIds) returns (google.protobuf.Empty);
+	rpc Follow (echo_sphere.grpc_shared.contracts.UserIdDto) returns (google.protobuf.Empty);
 
-	rpc GetFollowers (echo_sphere.grpc_models.UserIdDto) returns (UserIdsDto);
+	rpc GetFollowers (echo_sphere.grpc_shared.contracts.UserIdDto) returns (UserIdsDto);
 }
 
 message UserIdsDto {
 	repeated string ids = 1;
 }
 
-message FromToUserIds {
-	string from_user_id = 1;
-	string to_user_id = 2;
+message FollowErrorDto {
+	oneof error {
+		google.protobuf.Empty current_user_not_found = 1;
+		google.protobuf.Empty follow_user_not_found = 2;
+		google.protobuf.Empty already_followed = 3;
+	}
 }
 
 message FriendInvitationIdDto {
@@ -47,6 +50,21 @@ message FriendInvitationIdDto {
 message FriendInvitationDto {
 	string id = 1;
 	string from_user_id = 2;
+}
+
+message SendFriendInviteErrorDto {
+	oneof error {
+		google.protobuf.Empty current_user_not_found = 1;
+		google.protobuf.Empty to_user_not_found = 2;
+		google.protobuf.Empty already_sent = 3;
+		google.protobuf.Empty already_friend = 4;
+	}
+}
+
+message FriendInviteErrorDto {
+	oneof error {
+		google.protobuf.Empty invitation_not_found = 1;
+	}
 }
 
 message GetFriendInvitesResponse {

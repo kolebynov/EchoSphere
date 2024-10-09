@@ -1,45 +1,59 @@
-using EchoSphere.GrpcModels;
+using EchoSphere.Domain.Abstractions.Extensions;
+using EchoSphere.Domain.Abstractions.Models;
+using EchoSphere.GrpcClientShared;
+using EchoSphere.GrpcShared.Errors;
+using EchoSphere.GrpcShared.Extensions;
 using EchoSphere.Posts.Abstractions;
 using EchoSphere.Posts.Abstractions.Models;
 using EchoSphere.Posts.Grpc;
-using EchoSphere.SharedModels.Extensions;
-using EchoSphere.Users.Abstractions.Models;
+using EchoSphere.Users.Abstractions.Extensions;
 
 namespace EchoSphere.Posts.Client;
 
-public sealed class PostGrpcClient : IPostService
+internal sealed class PostGrpcClient : IPostService
 {
-	private readonly PostService.PostServiceClient _serviceGrpcClient;
+	private readonly GrpcCallExecutor<PostService.PostServiceClient> _grpcExecutor;
 
-	public PostGrpcClient(PostService.PostServiceClient serviceGrpcClient)
+	public PostGrpcClient(GrpcCallExecutor<PostService.PostServiceClient> grpcExecutor)
 	{
-		_serviceGrpcClient = serviceGrpcClient;
+		_grpcExecutor = grpcExecutor;
 	}
 
-	public async ValueTask<PostId> PublishPost(UserId userId, string title, string body, CancellationToken cancellationToken)
-	{
-		var postId = await _serviceGrpcClient.PublishPostAsync(
-			new PublishPostRequest
+	public Task<Either<PublishPostError, PostId>> PublishPost(string title, string body,
+		CancellationToken cancellationToken) =>
+		_grpcExecutor
+			.ExecuteAsync<PostId, PublishPostErrorDto>(
+				async client =>
+				{
+					var postId = await client.PublishPostAsync(
+						new PublishPostRequest
+						{
+							Title = title,
+							Body = body,
+						},
+						cancellationToken: cancellationToken);
+					return postId.ToModel();
+				})
+			.MapLeftAsync(err => err.ErrorCase switch
 			{
-				UserId = userId.ToInnerString(),
-				Title = title,
-				Body = body,
-			},
-			cancellationToken: cancellationToken);
-		return IdValueExtensions.Parse<PostId>(postId.Value);
-	}
+				PublishPostErrorDto.ErrorOneofCase.InvalidUser => PublishPostError.InvalidUser(),
+				_ => throw new ArgumentOutOfRangeException(nameof(err), err.ErrorCase, null),
+			});
 
-	public async ValueTask<IReadOnlyList<Post>> GetUserPosts(UserId userId, CancellationToken cancellationToken)
-	{
-		var posts = await _serviceGrpcClient.GetUserPostsAsync(
-			new UserIdDto { Value = userId.ToInnerString() }, cancellationToken: cancellationToken);
-		return posts.Posts
-			.Select(x => new Post
-			{
-				Id = IdValueExtensions.Parse<PostId>(x.Id),
-				Title = x.Title,
-				Body = x.Body,
-			})
-			.ToArray();
-	}
+	public Task<Option<IReadOnlyList<Post>>> GetUserPosts(UserId userId, CancellationToken cancellationToken) =>
+		_grpcExecutor
+			.ExecuteAsync<Option<IReadOnlyList<Post>>, NotFoundError>(
+				async client =>
+				{
+					var posts = await client.GetUserPostsAsync(userId.ToDto(), cancellationToken: cancellationToken);
+					return posts.Posts
+						.Select(x => new Post
+						{
+							Id = IdValueExtensions.Parse<PostId>(x.Id),
+							Title = x.Title,
+							Body = x.Body,
+						})
+						.ToArray();
+				})
+			.IfLeft(_ => None);
 }

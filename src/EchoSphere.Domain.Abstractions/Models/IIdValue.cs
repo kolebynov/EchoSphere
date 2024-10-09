@@ -1,4 +1,4 @@
-namespace EchoSphere.SharedModels;
+namespace EchoSphere.Domain.Abstractions.Models;
 
 public interface IIdValue<TValue>
 {

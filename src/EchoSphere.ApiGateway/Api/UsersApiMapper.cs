@@ -1,11 +1,12 @@
 using System.Security.Claims;
 using EchoSphere.ApiGateway.Contracts;
 using EchoSphere.ApiGateway.Extensions;
-using EchoSphere.SharedModels.Extensions;
+using EchoSphere.Domain.Abstractions.Extensions;
+using EchoSphere.Domain.Abstractions.Models;
 using EchoSphere.Users.Abstractions;
+using EchoSphere.Users.Abstractions.Extensions;
 using EchoSphere.Users.Abstractions.Models;
-using LanguageExt;
-using LanguageExt.UnsafeValueAccess;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace EchoSphere.ApiGateway.Api;
 
@@ -14,125 +15,18 @@ public static class UsersApiMapper
 	public static IEndpointRouteBuilder MapUsersApi(this IEndpointRouteBuilder routeBuilder)
 	{
 		var usersApi = routeBuilder.MapGroup("/users").RequireAuthorization();
+		var friendInvitesApi = routeBuilder.MapGroup("/friendInvites").RequireAuthorization();
 
-		usersApi.MapGet(
-			"/",
-			async (IUserProfileService userProfileService, CancellationToken cancellationToken) =>
-			{
-				var profiles = await userProfileService.GetUserProfiles(cancellationToken);
-				return profiles
-					.Select(x => new UserProfileDtoV1
-					{
-						Id = x.Id.Value,
-						FirstName = x.FirstName,
-						SecondName = x.SecondName,
-					});
-			});
+		usersApi.MapGet("/", GetUserProfiles);
+		usersApi.MapGet("/{userId}", GetUserProfile);
+		usersApi.MapGet("/{userId}/friends", GetUserFriends);
+		usersApi.MapPost("/{toUserId:guid}/sendFriendInvite", SendFriendInvite);
+		usersApi.MapPost("/{followUserId:guid}/follow", Follow);
+		usersApi.MapGet("/{userId}/followers", GetFollowers);
 
-		usersApi.MapGet(
-			"/{userId}",
-			async (IUserProfileService userProfileService, ClaimsPrincipal currentUser, string userId, CancellationToken cancellationToken) =>
-			{
-				var profile = (await userProfileService.GetUserProfile(ParseUserId(userId, currentUser), cancellationToken)).ValueUnsafe();
-				return new UserProfileDtoV1
-				{
-					Id = profile.Id.Value,
-					FirstName = profile.FirstName,
-					SecondName = profile.SecondName,
-				};
-			});
-
-		usersApi.MapGet(
-			"/{userId}/friends",
-			async (IFriendService friendService, ClaimsPrincipal currentUser, string userId,
-				CancellationToken cancellationToken) =>
-			{
-				var friends = await friendService.GetFriends(ParseUserId(userId, currentUser), cancellationToken);
-				return friends.ValueUnsafe().Select(x => x.Value);
-			});
-
-		usersApi.MapPost(
-			"/{toUserId:guid}/sendFriendInvite",
-			(IFriendService friendService, ClaimsPrincipal currentUser, Guid toUserId,
-				CancellationToken cancellationToken) =>
-				friendService.SendFriendInvite(currentUser.GetUserId(), new UserId(toUserId), cancellationToken));
-
-		usersApi.MapGet(
-			"/{userId}/friendInvites",
-			async (IFriendService friendService, ClaimsPrincipal currentUser, string userId,
-				CancellationToken cancellationToken) =>
-			{
-				var currentUserId = currentUser.GetUserId();
-				var parsedUserId = ParseUserId(userId, currentUser);
-				if (currentUserId != parsedUserId)
-				{
-					return [];
-				}
-
-				var invites = (await friendService.GetFriendInvites(currentUserId, cancellationToken)).ValueUnsafe();
-				return invites.Select(x => new FriendInvitationDtoV1
-				{
-					Id = x.Id.Value,
-					FromUserId = x.FromUserId.Value,
-				});
-			});
-
-		usersApi.MapPost(
-			"/{userId}/friendInvites/{invitationId:guid}/accept",
-			(IFriendService friendService, ClaimsPrincipal currentUser, string userId, Guid invitationId,
-				CancellationToken cancellationToken) =>
-			{
-				var currentUserId = currentUser.GetUserId();
-				var parsedUserId = ParseUserId(userId, currentUser);
-				if (currentUserId != parsedUserId)
-				{
-					return Task.CompletedTask;
-				}
-
-				return friendService.AcceptFriendInvite(new FriendInvitationId(invitationId), cancellationToken)
-					.Map(x => x.ValueUnsafe());
-			});
-
-		usersApi.MapPost(
-			"/{userId}/friendInvites/{invitationId:guid}/reject",
-			(IFriendService friendService, ClaimsPrincipal currentUser, string userId, Guid invitationId,
-				CancellationToken cancellationToken) =>
-			{
-				var currentUserId = currentUser.GetUserId();
-				var parsedUserId = ParseUserId(userId, currentUser);
-				if (currentUserId != parsedUserId)
-				{
-					return Task.CompletedTask;
-				}
-
-				return friendService.RejectFriendInvite(new FriendInvitationId(invitationId), cancellationToken)
-					.Map(x => x.ValueUnsafe());
-			});
-
-		usersApi.MapPost(
-			"/{followUserId:guid}/follow",
-			(IFollowService followService, ClaimsPrincipal currentUser, Guid followUserId,
-				CancellationToken cancellationToken) =>
-			{
-				var currentUserId = currentUser.GetUserId();
-				if (currentUserId.Value == followUserId)
-				{
-					return Task.CompletedTask;
-				}
-
-				return followService.Follow(currentUserId, new UserId(followUserId), cancellationToken)
-					.Map(x => x.ValueUnsafe());
-			});
-
-		usersApi.MapGet(
-			"/{userId}/followers",
-			async (IFollowService followService, ClaimsPrincipal currentUser, string userId,
-				CancellationToken cancellationToken) =>
-			{
-				var parsedUserId = ParseUserId(userId, currentUser);
-				var followers = (await followService.GetFollowers(parsedUserId, cancellationToken)).ValueUnsafe();
-				return followers.Select(x => x.Value);
-			});
+		friendInvitesApi.MapGet("/", GetFriendInvites);
+		friendInvitesApi.MapPost("/{invitationId:guid}/accept", AcceptInvitation);
+		friendInvitesApi.MapPost("/{invitationId:guid}/reject", RejectInvitation);
 
 		return routeBuilder;
 	}
@@ -142,4 +36,88 @@ public static class UsersApiMapper
 		userId.Equals("me", StringComparison.OrdinalIgnoreCase)
 			? currentUser.GetUserId()
 			: IdValueExtensions.Parse<UserId>(userId);
+
+	private static async Task<IEnumerable<UserProfileDtoV1>> GetUserProfiles(
+		IUserProfileService userProfileService, CancellationToken cancellationToken)
+	{
+		var profiles = await userProfileService.GetUserProfiles(cancellationToken);
+		return profiles
+			.Select(x => new UserProfileDtoV1
+			{
+				Id = x.Id.Value,
+				FirstName = x.FirstName,
+				SecondName = x.SecondName,
+			});
+	}
+
+	private static Task<Results<Ok<UserProfileDtoV1>, ProblemHttpResult>> GetUserProfile(
+		IUserProfileService userProfileService, ClaimsPrincipal currentUser, string userId,
+		CancellationToken cancellationToken) =>
+		userProfileService.GetUserProfile(ParseUserId(userId, currentUser), cancellationToken)
+			.MapAsync(profile => TypedResults.Ok(new UserProfileDtoV1
+			{
+				Id = profile.Id.Value,
+				FirstName = profile.FirstName,
+				SecondName = profile.SecondName,
+			}).ToResults<Ok<UserProfileDtoV1>, ProblemHttpResult>())
+			.IfNone(() => TypedResults.Problem(statusCode: 404));
+
+	private static Task<Results<Ok<IEnumerable<Guid>>, ProblemHttpResult>> GetUserFriends(
+		IFriendService friendService, ClaimsPrincipal currentUser, string userId, CancellationToken cancellationToken) =>
+		friendService.GetFriends(ParseUserId(userId, currentUser), cancellationToken)
+			.MapAsync(friends => TypedResults.Ok(friends.Select(x => x.Value))
+				.ToResults<Ok<IEnumerable<Guid>>, ProblemHttpResult>())
+			.IfNone(() => TypedResults.Problem(statusCode: 404));
+
+	private static Task<Results<Ok, ProblemHttpResult>> SendFriendInvite(
+		IFriendService friendService, Guid toUserId, CancellationToken cancellationToken) =>
+		friendService.SendFriendInvite(new UserId(toUserId), cancellationToken)
+			.MapAsync(_ => TypedResults.Ok().ToResults<Ok, ProblemHttpResult>())
+			.IfLeft(err => err.Match(
+				() => TypedResults.Problem(statusCode: 400, type: "Invalid_from_user"),
+				() => TypedResults.Problem(statusCode: 400, type: "Invalid_to_user"),
+				() => TypedResults.Problem(statusCode: 400, type: "already_sent"),
+				() => TypedResults.Problem(statusCode: 400, type: "already_friend")));
+
+	private static Task<Results<Ok<IEnumerable<FriendInvitationDtoV1>>, ProblemHttpResult>> GetFriendInvites(
+		IFriendService friendService, CancellationToken cancellationToken) =>
+		friendService.GetCurrentUserFriendInvites(cancellationToken)
+			.MapAsync(invites => TypedResults.Ok(invites.Select(x => new FriendInvitationDtoV1
+			{
+				Id = x.Id.Value,
+				FromUserId = x.FromUserId.Value,
+			})).ToResults<Ok<IEnumerable<FriendInvitationDtoV1>>, ProblemHttpResult>())
+			.IfNone(() => TypedResults.Problem(statusCode: 404));
+
+	private static Task<Results<Ok, ProblemHttpResult>> AcceptInvitation(
+		IFriendService friendService, Guid invitationId, CancellationToken cancellationToken) =>
+		friendService.AcceptFriendInvite(new FriendInvitationId(invitationId), cancellationToken)
+			.MapAsync(_ => TypedResults.Ok().ToResults<Ok, ProblemHttpResult>())
+			.IfLeft(err => err.Match(() => TypedResults.Problem(statusCode: 404, type: "invitation_not_found")));
+
+	private static Task<Results<Ok, ProblemHttpResult>> RejectInvitation(
+		IFriendService friendService, Guid invitationId, CancellationToken cancellationToken) =>
+		friendService.RejectFriendInvite(new FriendInvitationId(invitationId), cancellationToken)
+			.MapAsync(_ => TypedResults.Ok().ToResults<Ok, ProblemHttpResult>())
+			.IfLeft(err => err.Match(() => TypedResults.Problem(statusCode: 404, type: "invitation_not_found")));
+
+	private static Task<Results<Ok, ProblemHttpResult>> Follow(
+		IFollowService followService, Guid followUserId, CancellationToken cancellationToken) =>
+		followService.Follow(new UserId(followUserId), cancellationToken)
+			.MapAsync(_ => TypedResults.Ok().ToResults<Ok, ProblemHttpResult>())
+			.IfLeft(err => err.Match(
+				() => TypedResults.Problem(statusCode: 404, type: "user_not_found"),
+				() => TypedResults.Problem(statusCode: 404, type: "follow_user_not_found"),
+				() => TypedResults.Problem(statusCode: 400, type: "already_followed")));
+
+	private static Task<Results<Ok<IEnumerable<Guid>>, ProblemHttpResult>> GetFollowers(
+		IFollowService followService, ClaimsPrincipal currentUser, string userId,
+		CancellationToken cancellationToken)
+	{
+		var parsedUserId = ParseUserId(userId, currentUser);
+		return followService.GetFollowers(parsedUserId, cancellationToken)
+			.MapAsync(followers => TypedResults.Ok(followers.Select(x => x.Value))
+				.ToResults<Ok<IEnumerable<Guid>>, ProblemHttpResult>())
+			.IfNone(() => TypedResults.Problem(statusCode: 404));
+	}
 }

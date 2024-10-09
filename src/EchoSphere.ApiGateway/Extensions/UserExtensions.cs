@@ -1,6 +1,6 @@
 using System.Security.Claims;
-using EchoSphere.SharedModels.Extensions;
-using EchoSphere.Users.Abstractions.Models;
+using EchoSphere.Domain.Abstractions.Extensions;
+using EchoSphere.Domain.Abstractions.Models;
 
 namespace EchoSphere.ApiGateway.Extensions;
 
