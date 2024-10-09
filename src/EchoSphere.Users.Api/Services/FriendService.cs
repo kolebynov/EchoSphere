@@ -120,8 +120,8 @@ internal sealed class FriendService : IFriendService
 				await _dataConnection.InsertAsync(
 					new FriendLinkDb { User1Id = user1Id, User2Id = user2Id },
 					token: cancellationToken);
-				await _followService.Follow(user2Id, cancellationToken);
-				await _followService.Follow(user1Id, cancellationToken);
+				await _followService.Follow(user1Id, user2Id, cancellationToken);
+				await _followService.Follow(user2Id, user1Id, cancellationToken);
 				await transaction.CommitAsync(cancellationToken);
 			})
 			.Map(either => either.Map(_ => Unit.Default));

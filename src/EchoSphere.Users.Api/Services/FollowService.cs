@@ -12,23 +12,21 @@ internal sealed class FollowService : IFollowService
 {
 	private readonly DataConnection _dataConnection;
 	private readonly IUserProfileService _userProfileService;
-	private readonly ICurrentUserAccessor _currentUserAccessor;
 
-	public FollowService(DataConnection dataConnection, IUserProfileService userProfileService,
-		ICurrentUserAccessor currentUserAccessor)
+	public FollowService(DataConnection dataConnection, IUserProfileService userProfileService)
 	{
 		_dataConnection = dataConnection;
 		_userProfileService = userProfileService;
-		_currentUserAccessor = currentUserAccessor;
 	}
 
-	public Task<Either<FollowError, Unit>> Follow(UserId followUserId, CancellationToken cancellationToken) =>
-		_userProfileService.CheckUsersExistence([_currentUserAccessor.CurrentUserId, followUserId], cancellationToken)
+	public Task<Either<FollowError, Unit>> Follow(UserId followerUserId, UserId followUserId,
+		CancellationToken cancellationToken) =>
+		_userProfileService.CheckUsersExistence([followerUserId, followUserId], cancellationToken)
 			.MapAsync(async usersExistence =>
 			{
 				if (!usersExistence[0].Exists)
 				{
-					return Either<FollowError, Unit>.Left(FollowError.CurrentUserNotFound());
+					return Either<FollowError, Unit>.Left(FollowError.FollowerUserNotFound());
 				}
 
 				if (!usersExistence[1].Exists)
@@ -38,7 +36,7 @@ internal sealed class FollowService : IFollowService
 
 				var followers = _dataConnection.GetTable<FollowerDb>();
 				if (await followers.AnyAsync(
-					    x => x.UserId == followUserId && x.FollowerUserId == _currentUserAccessor.CurrentUserId, cancellationToken))
+					    x => x.UserId == followUserId && x.FollowerUserId == followerUserId, cancellationToken))
 				{
 					return FollowError.AlreadyFollowed();
 				}
@@ -46,7 +44,7 @@ internal sealed class FollowService : IFollowService
 				return Unit.Default;
 			})
 			.DoAsync(_ => _dataConnection.InsertAsync(
-				new FollowerDb { UserId = followUserId, FollowerUserId = _currentUserAccessor.CurrentUserId }, token: cancellationToken));
+				new FollowerDb { UserId = followUserId, FollowerUserId = followerUserId }, token: cancellationToken));
 
 	public Task<Option<IReadOnlyList<UserId>>> GetFollowers(UserId userId, CancellationToken cancellationToken) =>
 		_userProfileService.CheckUsersExistence([userId], cancellationToken)

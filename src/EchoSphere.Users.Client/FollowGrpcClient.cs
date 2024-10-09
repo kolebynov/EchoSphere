@@ -18,17 +18,23 @@ internal sealed class FollowGrpcClient : IFollowService
 		_grpcExecutor = grpcExecutor;
 	}
 
-	public Task<Either<FollowError, Unit>> Follow(UserId followUserId, CancellationToken cancellationToken) =>
+	public Task<Either<FollowError, Unit>> Follow(UserId followerUserId, UserId followUserId,
+		CancellationToken cancellationToken) =>
 		_grpcExecutor
 			.ExecuteAsync<Unit, FollowErrorDto>(
 				async client =>
 				{
-					await client.FollowAsync(followUserId.ToDto(), cancellationToken: cancellationToken);
+					await client.FollowAsync(
+						new FollowRequest
+						{
+							FollowerUserId = followerUserId.ToInnerString(),
+							FollowUserId = followUserId.ToInnerString(),
+						}, cancellationToken: cancellationToken);
 					return Unit.Default;
 				})
 			.MapLeftAsync(err => err.ErrorCase switch
 			{
-				FollowErrorDto.ErrorOneofCase.CurrentUserNotFound => FollowError.CurrentUserNotFound(),
+				FollowErrorDto.ErrorOneofCase.CurrentUserNotFound => FollowError.FollowerUserNotFound(),
 				FollowErrorDto.ErrorOneofCase.FollowUserNotFound => FollowError.FollowUserNotFound(),
 				FollowErrorDto.ErrorOneofCase.AlreadyFollowed => FollowError.AlreadyFollowed(),
 				_ => throw new ArgumentOutOfRangeException(nameof(err), err.ErrorCase, null),

@@ -7,7 +7,7 @@ namespace EchoSphere.Users.Abstractions;
 public partial struct FollowError
 {
 	[UnionCase]
-	public static partial FollowError CurrentUserNotFound();
+	public static partial FollowError FollowerUserNotFound();
 
 	[UnionCase]
 	public static partial FollowError FollowUserNotFound();
@@ -18,7 +18,8 @@ public partial struct FollowError
 
 public interface IFollowService
 {
-	Task<Either<FollowError, Unit>> Follow(UserId followUserId, CancellationToken cancellationToken);
+	Task<Either<FollowError, Unit>> Follow(UserId followerUserId, UserId followUserId,
+		CancellationToken cancellationToken);
 
 	Task<Option<IReadOnlyList<UserId>>> GetFollowers(UserId userId, CancellationToken cancellationToken);
 }

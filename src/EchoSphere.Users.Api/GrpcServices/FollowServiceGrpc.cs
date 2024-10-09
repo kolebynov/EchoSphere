@@ -22,9 +22,11 @@ internal sealed class FollowServiceGrpc : FollowService.FollowServiceBase
 		_followService = followService;
 	}
 
-	public override Task<Empty> Follow(UserIdDto request, ServerCallContext context) =>
+	public override Task<Empty> Follow(FollowRequest request, ServerCallContext context) =>
 		_followService
-			.Follow(IdValueExtensions.Parse<UserId>(request.Value), context.CancellationToken)
+			.Follow(
+				IdValueExtensions.Parse<UserId>(request.FollowerUserId),
+				IdValueExtensions.Parse<UserId>(request.FollowUserId), context.CancellationToken)
 			.MapAsync(_ => GrpcExtensions.EmptyInstance)
 			.IfLeft(err => throw err
 				.Match(

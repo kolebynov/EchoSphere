@@ -26,13 +26,18 @@ service FriendService {
 }
 
 service FollowService {
-	rpc Follow (echo_sphere.grpc_shared.contracts.UserIdDto) returns (google.protobuf.Empty);
+	rpc Follow (FollowRequest) returns (google.protobuf.Empty);
 
 	rpc GetFollowers (echo_sphere.grpc_shared.contracts.UserIdDto) returns (UserIdsDto);
 }
 
 message UserIdsDto {
 	repeated string ids = 1;
+}
+
+message FollowRequest {
+	string follower_user_id = 1;
+	string follow_user_id = 2;
 }
 
 message FollowErrorDto {

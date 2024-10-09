@@ -102,8 +102,8 @@ public static class UsersApiMapper
 			.IfLeft(err => err.Match(() => TypedResults.Problem(statusCode: 404, type: "invitation_not_found")));
 
 	private static Task<Results<Ok, ProblemHttpResult>> Follow(
-		IFollowService followService, Guid followUserId, CancellationToken cancellationToken) =>
-		followService.Follow(new UserId(followUserId), cancellationToken)
+		IFollowService followService, ClaimsPrincipal currentUser, Guid followUserId, CancellationToken cancellationToken) =>
+		followService.Follow(currentUser.GetUserId(), new UserId(followUserId), cancellationToken)
 			.MapAsync(_ => TypedResults.Ok().ToResults<Ok, ProblemHttpResult>())
 			.IfLeft(err => err.Match(
 				() => TypedResults.Problem(statusCode: 404, type: "user_not_found"),
