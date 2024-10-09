@@ -1,8 +1,10 @@
 using EchoSphere.Domain.Abstractions;
 using EchoSphere.Domain.Abstractions.Models;
+using EchoSphere.Infrastructure.IntegrationEvents.Abstractions;
 using EchoSphere.Messages.Abstractions;
 using EchoSphere.Messages.Abstractions.Models;
 using EchoSphere.Messages.Api.Data.Models;
+using EchoSphere.Messages.Api.Events;
 using EchoSphere.Users.Abstractions;
 using LinqToDB;
 using LinqToDB.Data;
@@ -11,16 +13,18 @@ namespace EchoSphere.Messages.Api.Services;
 
 internal sealed class ChatService : IChatService
 {
-	private readonly IDataContext _dataContext;
+	private readonly DataConnection _dataConnection;
 	private readonly IUserProfileService _userProfileService;
 	private readonly ICurrentUserAccessor _currentUserAccessor;
+	private readonly IIntegrationEventService _integrationEventService;
 
-	public ChatService(IDataContext dataContext, IUserProfileService userProfileService,
-		ICurrentUserAccessor currentUserAccessor)
+	public ChatService(DataConnection dataConnection, IUserProfileService userProfileService,
+		ICurrentUserAccessor currentUserAccessor, IIntegrationEventService integrationEventService)
 	{
-		_dataContext = dataContext;
+		_dataConnection = dataConnection;
 		_userProfileService = userProfileService;
 		_currentUserAccessor = currentUserAccessor;
+		_integrationEventService = integrationEventService;
 	}
 
 	public async Task<Option<IReadOnlyList<ChatInfo>>> GetCurrentUserChats(CancellationToken cancellationToken)
@@ -32,7 +36,7 @@ internal sealed class ChatService : IChatService
 			return None;
 		}
 
-		var chatParticipants = _dataContext.GetTable<ChatParticipantDb>();
+		var chatParticipants = _dataConnection.GetTable<ChatParticipantDb>();
 
 		var chatIds = chatParticipants
 			.Where(x => x.UserId == currentUserId)
@@ -60,7 +64,7 @@ internal sealed class ChatService : IChatService
 			return None;
 		}
 
-		return await _dataContext.GetTable<ChatMessageDb>()
+		return await _dataConnection.GetTable<ChatMessageDb>()
 			.Where(x => x.ChatId == chatId)
 			.Select(x => new ChatMessage
 			{
@@ -84,7 +88,7 @@ internal sealed class ChatService : IChatService
 			return CreateChatError.ParticipantUserNotFound(invalidUserId);
 		}
 
-		await _dataContext.GetTable<ChatParticipantDb>()
+		await _dataConnection.GetTable<ChatParticipantDb>()
 			.BulkCopyAsync(
 				participants.Select(userId => new ChatParticipantDb
 				{
@@ -104,7 +108,8 @@ internal sealed class ChatService : IChatService
 			return SendMessageError.ChatNotFound();
 		}
 
-		var messageId = await _dataContext.InsertWithInt64IdentityAsync(
+		await using var transaction = await _dataConnection.BeginTransactionAsync(cancellationToken);
+		var messageId = await _dataConnection.InsertWithInt64IdentityAsync(
 			new ChatMessageDb
 			{
 				Timestamp = DateTimeOffset.UtcNow,
@@ -113,10 +118,20 @@ internal sealed class ChatService : IChatService
 				Text = text,
 			}, token: cancellationToken);
 
+		await _integrationEventService.PublishEvent(
+			new MessageSentEvent
+			{
+				ChatId = chatId.Value,
+				SenderId = _currentUserAccessor.CurrentUserId.Value,
+			},
+			cancellationToken);
+
+		await transaction.CommitAsync(cancellationToken);
+
 		return Right(new MessageId(messageId));
 	}
 
 	private Task<bool> IsChatExist(ChatId chatId, CancellationToken cancellationToken) =>
-		_dataContext.GetTable<ChatParticipantDb>()
+		_dataConnection.GetTable<ChatParticipantDb>()
 			.AnyAsync(x => x.ChatId == chatId && x.UserId == _currentUserAccessor.CurrentUserId, cancellationToken);
 }

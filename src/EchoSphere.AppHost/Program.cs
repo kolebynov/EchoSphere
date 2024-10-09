@@ -1,7 +1,7 @@
 var builder = DistributedApplication.CreateBuilder(args);
 var profileName = builder.Configuration["DOTNET_LAUNCH_PROFILE"] ?? "http";
 
-var postgres = builder.AddPostgres("postgres")
+var postgres = builder.AddPostgres("postgres", port: 5433)
 	.WithImageTag("latest");
 
 var userMessagesDb = postgres.AddDatabase("UserMessagesDb");

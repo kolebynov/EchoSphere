@@ -1,14 +1,15 @@
 using System.Globalization;
-using System.Reflection;
+using EchoSphere.Infrastructure.Db.Settings;
 using EchoSphere.Infrastructure.Hosting.Extensions;
 using FluentMigrator.Runner;
+using FluentMigrator.Runner.Initialization;
 using LinqToDB;
 using LinqToDB.AspNet;
 using LinqToDB.AspNet.Logging;
 using LinqToDB.Data;
-using LinqToDB.Mapping;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Npgsql;
 
 namespace EchoSphere.Infrastructure.Db.Extensions;
@@ -16,34 +17,51 @@ namespace EchoSphere.Infrastructure.Db.Extensions;
 public static class ServiceCollectionExtensions
 {
 	public static IServiceCollection AddLinqToDb<TContext>(
-		this IServiceCollection services, IConfiguration configuration, string name, MappingSchema? mappingSchema,
-		Assembly migrationsAssembly)
+		this IServiceCollection services, Action<DbSettings>? configureAction = null)
 		where TContext : DataConnection
 	{
-		var connectionString = configuration.GetConnectionString(name)!;
 		services.AddLinqToDBContext<TContext>(
 			(provider, options) =>
 			{
-				options = options
+				var dbSettings = provider.GetRequiredService<IOptions<DbSettings>>().Value;
+				var connectionString = provider.GetRequiredService<IConfiguration>().GetConnectionString(dbSettings.ConnectionStringName)!;
+				return options
 					.UsePostgreSQL(connectionString)
-					.UseDefaultLogging(provider);
-				return mappingSchema != null ? options.UseMappingSchema(mappingSchema) : options;
+					.UseDefaultLogging(provider)
+					.UseMappingSchema(dbSettings.MappingSchema);
 			});
-
-		services.AddTransient<IDataContext>(sp => sp.GetRequiredService<TContext>());
-		services.AddTransient<DataConnection>(sp => sp.GetRequiredService<TContext>());
 
 		services
 			.AddFluentMigratorCore()
-			.ConfigureRunner(rb => rb
-				.AddPostgres()
-				.WithGlobalConnectionString(connectionString)
-				.ScanIn(migrationsAssembly).For.Migrations());
+			.ConfigureRunner(rb =>
+			{
+				rb
+					.AddPostgres()
+					.WithGlobalConnectionString(sp =>
+					{
+						var dbSettings = sp.GetRequiredService<IOptions<DbSettings>>().Value;
+						return sp.GetRequiredService<IConfiguration>().GetConnectionString(dbSettings.ConnectionStringName)!;
+					});
+			});
 
 		services.AddScopedAsyncInitializer(async (sp, ct) =>
 		{
 			await EnsureDatabase(sp.GetRequiredService<DataOptions<TContext>>(), ct);
 			sp.GetRequiredService<IMigrationRunner>().MigrateUp();
+		});
+
+		if (configureAction != null)
+		{
+			services.AddOptions<DbSettings>().Configure(configureAction);
+		}
+
+		services.AddTransient<IDataContext>(sp => sp.GetRequiredService<TContext>());
+		services.AddTransient<DataConnection>(sp => sp.GetRequiredService<TContext>());
+
+		services.AddSingleton<IMigrationSourceItem>(sp =>
+		{
+			var dbSettings = sp.GetRequiredService<IOptions<DbSettings>>().Value;
+			return new AssemblyMigrationSourceItem(dbSettings.MigrationAssemblies);
 		});
 
 		return services;

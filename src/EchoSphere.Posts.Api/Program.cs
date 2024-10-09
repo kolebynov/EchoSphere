@@ -17,21 +17,24 @@ builder.AddServiceDefaults();
 builder.Services.AddGrpc();
 builder.Services.AddAsyncInitialization();
 
-var mappingSchema = new MappingSchema();
-var fluentMappingBuilder = new FluentMappingBuilder(mappingSchema);
+builder.Services.AddLinqToDb<AppDataConnection>(dbSettings =>
+{
+	dbSettings.ConnectionStringName = "PostsDb";
+	dbSettings.MigrationAssemblies = [Assembly.GetExecutingAssembly()];
 
-fluentMappingBuilder.Entity<PostDb>()
-	.HasTableName(DataConstants.PostsTableName)
-	.HasPrimaryKey(x => x.Id);
+	var mappingSchema = dbSettings.MappingSchema;
+	var fluentMappingBuilder = new FluentMappingBuilder(mappingSchema);
 
-fluentMappingBuilder.Build();
+	fluentMappingBuilder.Entity<PostDb>()
+		.HasTableName(DataConstants.PostsTableName)
+		.HasPrimaryKey(x => x.Id);
 
-mappingSchema
-	.AddIdValueConverter<Guid, PostId>()
-	.AddIdValueConverter<Guid, UserId>();
+	fluentMappingBuilder.Build();
 
-builder.Services.AddLinqToDb<AppDataConnection>(builder.Configuration, "PostsDb", mappingSchema,
-	Assembly.GetExecutingAssembly());
+	mappingSchema
+		.AddIdValueConverter<Guid, PostId>()
+		.AddIdValueConverter<Guid, UserId>();
+});
 
 builder.Services.AddDomainServices();
 

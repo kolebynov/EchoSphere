@@ -4,7 +4,7 @@ namespace EchoSphere.Messages.Api.Data.Models;
 
 internal sealed class ChatMessageDb
 {
-	public MessageId Id { get; }
+	public MessageId Id { get; init; }
 
 	public required DateTimeOffset Timestamp { get; init; }
 

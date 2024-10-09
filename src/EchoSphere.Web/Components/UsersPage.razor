@@ -8,6 +8,7 @@
 @inject IUserProfileClient UserProfileClient;
 @inject IFriendClient FriendClient;
 @inject IFollowClient FollowClient;
+@inject IChatClient ChatClient;
 @inject LongOperationExecutor LongOperationExecutor;
 @inject AuthenticationStateProvider AuthenticationStateProvider;
 @inject NavigationManager NavigationManager;
@@ -31,6 +32,9 @@
 				</MudButton>
 				<MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="() => NavigateToUserPosts(userProfile.Id)">
 					View posts
+				</MudButton>
+				<MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="() => StartChat(userProfile.Id)">
+					Start chat
 				</MudButton>
 			}
 		</div>
@@ -65,5 +69,21 @@
 	private void NavigateToUserPosts(Guid userId)
 	{
 		NavigationManager.NavigateTo($"/posts/{userId}");
+	}
+
+	private async Task StartChat(Guid userId)
+	{
+		var chatId = await LongOperationExecutor.ExecuteLongOperationAndReturnDefaultIfError(
+			() => ChatClient.CreateChat(
+				new CreateChatRequestV1
+				{
+					Participants = [userId]
+				}, CancellationToken.None),
+			Guid.Empty);
+
+		if (chatId != Guid.Empty)
+		{
+			NavigationManager.NavigateTo($"/chats/{chatId}");
+		}
 	}
 }

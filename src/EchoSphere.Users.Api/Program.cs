@@ -21,32 +21,34 @@ builder.AddServiceDefaults();
 builder.Services.AddGrpc();
 builder.Services.AddAsyncInitialization();
 
-var mappingSchema = new MappingSchema();
+builder.Services.AddLinqToDb<AppDataConnection>(dbSettings =>
+{
+	dbSettings.ConnectionStringName = "UsersDb";
+	dbSettings.MigrationAssemblies = [Assembly.GetExecutingAssembly()];
 
-var fluentMappingBuilder = new FluentMappingBuilder(mappingSchema);
+	var mappingSchema = dbSettings.MappingSchema;
+	var fluentMappingBuilder = new FluentMappingBuilder(mappingSchema);
 
-fluentMappingBuilder.Entity<UserProfile>()
-	.HasTableName(DataConstants.UserProfilesTableName)
-	.HasPrimaryKey(x => x.Id);
+	fluentMappingBuilder.Entity<UserProfile>()
+		.HasTableName(DataConstants.UserProfilesTableName)
+		.HasPrimaryKey(x => x.Id);
 
-fluentMappingBuilder.Entity<FriendInvitationDb>()
-	.HasTableName(DataConstants.FriendInvitesTableName)
-	.HasPrimaryKey(x => x.Id);
+	fluentMappingBuilder.Entity<FriendInvitationDb>()
+		.HasTableName(DataConstants.FriendInvitesTableName)
+		.HasPrimaryKey(x => x.Id);
 
-fluentMappingBuilder.Entity<FriendLinkDb>()
-	.HasTableName(DataConstants.FriendsTableName);
+	fluentMappingBuilder.Entity<FriendLinkDb>()
+		.HasTableName(DataConstants.FriendsTableName);
 
-fluentMappingBuilder.Entity<FollowerDb>()
-	.HasTableName(DataConstants.FollowersTableName);
+	fluentMappingBuilder.Entity<FollowerDb>()
+		.HasTableName(DataConstants.FollowersTableName);
 
-fluentMappingBuilder.Build();
+	fluentMappingBuilder.Build();
 
-mappingSchema
-	.AddIdValueConverter<Guid, FriendInvitationId>()
-	.AddIdValueConverter<Guid, UserId>();
-
-builder.Services.AddLinqToDb<AppDataConnection>(builder.Configuration, "UsersDb", mappingSchema,
-	Assembly.GetExecutingAssembly());
+	mappingSchema
+		.AddIdValueConverter<Guid, FriendInvitationId>()
+		.AddIdValueConverter<Guid, UserId>();
+});
 
 builder.Services.AddDomainServices();
 

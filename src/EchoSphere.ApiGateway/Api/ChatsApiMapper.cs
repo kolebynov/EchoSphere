@@ -1,6 +1,4 @@
-using System.Security.Claims;
 using EchoSphere.ApiGateway.Contracts;
-using EchoSphere.ApiGateway.Extensions;
 using EchoSphere.Domain.Abstractions.Models;
 using EchoSphere.Messages.Abstractions;
 using EchoSphere.Users.Abstractions.Extensions;

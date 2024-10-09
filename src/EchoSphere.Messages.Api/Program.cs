@@ -3,6 +3,7 @@ using EchoSphere.Domain.Abstractions.Models;
 using EchoSphere.Domain.AspNetCore.Extensions;
 using EchoSphere.Domain.LinqToDb.Extensions;
 using EchoSphere.Infrastructure.Db.Extensions;
+using EchoSphere.Infrastructure.IntegrationEvents.Extensions;
 using EchoSphere.Messages.Abstractions;
 using EchoSphere.Messages.Api.Data;
 using EchoSphere.Messages.Api.Data.Models;
@@ -19,26 +20,30 @@ builder.AddServiceDefaults();
 builder.Services.AddGrpc();
 builder.Services.AddAsyncInitialization();
 
-var mappingSchema = new MappingSchema();
-var fluentMappingBuilder = new FluentMappingBuilder(mappingSchema);
+builder.Services.AddLinqToDb<AppDataConnection>(dbSettings =>
+{
+	dbSettings.ConnectionStringName = "UserMessagesDb";
+	dbSettings.MigrationAssemblies = [Assembly.GetExecutingAssembly()];
 
-fluentMappingBuilder.Entity<ChatParticipantDb>()
-	.HasTableName(DataConstants.ChatParticipantsTableName);
+	var mappingSchema = dbSettings.MappingSchema;
+	var fluentMappingBuilder = new FluentMappingBuilder(mappingSchema);
 
-fluentMappingBuilder.Entity<ChatMessageDb>()
-	.HasTableName(DataConstants.ChatMessagesTableName)
-	.HasPrimaryKey(x => x.Id)
-	.HasIdentity(x => x.Id);
+	fluentMappingBuilder.Entity<ChatParticipantDb>()
+		.HasTableName(DataConstants.ChatParticipantsTableName);
 
-fluentMappingBuilder.Build();
+	fluentMappingBuilder.Entity<ChatMessageDb>()
+		.HasTableName(DataConstants.ChatMessagesTableName)
+		.HasPrimaryKey(x => x.Id)
+		.HasIdentity(x => x.Id);
 
-mappingSchema
-	.AddIdValueConverter<Guid, UserId>()
-	.AddIdValueConverter<Guid, ChatId>()
-	.AddIdValueConverter<long, MessageId>();
+	fluentMappingBuilder.Build();
 
-builder.Services.AddLinqToDb<AppDataConnection>(builder.Configuration, "UserMessagesDb", mappingSchema,
-	Assembly.GetExecutingAssembly());
+	mappingSchema
+		.AddIdValueConverter<Guid, UserId>()
+		.AddIdValueConverter<Guid, ChatId>()
+		.AddIdValueConverter<long, MessageId>();
+});
+builder.Services.AddIntegrationEvents();
 
 builder.Services.AddUsersGrpcClient(new Uri("https://UsersApi"));
 builder.Services.AddDomainServices();

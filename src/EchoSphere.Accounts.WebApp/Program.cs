@@ -19,28 +19,30 @@ builder.Services.AddRazorComponents()
 	.AddInteractiveServerComponents()
 	.AddInteractiveWebAssemblyComponents();
 
-var mappingSchema = new MappingSchema();
-var fluentMappingBuilder = new FluentMappingBuilder(mappingSchema);
+builder.Services.AddLinqToDb<AppDataConnection>(dbSettings =>
+{
+	dbSettings.ConnectionStringName = "AccountsDb";
+	dbSettings.MigrationAssemblies = [Assembly.GetExecutingAssembly()];
 
-fluentMappingBuilder.Entity<Account>()
-	.HasTableName(DataConstants.AccountsTableName)
-	.HasPrimaryKey(x => x.Id);
+	var fluentMappingBuilder = new FluentMappingBuilder(dbSettings.MappingSchema);
 
-fluentMappingBuilder.Entity<IdentityUserClaim<Guid>>()
-	.HasTableName(DataConstants.AccountClaimsTableName)
-	.HasPrimaryKey(x => x.Id);
+	fluentMappingBuilder.Entity<Account>()
+		.HasTableName(DataConstants.AccountsTableName)
+		.HasPrimaryKey(x => x.Id);
 
-fluentMappingBuilder.Entity<Role>()
-	.HasTableName(DataConstants.RolesTableName)
-	.HasPrimaryKey(x => x.Id);
+	fluentMappingBuilder.Entity<IdentityUserClaim<Guid>>()
+		.HasTableName(DataConstants.AccountClaimsTableName)
+		.HasPrimaryKey(x => x.Id);
 
-fluentMappingBuilder.Entity<IdentityUserRole<Guid>>()
-	.HasTableName(DataConstants.AccountRolesTableName);
+	fluentMappingBuilder.Entity<Role>()
+		.HasTableName(DataConstants.RolesTableName)
+		.HasPrimaryKey(x => x.Id);
 
-fluentMappingBuilder.Build();
+	fluentMappingBuilder.Entity<IdentityUserRole<Guid>>()
+		.HasTableName(DataConstants.AccountRolesTableName);
 
-builder.Services.AddLinqToDb<AppDataConnection>(builder.Configuration, "AccountsDb", mappingSchema,
-	Assembly.GetExecutingAssembly());
+	fluentMappingBuilder.Build();
+});
 
 builder.Services.AddIdentity<Account, Role>(
 		opt =>
