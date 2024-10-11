@@ -25,7 +25,7 @@ internal sealed class IntegrationEventService : IIntegrationEventService
 			{
 				TypeName = serializedIntegrationEvent.TypeName,
 				EventData = serializedIntegrationEvent.EventData,
-				State = IntegrationEventState.Initial,
+				State = IntegrationEventState.Pending,
 			},
 			cancellationToken);
 	}

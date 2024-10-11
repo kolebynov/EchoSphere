@@ -121,8 +121,8 @@ internal sealed class ChatService : IChatService
 		await _integrationEventService.PublishEvent(
 			new MessageSentEvent
 			{
-				ChatId = chatId.Value,
-				SenderId = _currentUserAccessor.CurrentUserId.Value,
+				ChatId = chatId,
+				SenderId = _currentUserAccessor.CurrentUserId,
 			},
 			cancellationToken);
 

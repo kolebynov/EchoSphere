@@ -4,6 +4,11 @@ var profileName = builder.Configuration["DOTNET_LAUNCH_PROFILE"] ?? "http";
 var postgres = builder.AddPostgres("postgres", port: 5433)
 	.WithImageTag("latest");
 
+var kafka = builder.AddKafka("kafka")
+	.WithImageTag("latest")
+	.WithEnvironment("KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE", "true")
+	.WithKafkaUI(x => x.WithHostPort(9100).WithImageTag("latest"));
+
 var userMessagesDb = postgres.AddDatabase("UserMessagesDb");
 var usersDb = postgres.AddDatabase("UsersDb");
 var accountsDb = postgres.AddDatabase("AccountsDb");
@@ -14,7 +19,8 @@ var usersApi = builder.AddProject<Projects.EchoSphere_Users_Api>("UsersApi")
 
 var userMessageApi = builder.AddProject<Projects.EchoSphere_Messages_Api>("MessagesApi")
 	.WithReference(userMessagesDb)
-	.WithReference(usersApi);
+	.WithReference(usersApi)
+	.WithReference(kafka);
 
 var postsApi = builder.AddProject<Projects.EchoSphere_Posts_Api>("PostsApi")
 	.WithReference(postsDb);

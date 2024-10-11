@@ -87,6 +87,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.Domain.AspNetCor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.Infrastructure.IntegrationEvents", "src\EchoSphere.Infrastructure.IntegrationEvents\EchoSphere.Infrastructure.IntegrationEvents.csproj", "{C48C9B32-0186-4716-96D4-A8893E6A0A6A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.Infrastructure.IntegrationEvents.Tests", "tests\EchoSphere.Infrastructure.IntegrationEvents.Tests\EchoSphere.Infrastructure.IntegrationEvents.Tests.csproj", "{419AF003-7689-435F-8BE1-478EC20CC756}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -201,6 +203,10 @@ Global
 		{C48C9B32-0186-4716-96D4-A8893E6A0A6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C48C9B32-0186-4716-96D4-A8893E6A0A6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C48C9B32-0186-4716-96D4-A8893E6A0A6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{419AF003-7689-435F-8BE1-478EC20CC756}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{419AF003-7689-435F-8BE1-478EC20CC756}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{419AF003-7689-435F-8BE1-478EC20CC756}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{419AF003-7689-435F-8BE1-478EC20CC756}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -244,5 +250,6 @@ Global
 		{405B3D54-6B57-4037-9A55-684378739383} = {84F702C5-B09D-406D-AA25-B8945999B2E4}
 		{7EA6C148-4E32-4822-BC69-0E897A87513D} = {84F702C5-B09D-406D-AA25-B8945999B2E4}
 		{C48C9B32-0186-4716-96D4-A8893E6A0A6A} = {B05A24C9-6E4C-444C-B162-34ED1A9A9C3A}
+		{419AF003-7689-435F-8BE1-478EC20CC756} = {A519908E-3B25-41AC-9072-C25AD92B2ED1}
 	EndGlobalSection
 EndGlobal

@@ -1,9 +1,11 @@
 using EchoSphere.ApiGateway.Api;
+using EchoSphere.Domain.Abstractions.Extensions;
 using EchoSphere.Messages.Client.Extensions;
 using EchoSphere.Posts.Client.Extensions;
 using EchoSphere.ServiceDefaults;
 using EchoSphere.Users.Client.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,6 +32,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddProblemDetails();
+
+builder.Services.Configure<JsonOptions>(opt => opt.SerializerOptions.AddIdValueConverters());
 
 builder.Services.AddUsersGrpcClient(new Uri("https://UsersApi"));
 builder.Services.AddMessagesGrpcClient(new Uri("https://MessagesApi"));

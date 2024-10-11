@@ -19,7 +19,7 @@ public sealed class InitialMigration : Migration
 			.OnTable(DataConstants.EventsTableName)
 			.OnColumn(nameof(IntegrationEventDb.State)).Ascending()
 			.WithOptions()
-			.Filter($"\"{nameof(IntegrationEventDb.State)}\" in ({(int)IntegrationEventState.Initial}, {(int)IntegrationEventState.Processing})")
+			.Filter($"\"{nameof(IntegrationEventDb.State)}\" in ({(int)IntegrationEventState.Pending})")
 			.UsingHash();
 	}
 

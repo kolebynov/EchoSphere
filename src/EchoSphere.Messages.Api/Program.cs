@@ -16,6 +16,7 @@ using LinqToDB.Mapping;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
+builder.AddIntegrationEvents();
 
 builder.Services.AddGrpc();
 builder.Services.AddAsyncInitialization();
@@ -43,7 +44,6 @@ builder.Services.AddLinqToDb<AppDataConnection>(dbSettings =>
 		.AddIdValueConverter<Guid, ChatId>()
 		.AddIdValueConverter<long, MessageId>();
 });
-builder.Services.AddIntegrationEvents();
 
 builder.Services.AddUsersGrpcClient(new Uri("https://UsersApi"));
 builder.Services.AddDomainServices();
