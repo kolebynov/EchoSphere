@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<Protobuf_StandardImportsPath>$(Protobuf_StandardImportsPath);$(MSBuildProjectDirectory)\..\EchoSphere.GrpcShared</Protobuf_StandardImportsPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Google.Protobuf" Version="3.28.2" />
+		<PackageReference Include="Grpc.Net.Client" Version="2.66.0" />
+		<PackageReference Include="Grpc.Tools" Version="2.67.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Protobuf Include="..\EchoSphere.Notifications.Api\Protos\notifications.proto">
+			<GrpcServices>Client</GrpcServices>
+			<Access>Public</Access>
+			<ProtoCompile>True</ProtoCompile>
+			<CompileOutputs>True</CompileOutputs>
+			<OutputDir>obj/Debug/net9.0/</OutputDir>
+			<Generator>MSBuild:Compile</Generator>
+			<Link>Protos\notifications.proto</Link>
+		</Protobuf>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\EchoSphere.GrpcClientShared\EchoSphere.GrpcClientShared.csproj" />
+	  <ProjectReference Include="..\EchoSphere.GrpcShared\EchoSphere.GrpcShared.csproj" />
+	  <ProjectReference Include="..\EchoSphere.Notifications.Abstractions\EchoSphere.Notifications.Abstractions.csproj" />
+	</ItemGroup>
+</Project>

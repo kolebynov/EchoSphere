@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace EchoSphere.Users.Api.GrpcServices;
 
-[Authorize]
 internal sealed class FollowServiceGrpc : FollowService.FollowServiceBase
 {
 	private readonly IFollowService _followService;
@@ -22,6 +21,7 @@ internal sealed class FollowServiceGrpc : FollowService.FollowServiceBase
 		_followService = followService;
 	}
 
+	[Authorize]
 	public override Task<Empty> Follow(FollowRequest request, ServerCallContext context) =>
 		_followService
 			.Follow(

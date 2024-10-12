@@ -1,6 +1,7 @@
 using EchoSphere.ApiGateway.Api;
 using EchoSphere.Domain.Abstractions.Extensions;
 using EchoSphere.Messages.Client.Extensions;
+using EchoSphere.Notifications.Client.Extensions;
 using EchoSphere.Posts.Client.Extensions;
 using EchoSphere.ServiceDefaults;
 using EchoSphere.Users.Client.Extensions;
@@ -38,6 +39,7 @@ builder.Services.Configure<JsonOptions>(opt => opt.SerializerOptions.AddIdValueC
 builder.Services.AddUsersGrpcClient(new Uri("https://UsersApi"));
 builder.Services.AddMessagesGrpcClient(new Uri("https://MessagesApi"));
 builder.Services.AddPostsGrpcClient(new Uri("https://PostsApi"));
+builder.Services.AddNotificationsGrpcClient(new Uri("https://NotificationsApi"));
 
 var app = builder.Build();
 

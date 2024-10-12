@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+package echo_sphere.notifications.grpc;
+
+service NotificationService {
+	rpc GetCurrentUserNotifications (google.protobuf.Empty) returns (NotificationsDto);
+
+	rpc MarkAsRead (NotificationIdsDto) returns (google.protobuf.Empty);
+
+	rpc DeleteCurrentUserNotifications (google.protobuf.Empty) returns (google.protobuf.Empty);
+}
+
+message NotificationDto {
+	int64 id = 1;
+	string text = 2;
+	bool isRead = 3;
+}
+
+message NotificationsDto {
+	repeated NotificationDto notifications = 1;
+}
+
+message NotificationIdsDto {
+	repeated int64 ids = 1;
+}

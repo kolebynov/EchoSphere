@@ -1,0 +1,54 @@
+@page "/notifications"
+
+@using EchoSphere.ApiGateway.Client
+@using EchoSphere.ApiGateway.Contracts
+@using EchoSphere.BlazorShared
+
+@inject INotificationClient NotificationClient;
+@inject LongOperationExecutor LongOperationExecutor;
+
+<div>
+	<MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="() => DeleteAll()">
+		Delete all
+	</MudButton>
+	@foreach (var notification in _notifications)
+	{
+		<div style="border: 1px solid black; padding: 10px">
+			<div>Text: @notification.Text</div>
+			<div>Is read: @notification.IsRead</div>
+			@if (!notification.IsRead)
+			{
+				<MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="() => MarkAsRead(notification.Id)">
+					Mark as read
+				</MudButton>
+			}
+		</div>
+	}
+</div>
+
+@code {
+	private IReadOnlyList<NotificationDtoV1> _notifications = [];
+
+	protected override async Task OnInitializedAsync()
+	{
+		await LoadNotifications();
+	}
+
+	private async Task DeleteAll()
+	{
+		await LongOperationExecutor.ExecuteLongOperation(
+			() => NotificationClient.DeleteCurrentUserNotifications(CancellationToken.None));
+		await LoadNotifications();
+	}
+
+	private async Task MarkAsRead(long notificationId)
+	{
+		await LongOperationExecutor.ExecuteLongOperation(
+			() => NotificationClient.MarkAsRead([notificationId], CancellationToken.None));
+		await LoadNotifications();
+	}
+
+	private async Task LoadNotifications() =>
+		_notifications = await LongOperationExecutor.ExecuteLongOperationAndReturnDefaultIfError(
+			() => NotificationClient.GetCurrentUserNotifications(CancellationToken.None), []);
+}

@@ -89,6 +89,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.Infrastructure.I
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.Infrastructure.IntegrationEvents.Tests", "tests\EchoSphere.Infrastructure.IntegrationEvents.Tests\EchoSphere.Infrastructure.IntegrationEvents.Tests.csproj", "{419AF003-7689-435F-8BE1-478EC20CC756}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notifications", "Notifications", "{380C0C1E-31E7-4B46-B981-8CBBA7F0ABFF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.Notifications.Abstractions", "src\EchoSphere.Notifications.Abstractions\EchoSphere.Notifications.Abstractions.csproj", "{22FDAD01-E592-4BA7-998C-6D382CF6C150}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.Notifications.Api", "src\EchoSphere.Notifications.Api\EchoSphere.Notifications.Api.csproj", "{48682CF7-F395-468A-B348-CAA9624DC370}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.Notifications.Client", "src\EchoSphere.Notifications.Client\EchoSphere.Notifications.Client.csproj", "{D608E4DA-C1A1-4D25-A8B9-CC154BEC15ED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -207,6 +215,18 @@ Global
 		{419AF003-7689-435F-8BE1-478EC20CC756}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{419AF003-7689-435F-8BE1-478EC20CC756}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{419AF003-7689-435F-8BE1-478EC20CC756}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22FDAD01-E592-4BA7-998C-6D382CF6C150}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22FDAD01-E592-4BA7-998C-6D382CF6C150}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22FDAD01-E592-4BA7-998C-6D382CF6C150}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22FDAD01-E592-4BA7-998C-6D382CF6C150}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48682CF7-F395-468A-B348-CAA9624DC370}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48682CF7-F395-468A-B348-CAA9624DC370}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48682CF7-F395-468A-B348-CAA9624DC370}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48682CF7-F395-468A-B348-CAA9624DC370}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D608E4DA-C1A1-4D25-A8B9-CC154BEC15ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D608E4DA-C1A1-4D25-A8B9-CC154BEC15ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D608E4DA-C1A1-4D25-A8B9-CC154BEC15ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D608E4DA-C1A1-4D25-A8B9-CC154BEC15ED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -251,5 +271,9 @@ Global
 		{7EA6C148-4E32-4822-BC69-0E897A87513D} = {84F702C5-B09D-406D-AA25-B8945999B2E4}
 		{C48C9B32-0186-4716-96D4-A8893E6A0A6A} = {B05A24C9-6E4C-444C-B162-34ED1A9A9C3A}
 		{419AF003-7689-435F-8BE1-478EC20CC756} = {A519908E-3B25-41AC-9072-C25AD92B2ED1}
+		{380C0C1E-31E7-4B46-B981-8CBBA7F0ABFF} = {2B86BF74-1991-4852-A681-D3AD3F402161}
+		{22FDAD01-E592-4BA7-998C-6D382CF6C150} = {380C0C1E-31E7-4B46-B981-8CBBA7F0ABFF}
+		{48682CF7-F395-468A-B348-CAA9624DC370} = {380C0C1E-31E7-4B46-B981-8CBBA7F0ABFF}
+		{D608E4DA-C1A1-4D25-A8B9-CC154BEC15ED} = {380C0C1E-31E7-4B46-B981-8CBBA7F0ABFF}
 	EndGlobalSection
 EndGlobal

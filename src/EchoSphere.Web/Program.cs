@@ -20,19 +20,22 @@ builder.Services.AddSharedBlazor();
 builder.Services.AddOutputCache();
 
 builder.Services.AddRefitClient<IChatClient>()
-	.ConfigureHttpClient(client => client.BaseAddress = new("https+http://ApiGateway/api"))
+	.ConfigureHttpClient(client => client.BaseAddress = new("https://ApiGateway/api"))
 	.AddAccessToken();
 builder.Services.AddRefitClient<IUserProfileClient>()
-	.ConfigureHttpClient(client => client.BaseAddress = new("https+http://ApiGateway/api"))
+	.ConfigureHttpClient(client => client.BaseAddress = new("https://ApiGateway/api"))
 	.AddAccessToken();
 builder.Services.AddRefitClient<IFriendClient>()
-	.ConfigureHttpClient(client => client.BaseAddress = new("https+http://ApiGateway/api"))
+	.ConfigureHttpClient(client => client.BaseAddress = new("https://ApiGateway/api"))
 	.AddAccessToken();
 builder.Services.AddRefitClient<IFollowClient>()
-	.ConfigureHttpClient(client => client.BaseAddress = new("https+http://ApiGateway/api"))
+	.ConfigureHttpClient(client => client.BaseAddress = new("https://ApiGateway/api"))
 	.AddAccessToken();
 builder.Services.AddRefitClient<IPostClient>()
-	.ConfigureHttpClient(client => client.BaseAddress = new("https+http://ApiGateway/api"))
+	.ConfigureHttpClient(client => client.BaseAddress = new("https://ApiGateway/api"))
+	.AddAccessToken();
+builder.Services.AddRefitClient<INotificationClient>()
+	.ConfigureHttpClient(client => client.BaseAddress = new("https://ApiGateway/api"))
 	.AddAccessToken();
 
 var app = builder.Build();

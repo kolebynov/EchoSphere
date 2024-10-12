@@ -6,16 +6,17 @@ var postgres = builder.AddPostgres("postgres", port: 5433)
 
 var kafka = builder.AddKafka("kafka")
 	.WithImageTag("latest")
-	.WithEnvironment("KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE", "true")
 	.WithKafkaUI(x => x.WithHostPort(9100).WithImageTag("latest"));
 
 var userMessagesDb = postgres.AddDatabase("UserMessagesDb");
 var usersDb = postgres.AddDatabase("UsersDb");
 var accountsDb = postgres.AddDatabase("AccountsDb");
 var postsDb = postgres.AddDatabase("PostsDb");
+var notificationsDb = postgres.AddDatabase("NotificationsDb");
 
 var usersApi = builder.AddProject<Projects.EchoSphere_Users_Api>("UsersApi")
-	.WithReference(usersDb);
+	.WithReference(usersDb)
+	.WithReference(kafka);
 
 var userMessageApi = builder.AddProject<Projects.EchoSphere_Messages_Api>("MessagesApi")
 	.WithReference(userMessagesDb)
@@ -23,11 +24,18 @@ var userMessageApi = builder.AddProject<Projects.EchoSphere_Messages_Api>("Messa
 	.WithReference(kafka);
 
 var postsApi = builder.AddProject<Projects.EchoSphere_Posts_Api>("PostsApi")
-	.WithReference(postsDb);
+	.WithReference(postsDb)
+	.WithReference(kafka);
+
+var notificationsApi = builder.AddProject<Projects.EchoSphere_Notifications_Api>("NotificationsApi")
+	.WithReference(usersApi)
+	.WithReference(notificationsDb)
+	.WithReference(kafka);
 
 var apiService = builder.AddProject<Projects.EchoSphere_ApiGateway>("ApiGateway")
 	.WithReference(userMessageApi)
 	.WithReference(postsApi)
+	.WithReference(notificationsApi)
 	.WithReference(usersApi);
 
 var accountsWebApp = builder.AddProject<Projects.EchoSphere_Accounts_WebApp>("AccountsWebApp")

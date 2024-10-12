@@ -1,7 +1,7 @@
 using EchoSphere.Domain.Abstractions.Models;
 using EchoSphere.Infrastructure.IntegrationEvents;
 
-namespace EchoSphere.Messages.Api.Events;
+namespace EchoSphere.Messages.Abstractions.IntegrationEvents;
 
 public sealed class MessageSentEvent : IIntegrationEvent
 {

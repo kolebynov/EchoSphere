@@ -7,7 +7,8 @@ public static class ApiMapper
 		routeBuilder.MapGroup("/api")
 			.MapChatsApi()
 			.MapUsersApi()
-			.MapPostsApi();
+			.MapPostsApi()
+			.MapNotificationsApi();
 		return routeBuilder;
 	}
 }

@@ -1,6 +1,8 @@
 using EchoSphere.Domain.Abstractions;
 using EchoSphere.Domain.Abstractions.Models;
+using EchoSphere.Infrastructure.IntegrationEvents.Abstractions;
 using EchoSphere.Posts.Abstractions;
+using EchoSphere.Posts.Abstractions.IntegrationEvents;
 using EchoSphere.Posts.Abstractions.Models;
 using EchoSphere.Posts.Api.Data.Models;
 using LanguageExt;
@@ -15,20 +17,36 @@ internal sealed class PostService : IPostService
 {
 	private readonly DataConnection _dataConnection;
 	private readonly ICurrentUserAccessor _currentUserAccessor;
+	private readonly IIntegrationEventService _integrationEventService;
 
-	public PostService(DataConnection dataConnection, ICurrentUserAccessor currentUserAccessor)
+	public PostService(DataConnection dataConnection, ICurrentUserAccessor currentUserAccessor,
+		IIntegrationEventService integrationEventService)
 	{
-		_dataConnection = dataConnection ?? throw new ArgumentNullException(nameof(dataConnection));
+		_dataConnection = dataConnection;
 		_currentUserAccessor = currentUserAccessor;
+		_integrationEventService = integrationEventService;
 	}
 
 	public async Task<Either<PublishPostError, PostId>> PublishPost(string title, string body,
 		CancellationToken cancellationToken)
 	{
 		var postId = new PostId(Guid.NewGuid());
+		await using var transaction = await _dataConnection.BeginTransactionAsync(cancellationToken);
+
 		await _dataConnection.InsertAsync(
 			new PostDb { Id = postId, UserId = _currentUserAccessor.CurrentUserId, Title = title, Body = body },
 			token: cancellationToken);
+
+		await _integrationEventService.PublishEvent(
+			new PostPublished
+			{
+				PostId = postId,
+				UserId = _currentUserAccessor.CurrentUserId,
+			},
+			cancellationToken);
+
+		await transaction.CommitAsync(cancellationToken);
+
 		return postId;
 	}
 

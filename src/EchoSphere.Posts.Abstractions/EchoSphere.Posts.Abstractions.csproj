@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\EchoSphere.Infrastructure.IntegrationEvents\EchoSphere.Infrastructure.IntegrationEvents.csproj" />
       <ProjectReference Include="..\EchoSphere.Users.Abstractions\EchoSphere.Users.Abstractions.csproj" />
     </ItemGroup>
 

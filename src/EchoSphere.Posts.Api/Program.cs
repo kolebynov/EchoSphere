@@ -3,6 +3,7 @@ using EchoSphere.Domain.Abstractions.Models;
 using EchoSphere.Domain.AspNetCore.Extensions;
 using EchoSphere.Domain.LinqToDb.Extensions;
 using EchoSphere.Infrastructure.Db.Extensions;
+using EchoSphere.Infrastructure.IntegrationEvents.Extensions;
 using EchoSphere.Posts.Abstractions;
 using EchoSphere.Posts.Api.Data;
 using EchoSphere.Posts.Api.Data.Models;
@@ -12,7 +13,7 @@ using EchoSphere.ServiceDefaults;
 using LinqToDB.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.AddServiceDefaults();
+builder.AddServiceDefaults().AddIntegrationEvents();
 
 builder.Services.AddGrpc();
 builder.Services.AddAsyncInitialization();
