@@ -15,6 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 		Rules.ruleset = Rules.ruleset
 		Directory.Build.props = Directory.Build.props
 		README.md = README.md
+		Directory.Packages.props = Directory.Packages.props
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.ApiGateway", "src\EchoSphere.ApiGateway\EchoSphere.ApiGateway.csproj", "{084C7B12-A7C9-434D-97D6-CE3ACD9EF031}"

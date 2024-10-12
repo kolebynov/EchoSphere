@@ -5,11 +5,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Grpc.StatusProto" Version="2.66.0"/>
-		<PackageReference Include="Grpc.Tools" Version="2.67.0">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
+		<PackageReference Include="Grpc.StatusProto"/>
+		<PackageReference Include="Grpc.Tools"/>
 	</ItemGroup>
 
 	<ItemGroup>

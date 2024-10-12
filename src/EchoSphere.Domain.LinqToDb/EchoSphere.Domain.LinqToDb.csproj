@@ -1,17 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\EchoSphere.Domain.Abstractions\EchoSphere.Domain.Abstractions.csproj"/>
+	</ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\EchoSphere.Domain.Abstractions\EchoSphere.Domain.Abstractions.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="linq2db.AspNet" Version="5.4.1" />
-    </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="linq2db.AspNet"/>
+	</ItemGroup>
 
 </Project>

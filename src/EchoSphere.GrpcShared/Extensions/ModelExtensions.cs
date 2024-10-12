@@ -1,6 +1,6 @@
-using EchoSphere.GrpcShared.Contracts;
 using EchoSphere.Domain.Abstractions.Extensions;
 using EchoSphere.Domain.Abstractions.Models;
+using EchoSphere.GrpcShared.Contracts;
 
 namespace EchoSphere.GrpcShared.Extensions;
 

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<ItemGroup>
-		<PackageReference Include="Extensions.Hosting.AsyncInitialization" Version="3.0.1" />
+		<PackageReference Include="Extensions.Hosting.AsyncInitialization"/>
 	</ItemGroup>
 
 </Project>

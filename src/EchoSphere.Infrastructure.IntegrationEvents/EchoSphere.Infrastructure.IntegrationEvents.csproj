@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<ItemGroup>
-		<ProjectReference Include="..\EchoSphere.Domain.Abstractions\EchoSphere.Domain.Abstractions.csproj" />
+		<ProjectReference Include="..\EchoSphere.Domain.Abstractions\EchoSphere.Domain.Abstractions.csproj"/>
 		<ProjectReference Include="..\EchoSphere.Infrastructure.Db\EchoSphere.Infrastructure.Db.csproj"/>
 	</ItemGroup>
 	<ItemGroup>
-	  <PackageReference Include="Aspire.Confluent.Kafka" Version="8.2.1" />
+		<PackageReference Include="Aspire.Confluent.Kafka"/>
 	</ItemGroup>
 </Project>

@@ -5,20 +5,20 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Protobuf Include="Protos\posts.proto" GrpcServices="Server" />
+		<Protobuf Include="Protos\posts.proto" GrpcServices="Server"/>
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Grpc.AspNetCore" Version="2.66.0" />
+		<PackageReference Include="Grpc.AspNetCore"/>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\EchoSphere.Domain.AspNetCore\EchoSphere.Domain.AspNetCore.csproj" />
-	  <ProjectReference Include="..\EchoSphere.GrpcShared\EchoSphere.GrpcShared.csproj" />
-	  <ProjectReference Include="..\EchoSphere.Infrastructure.Db\EchoSphere.Infrastructure.Db.csproj" />
-	  <ProjectReference Include="..\EchoSphere.Posts.Abstractions\EchoSphere.Posts.Abstractions.csproj" />
-	  <ProjectReference Include="..\EchoSphere.ServiceDefaults\EchoSphere.ServiceDefaults.csproj" />
-	  <ProjectReference Include="..\EchoSphere.Domain.LinqToDb\EchoSphere.Domain.LinqToDb.csproj" />
+		<ProjectReference Include="..\EchoSphere.Domain.AspNetCore\EchoSphere.Domain.AspNetCore.csproj"/>
+		<ProjectReference Include="..\EchoSphere.GrpcShared\EchoSphere.GrpcShared.csproj"/>
+		<ProjectReference Include="..\EchoSphere.Infrastructure.Db\EchoSphere.Infrastructure.Db.csproj"/>
+		<ProjectReference Include="..\EchoSphere.Posts.Abstractions\EchoSphere.Posts.Abstractions.csproj"/>
+		<ProjectReference Include="..\EchoSphere.ServiceDefaults\EchoSphere.ServiceDefaults.csproj"/>
+		<ProjectReference Include="..\EchoSphere.Domain.LinqToDb\EchoSphere.Domain.LinqToDb.csproj"/>
 	</ItemGroup>
 
 </Project>

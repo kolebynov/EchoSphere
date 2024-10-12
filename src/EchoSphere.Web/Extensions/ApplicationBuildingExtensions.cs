@@ -44,7 +44,7 @@ public static class ApplicationBuildingExtensions
 			{
 				options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 				options.Authority = identityUrl;
-				options.SignedOutRedirectUri = callBackUrl;
+				options.SignedOutRedirectUri = callBackUrl!;
 				options.ClientId = "webapp";
 				options.ClientSecret = "secret";
 				options.ResponseType = "code";

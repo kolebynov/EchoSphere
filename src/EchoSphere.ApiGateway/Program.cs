@@ -19,9 +19,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 		opt.RequireHttpsMetadata = true;
 		opt.TokenValidationParameters = new TokenValidationParameters
 		{
+#pragma warning disable CA5404
 			ValidateIssuer = false,
 			// ValidIssuer = JwtOptions.Issuer,
 			ValidateAudience = false,
+#pragma warning restore CA5404
 			// ValidAudience = JwtOptions.Audience,
 			ValidateLifetime = true,
 			IssuerSigningKey = new JsonWebKey(File.ReadAllText(Path.Combine("..", "EchoSphere.Accounts.WebApp", "tempkey.jwk"))),
