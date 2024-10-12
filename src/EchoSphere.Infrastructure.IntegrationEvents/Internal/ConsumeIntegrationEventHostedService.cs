@@ -34,11 +34,13 @@ internal sealed class ConsumeIntegrationEventHostedService : BaseHostedService
 	{
 		_consumer.Subscribe(_integrationEventsSettings.ListenTopicNames);
 
-		var messagePoller = new MessagesPoller<Null, SerializedIntegrationEvent>(_consumer, _integrationEventsSettings.BatchSize);
+		var batchConsumer = new BatchKafkaConsumer<Null, SerializedIntegrationEvent>(_consumer, _integrationEventsSettings.BatchSize);
 
 		while (!stopCancellationToken.IsCancellationRequested)
 		{
-			var consumeResults = messagePoller.PollBatch(stopCancellationToken);
+			var consumeResults = batchConsumer.ConsumeBatch(stopCancellationToken);
+			_logger.LogInformation("Integration events consumed. [Count: {Count}]", consumeResults.Count);
+
 			using var scope = scopeServiceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope();
 
 			foreach (var consumeResult in consumeResults)
