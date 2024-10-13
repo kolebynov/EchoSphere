@@ -5,6 +5,7 @@ using EchoSphere.Domain.LinqToDb.Extensions;
 using EchoSphere.Infrastructure.Db.Extensions;
 using EchoSphere.Infrastructure.IntegrationEvents.Extensions;
 using EchoSphere.Posts.Abstractions;
+using EchoSphere.Posts.Abstractions.Models;
 using EchoSphere.Posts.Api.Data;
 using EchoSphere.Posts.Api.Data.Models;
 using EchoSphere.Posts.Api.GrpcServices;
@@ -30,10 +31,18 @@ builder.Services.AddLinqToDb<AppDataConnection>(dbSettings =>
 		.HasTableName(DataConstants.PostsTableName)
 		.HasPrimaryKey(x => x.Id);
 
+	fluentMappingBuilder.Entity<PostLikeDb>()
+		.HasTableName(DataConstants.PostLikesTableName);
+
+	fluentMappingBuilder.Entity<PostCommentDb>()
+		.HasTableName(DataConstants.PostCommentsTableName)
+		.HasPrimaryKey(x => x.Id);
+
 	fluentMappingBuilder.Build();
 
 	mappingSchema
 		.AddIdValueConverter<Guid, PostId>()
+		.AddIdValueConverter<Guid, PostCommentId>()
 		.AddIdValueConverter<Guid, UserId>();
 });
 

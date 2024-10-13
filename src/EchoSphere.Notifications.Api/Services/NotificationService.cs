@@ -10,14 +10,17 @@ using LinqToDB.Data;
 
 namespace EchoSphere.Notifications.Api.Services;
 
-internal sealed class NotificationService : INotificationService, IIntegrationEventHandler<PostPublished>
+internal sealed class NotificationService : INotificationService, IIntegrationEventHandler<PostPublished>,
+	IIntegrationEventHandler<PostLiked>, IIntegrationEventHandler<PostCommentAdded>
 {
+	private readonly IDataContext _dataConnection;
 	private readonly ITable<NotificationDb> _notificationsTable;
 	private readonly ICurrentUserAccessor _currentUserAccessor;
 	private readonly IFollowService _followService;
 
 	public NotificationService(IDataContext dataConnection, ICurrentUserAccessor currentUserAccessor, IFollowService followService)
 	{
+		_dataConnection = dataConnection;
 		_currentUserAccessor = currentUserAccessor;
 		_followService = followService;
 		_notificationsTable = dataConnection.GetTable<NotificationDb>();
@@ -59,5 +62,35 @@ internal sealed class NotificationService : INotificationService, IIntegrationEv
 				IsRead = false,
 				UserId = f,
 			}), cancellationToken);
+	}
+
+	public async ValueTask Handle(PostLiked @event, CancellationToken cancellationToken)
+	{
+		if (@event.UserId == @event.PostAuthorId)
+		{
+			return;
+		}
+
+		await _dataConnection.InsertAsync(
+			new NotificationDb
+			{
+				UserId = @event.PostAuthorId,
+				Text = $"User {@event.UserId.Value} has liked your post {@event.PostId.Value}",
+			}, token: cancellationToken);
+	}
+
+	public async ValueTask Handle(PostCommentAdded @event, CancellationToken cancellationToken)
+	{
+		if (@event.UserId == @event.PostAuthorId)
+		{
+			return;
+		}
+
+		await _dataConnection.InsertAsync(
+			new NotificationDb
+			{
+				UserId = @event.PostAuthorId,
+				Text = $"User {@event.UserId.Value} has added comment to your post {@event.PostId.Value}",
+			}, token: cancellationToken);
 	}
 }

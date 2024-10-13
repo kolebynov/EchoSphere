@@ -32,6 +32,10 @@ public static class PostsApiMapper
 			(IPostService postService, ClaimsPrincipal currentUser, CancellationToken cancellationToken) =>
 				GetUserPosts(postService, currentUser.GetUserId(), cancellationToken));
 
+		postsApi.MapPost("/{postId:guid}/toggleLike", TogglePostLike);
+		postsApi.MapGet("/{postId:guid}/comments", GetPostComments);
+		postsApi.MapPost("/{postId:guid}/comments", AddComment);
+
 		usersApi.MapGet(
 			"/{userId}/posts",
 			(IPostService postService, ClaimsPrincipal currentUser, string userId, CancellationToken cancellationToken) =>
@@ -52,6 +56,34 @@ public static class PostsApiMapper
 					Id = x.Id.Value,
 					Title = x.Title,
 					Body = x.Body,
+					LikedByCurrentUser = x.LikedByCurrentUser,
+					LikesCount = x.LikesCount,
 				})).ToResults<Ok<IEnumerable<PostDtoV1>>, ProblemHttpResult>())
 			.IfNone(() => TypedResults.Problem(statusCode: 404));
+
+	private static Task<Results<Ok, ProblemHttpResult>> TogglePostLike(IPostService postService, Guid postId,
+		CancellationToken cancellationToken) =>
+		postService.TogglePostLike(new PostId(postId), cancellationToken)
+			.MapAsync(_ => TypedResults.Ok().ToResults<Ok, ProblemHttpResult>())
+			.IfLeft(err => err.Match(
+				() => TypedResults.Problem(statusCode: 404)));
+
+	private static Task<Results<Ok<IEnumerable<PostCommentDtoV1>>, ProblemHttpResult>> GetPostComments(
+		IPostService postService, Guid postId, CancellationToken cancellationToken) =>
+		postService.GetPostComments(new PostId(postId), cancellationToken)
+			.MapAsync(posts => TypedResults.Ok(posts
+				.Select(x => new PostCommentDtoV1
+				{
+					Id = x.Id.Value,
+					Text = x.Text,
+					UserId = x.UserId.Value,
+				})).ToResults<Ok<IEnumerable<PostCommentDtoV1>>, ProblemHttpResult>())
+			.IfNone(() => TypedResults.Problem(statusCode: 404));
+
+	private static Task<Results<Ok<Guid>, ProblemHttpResult>> AddComment(IPostService postService, Guid postId,
+		[FromBody] AddPostCommentRequestV1 request, CancellationToken cancellationToken) =>
+		postService.AddComment(new PostId(postId), request.Text, cancellationToken)
+			.MapAsync(x => TypedResults.Ok(x.Value).ToResults<Ok<Guid>, ProblemHttpResult>())
+			.IfLeft(err => err.Match(
+				() => TypedResults.Problem(statusCode: 404)));
 }

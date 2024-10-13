@@ -49,6 +49,10 @@ builder.Services.AddUsersGrpcClient(new Uri("https://UsersApi"));
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddTransient<IIntegrationEventHandler<PostPublished>>(
 	sp => (IIntegrationEventHandler<PostPublished>)sp.GetRequiredService<INotificationService>());
+builder.Services.AddTransient<IIntegrationEventHandler<PostLiked>>(
+	sp => (IIntegrationEventHandler<PostLiked>)sp.GetRequiredService<INotificationService>());
+builder.Services.AddTransient<IIntegrationEventHandler<PostCommentAdded>>(
+	sp => (IIntegrationEventHandler<PostCommentAdded>)sp.GetRequiredService<INotificationService>());
 
 var app = builder.Build();
 

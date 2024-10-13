@@ -5,7 +5,6 @@ using EchoSphere.Posts.Abstractions;
 using EchoSphere.Posts.Abstractions.IntegrationEvents;
 using EchoSphere.Posts.Abstractions.Models;
 using EchoSphere.Posts.Api.Data.Models;
-using LanguageExt;
 using LinqToDB;
 using LinqToDB.Data;
 using Microsoft.AspNetCore.Authorization;
@@ -52,14 +51,112 @@ internal sealed class PostService : IPostService
 
 	public async Task<Option<IReadOnlyList<Post>>> GetUserPosts(UserId userId, CancellationToken cancellationToken)
 	{
+		var currentUserId = _currentUserAccessor.CurrentUserId;
+		var postLikeTable = _dataConnection.GetTable<PostLikeDb>();
+
 		return await _dataConnection.GetTable<PostDb>()
 			.Where(x => x.UserId == userId)
-			.Select(x => new Post
+			.LeftJoin(
+				postLikeTable,
+				(post, postLike) => post.Id == postLike.PostId && postLike.UserId == currentUserId,
+				(post, postLike) => new Post
+				{
+					Id = post.Id,
+					Title = post.Title,
+					Body = post.Body,
+					LikedByCurrentUser = postLike != null,
+					LikesCount = postLikeTable.Count(x => x.PostId == post.Id),
+				})
+			.ToArrayAsync(cancellationToken);
+	}
+
+	public Task<Either<TogglePostLikeError, Unit>> TogglePostLike(PostId postId, CancellationToken cancellationToken) =>
+		GetPost(postId, cancellationToken)
+			.MapAsync(async post =>
+			{
+				await using var transaction = await _dataConnection.BeginTransactionAsync(cancellationToken);
+				await TogglePostLikeInternal(post, cancellationToken);
+				await transaction.CommitAsync(cancellationToken);
+
+				return Either<TogglePostLikeError, Unit>.Right(Unit.Default);
+			})
+			.IfNone(TogglePostLikeError.PostNotFound());
+
+	public async Task<Option<IReadOnlyList<PostComment>>> GetPostComments(PostId postId, CancellationToken cancellationToken)
+	{
+		if ((await GetPost(postId, cancellationToken)).IsNone)
+		{
+			return None;
+		}
+
+		return await _dataConnection.GetTable<PostCommentDb>()
+			.Where(x => x.PostId == postId)
+			.Select(x => new PostComment
 			{
 				Id = x.Id,
-				Title = x.Title,
-				Body = x.Body,
+				Text = x.Text,
+				UserId = x.UserId,
 			})
 			.ToArrayAsync(cancellationToken);
 	}
+
+	public Task<Either<AddCommentError, PostCommentId>> AddComment(
+		PostId postId, string text, CancellationToken cancellationToken) =>
+		GetPost(postId, cancellationToken)
+			.MapAsync(async post =>
+			{
+				await using var transaction = await _dataConnection.BeginTransactionAsync(cancellationToken);
+
+				var postCommentId = new PostCommentId(Guid.NewGuid());
+				await _dataConnection.InsertAsync(
+					new PostCommentDb
+					{
+						Id = postCommentId,
+						Text = text,
+						PostId = postId,
+						UserId = _currentUserAccessor.CurrentUserId,
+					}, token: cancellationToken);
+
+				await _integrationEventService.PublishEvent(
+					new PostCommentAdded
+					{
+						PostCommentId = postCommentId,
+						PostId = postId,
+						PostAuthorId = post.UserId,
+						UserId = _currentUserAccessor.CurrentUserId,
+					}, cancellationToken);
+
+				await transaction.CommitAsync(cancellationToken);
+				return Either<AddCommentError, PostCommentId>.Right(postCommentId);
+			})
+			.IfNone(AddCommentError.PostNotFound());
+
+	private async Task TogglePostLikeInternal(PostDb post, CancellationToken cancellationToken)
+	{
+		var deleted = await _dataConnection.GetTable<PostLikeDb>()
+			.DeleteAsync(x => x.PostId == post.Id && x.UserId == _currentUserAccessor.CurrentUserId, cancellationToken);
+		if (deleted > 0)
+		{
+			return;
+		}
+
+		await _dataConnection.InsertAsync(
+			new PostLikeDb
+			{
+				PostId = post.Id,
+				UserId = _currentUserAccessor.CurrentUserId,
+			}, token: cancellationToken);
+
+		await _integrationEventService.PublishEvent(
+			new PostLiked
+			{
+				PostId = post.Id,
+				PostAuthorId = post.UserId,
+				UserId = _currentUserAccessor.CurrentUserId,
+			},
+			cancellationToken);
+	}
+
+	private Task<Option<PostDb>> GetPost(PostId postId, CancellationToken cancellationToken) =>
+		_dataConnection.GetTable<PostDb>().FirstOrDefaultAsync(x => x.Id == postId, cancellationToken).Map(Optional);
 }

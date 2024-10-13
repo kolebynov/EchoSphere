@@ -47,6 +47,7 @@
 		<PackageVersion Include="Extensions.Hosting.AsyncInitialization" Version="3.0.1"/>
 	</ItemGroup>
 
+	<!-- Tests packages -->
 	<ItemGroup>
 		<PackageVersion Include="coverlet.collector" Version="6.0.2">
 			<PrivateAssets>all</PrivateAssets>

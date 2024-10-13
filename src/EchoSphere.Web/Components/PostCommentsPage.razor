@@ -1,0 +1,56 @@
+@page "/postComments/{PostId:guid}"
+
+@using EchoSphere.ApiGateway.Client
+@using EchoSphere.ApiGateway.Contracts
+@using EchoSphere.BlazorShared
+
+@inject IPostClient PostClient;
+@inject LongOperationExecutor LongOperationExecutor;
+
+<div>
+	<div style="max-height: 600px; overflow-y: auto">
+		@foreach (var comment in _comments)
+		{
+			<div style="border: 1px solid black; padding: 10px">
+				<div>@comment.UserId</div>
+				<div>@comment.Text</div>
+			</div>
+		}
+	</div>
+	<MudForm ValidationDelay="200" @bind-IsValid="_addCommentFormIsValid">
+		<MudTextField Label="Comment" @bind-Value="_commentText" Required/>
+		<MudButton Disabled="!_addCommentFormIsValid" OnClick="AddComment">Add comment</MudButton>
+	</MudForm>
+</div>
+
+@code {
+	private IReadOnlyList<PostCommentDtoV1> _comments = [];
+	private string? _commentText;
+	private bool _addCommentFormIsValid;
+
+	[Parameter]
+	public Guid PostId { get; set; }
+
+	protected override Task OnInitializedAsync()
+	{
+		return LoadComments();
+	}
+
+	private async Task AddComment()
+	{
+		await PostClient.AddComment(PostId, new AddPostCommentRequestV1 { Text = _commentText! },
+			CancellationToken.None);
+		await LoadComments();
+	}
+
+	private async Task LoadComments()
+	{
+		if (PostId == Guid.Empty)
+		{
+			return;
+		}
+
+		_comments = await LongOperationExecutor.ExecuteLongOperationAndReturnDefaultIfError(
+			() => PostClient.GetPostComments(PostId, CancellationToken.None), []);
+	}
+}

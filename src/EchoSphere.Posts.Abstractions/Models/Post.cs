@@ -9,4 +9,8 @@ public sealed class Post
 	public required string Title { get; init; }
 
 	public required string Body { get; init; }
+
+	public required bool LikedByCurrentUser { get; init; }
+
+	public required int LikesCount { get; init; }
 }

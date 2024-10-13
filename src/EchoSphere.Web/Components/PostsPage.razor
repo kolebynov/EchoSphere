@@ -5,6 +5,7 @@
 
 @inject IPostClient PostClient;
 @inject LongOperationExecutor LongOperationExecutor;
+@inject NavigationManager NavigationManager;
 
 <div>
 	@foreach (var post in _posts)
@@ -12,6 +13,11 @@
 		<div style="border: 1px solid black; padding: 10px">
 			<div>@post.Title</div>
 			<div>@post.Body</div>
+			<MudText Typo="Typo.body2">@post.LikesCount</MudText>
+			<MudIconButton
+				Icon="@(post.LikedByCurrentUser ? Icons.Material.Filled.Favorite : Icons.Material.Filled.FavoriteBorder)"
+				Color="Color.Primary" OnClick="() => TogglePostLike(post.Id)"/>
+			<MudButton Variant="Variant.Filled" OnClick="() => NavigateToComments(post.Id)">Comments</MudButton>
 		</div>
 	}
 </div>
@@ -31,5 +37,38 @@
 
 		_posts = await LongOperationExecutor.ExecuteLongOperationAndReturnDefaultIfError(
 			() => PostClient.GetUserPosts(UserId!, CancellationToken.None), []);
+	}
+
+	private async Task TogglePostLike(Guid postId)
+	{
+		var success = await LongOperationExecutor.ExecuteLongOperation(() => PostClient.TogglePostLike(postId, CancellationToken.None));
+		if (success)
+		{
+			_posts = _posts
+				.Select(x =>
+				{
+					if (x.Id != postId)
+					{
+						return x;
+					}
+
+					var liked = !x.LikedByCurrentUser;
+
+					return new PostDtoV1
+					{
+						Id = x.Id,
+						Body = x.Body,
+						Title = x.Title,
+						LikedByCurrentUser = liked,
+						LikesCount = liked ? x.LikesCount + 1 : x.LikesCount - 1,
+					};
+				})
+				.ToArray();
+		}
+	}
+
+	private void NavigateToComments(Guid postId)
+	{
+		NavigationManager.NavigateTo($"postComments/{postId}");
 	}
 }

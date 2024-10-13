@@ -8,7 +8,13 @@ package echo_sphere.posts.grpc;
 service PostService {
 	rpc PublishPost (PublishPostRequest) returns (echo_sphere.grpc_shared.contracts.PostIdDto);
 
-	rpc GetUserPosts(echo_sphere.grpc_shared.contracts.UserIdDto) returns (PostsDto);
+	rpc GetUserPosts (echo_sphere.grpc_shared.contracts.UserIdDto) returns (PostsDto);
+
+	rpc TogglePostLike (echo_sphere.grpc_shared.contracts.PostIdDto) returns (google.protobuf.Empty);
+
+	rpc GetPostComments (echo_sphere.grpc_shared.contracts.PostIdDto) returns (PostCommentsDto);
+
+	rpc AddComment (AddCommentRequest) returns (PostCommentIdDto);
 }
 
 message PublishPostRequest {
@@ -18,7 +24,7 @@ message PublishPostRequest {
 
 message PublishPostErrorDto {
 	oneof error {
-		google.protobuf.Empty invalid_user = 1;
+		google.protobuf.Empty current_user_not_found = 1;
 	}
 }
 
@@ -26,8 +32,41 @@ message PostDto {
 	string id = 1;
 	string title = 2;
 	string body = 3;
+	bool liked_by_current_user = 4;
+	int32 likes_count = 5;
 }
 
 message PostsDto {
 	repeated PostDto posts = 1;
+}
+
+message PostCommentIdDto {
+	string value = 1;
+}
+
+message PostCommentDto {
+	string id = 1;
+	string text = 2;
+	string user_id = 3;
+}
+
+message PostCommentsDto {
+	repeated PostCommentDto comments = 1;
+}
+
+message TogglePostLikeErrorDto {
+	oneof error {
+		google.protobuf.Empty post_not_found = 1;
+	}
+}
+
+message AddCommentRequest {
+	string post_id = 1;
+	string text = 2;
+}
+
+message AddCommentErrorDto {
+	oneof error {
+		google.protobuf.Empty post_not_found = 1;
+	}
 }
