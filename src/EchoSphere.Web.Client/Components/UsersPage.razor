@@ -10,7 +10,6 @@
 @inject IFollowClient FollowClient;
 @inject IChatClient ChatClient;
 @inject LongOperationExecutor LongOperationExecutor;
-@inject AuthenticationStateProvider AuthenticationStateProvider;
 @inject NavigationManager NavigationManager;
 
 <div>
@@ -45,14 +44,17 @@
 	private IReadOnlyList<UserProfileDtoV1> _userProfiles = [];
 	private ClaimsPrincipal _currentUser = null!;
 
+	[CascadingParameter]
+	public Task<AuthenticationState> AuthenticationStateTask { get; set; } = null!;
+
 	protected override async Task OnInitializedAsync()
 	{
-		_currentUser = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+		_currentUser = (await AuthenticationStateTask).User;
 		_userProfiles = await LongOperationExecutor.ExecuteLongOperationAndReturnDefaultIfError(
 			() => UserProfileClient.GetUserProfiles(CancellationToken.None), []);
 	}
 
-	private Guid CurrentUserId => Guid.Parse(_currentUser.FindFirstValue("sub")!);
+	private Guid CurrentUserId => Guid.Parse(_currentUser.FindFirst("sub")!.Value);
 
 	private Task SendFriendInvite(Guid toUser)
 	{

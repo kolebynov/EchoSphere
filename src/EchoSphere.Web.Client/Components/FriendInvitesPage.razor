@@ -33,7 +33,7 @@
 			.SelectAwait(invitation =>
 				new ValueTask<(Guid, UserProfileDtoV1)>(
 					LongOperationExecutor.ExecuteLongOperationAndReturnDefaultIfError(
-						async () => (invitation.Id, await UserProfileClient.GetUserProfile(invitation.FromUserId, CancellationToken.None)), default)))
+						async () => (invitation.Id, await UserProfileClient.GetUserProfile(invitation.FromUserId.ToString(), CancellationToken.None)), default)))
 			.ToArrayAsync();
 	}
 

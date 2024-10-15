@@ -1,0 +1,23 @@
+<script>
+	window.environmentVariables = {
+		@foreach (var (key, value) in EnvironmentVariables)
+		{
+			@GetKeyValueJsString(key, value);
+		}
+	};
+
+	window.getEnvironmentVariables = function() {
+		return {
+			keys: Object.keys(window.environmentVariables),
+			values: Object.values(window.environmentVariables),
+		};
+	};
+</script>
+
+@code {
+	[Parameter]
+	public IReadOnlyDictionary<string, string> EnvironmentVariables { get; set; } = new Dictionary<string, string>();
+
+	private static MarkupString GetKeyValueJsString(string key, string value) =>
+		(MarkupString)$"\"{key}\": \"{value}\",\n";
+}

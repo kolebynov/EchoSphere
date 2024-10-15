@@ -29,6 +29,25 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 			IssuerSigningKey = new JsonWebKey(File.ReadAllText(Path.Combine("..", "EchoSphere.Accounts.WebApp", "tempkey.jwk"))),
 			ValidateIssuerSigningKey = true,
 		};
+
+		opt.Events = new JwtBearerEvents
+		{
+			OnMessageReceived = context =>
+			{
+				var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+				if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer ", StringComparison.Ordinal))
+				{
+					context.Token = authHeader["Bearer ".Length..].Trim();
+				}
+
+				if (string.IsNullOrEmpty(context.Token))
+				{
+					context.Token = context.Request.Cookies["AccessToken"];
+				}
+
+				return Task.CompletedTask;
+			},
+		};
 	});
 builder.Services.AddAuthorization();
 

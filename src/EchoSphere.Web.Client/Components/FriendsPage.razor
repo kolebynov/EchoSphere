@@ -29,7 +29,7 @@
 		_friends = await friendIds.ToAsyncEnumerable()
 			.SelectAwait(fromUserId =>
 				new ValueTask<UserProfileDtoV1>(LongOperationExecutor.ExecuteLongOperationAndReturnDefaultIfError(
-					() => UserProfileClient.GetUserProfile(fromUserId, CancellationToken.None), null!)))
+					() => UserProfileClient.GetUserProfile(fromUserId.ToString(), CancellationToken.None), null!)))
 			.ToArrayAsync();
 	}
 

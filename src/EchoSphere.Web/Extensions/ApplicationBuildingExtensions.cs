@@ -24,7 +24,6 @@ public static class ApplicationBuildingExtensions
 		var callBackUrl = configuration.GetValue<string>("CallBackUrl");
 		var sessionCookieLifetime = configuration.GetValue("SessionCookieLifetimeMinutes", 60);
 
-		// Add Authentication services
 		services.AddAuthorization();
 		services
 			.AddAuthentication(options =>
@@ -35,10 +34,6 @@ public static class ApplicationBuildingExtensions
 			.AddCookie(options =>
 			{
 				options.ExpireTimeSpan = TimeSpan.FromMinutes(sessionCookieLifetime);
-				options.Events.OnValidatePrincipal += context =>
-				{
-					return Task.CompletedTask;
-				};
 			})
 			.AddOpenIdConnect(options =>
 			{
@@ -56,7 +51,6 @@ public static class ApplicationBuildingExtensions
 				options.Scope.Add("api_gateway");
 			});
 
-		// Blazor auth services
 		services.AddScoped<AuthenticationStateProvider, ServerAuthenticationStateProvider>();
 		services.AddCascadingAuthenticationState();
 	}

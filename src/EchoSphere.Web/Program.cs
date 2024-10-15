@@ -1,49 +1,29 @@
-using EchoSphere.ApiGateway.Client;
-using EchoSphere.BlazorShared.Extensions;
 using EchoSphere.ServiceDefaults;
+using EchoSphere.Web.Client.Extensions;
 using EchoSphere.Web.Components;
 using EchoSphere.Web.Extensions;
-using Refit;
+using Microsoft.AspNetCore.Authentication;
+using Yarp.ReverseProxy.Transforms;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add service defaults & Aspire components.
 builder.AddServiceDefaults();
 builder.AddApplicationServices();
 
-// Add services to the container.
 builder.Services.AddRazorComponents()
+	.AddInteractiveWebAssemblyComponents()
 	.AddInteractiveServerComponents();
 
-builder.Services.AddSharedBlazor();
-
+builder.Services.AddCommonClientAndServerServices();
 builder.Services.AddOutputCache();
-
-builder.Services.AddRefitClient<IChatClient>()
-	.ConfigureHttpClient(client => client.BaseAddress = new("https://ApiGateway/api"))
-	.AddAccessToken();
-builder.Services.AddRefitClient<IUserProfileClient>()
-	.ConfigureHttpClient(client => client.BaseAddress = new("https://ApiGateway/api"))
-	.AddAccessToken();
-builder.Services.AddRefitClient<IFriendClient>()
-	.ConfigureHttpClient(client => client.BaseAddress = new("https://ApiGateway/api"))
-	.AddAccessToken();
-builder.Services.AddRefitClient<IFollowClient>()
-	.ConfigureHttpClient(client => client.BaseAddress = new("https://ApiGateway/api"))
-	.AddAccessToken();
-builder.Services.AddRefitClient<IPostClient>()
-	.ConfigureHttpClient(client => client.BaseAddress = new("https://ApiGateway/api"))
-	.AddAccessToken();
-builder.Services.AddRefitClient<INotificationClient>()
-	.ConfigureHttpClient(client => client.BaseAddress = new("https://ApiGateway/api"))
-	.AddAccessToken();
+builder.Services.AddHttpForwarderWithServiceDiscovery();
+builder.Services.AddAsyncInitialization();
 
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
 	app.UseExceptionHandler("/Error", createScopeForErrors: true);
-	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 	app.UseHsts();
 }
 
@@ -55,8 +35,17 @@ app.UseAntiforgery();
 app.UseOutputCache();
 
 app.MapRazorComponents<App>()
-	.AddInteractiveServerRenderMode();
+	.AddInteractiveWebAssemblyRenderMode()
+	.AddInteractiveServerRenderMode()
+	.AddAdditionalAssemblies(typeof(EchoSphere.Web.Client.Components._Imports).Assembly);
 
-app.MapDefaultEndpoints();
+app.MapForwarder("/api/{**catch-all}", "https://ApiGateway", transformBuilder =>
+{
+	transformBuilder.AddRequestTransform(async transformContext =>
+	{
+		var accessToken = await transformContext.HttpContext.GetTokenAsync("access_token");
+		transformContext.ProxyRequest.Headers.Authorization = new("Bearer", accessToken);
+	});
+}).RequireAuthorization();
 
-app.Run();
+await app.InitAndRunAsync();

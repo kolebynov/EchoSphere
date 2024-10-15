@@ -9,5 +9,5 @@ public interface IUserProfileClient
 	Task<IReadOnlyList<UserProfileDtoV1>> GetUserProfiles(CancellationToken cancellationToken);
 
 	[Get("/users/{userId}")]
-	Task<UserProfileDtoV1> GetUserProfile(Guid userId, CancellationToken cancellationToken);
+	Task<UserProfileDtoV1> GetUserProfile(string userId, CancellationToken cancellationToken);
 }
