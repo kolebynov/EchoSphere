@@ -50,9 +50,14 @@ public static class ServiceCollectionExtensions
 			sp.GetRequiredService<IMigrationRunner>().MigrateUp();
 		});
 
+		var dbSettingsBuilder = services.AddOptions<DbSettings>().PostConfigure(settings =>
+		{
+			settings.MappingSchema.SetConvertExpression<DateTime, DateTimeOffset>(x => x.UnspecifiedAsUtc());
+		});
+
 		if (configureAction != null)
 		{
-			services.AddOptions<DbSettings>().Configure(configureAction);
+			dbSettingsBuilder.Configure(configureAction);
 		}
 
 		services.AddTransient<IDataContext>(sp => sp.GetRequiredService<TContext>());
@@ -89,4 +94,9 @@ public static class ServiceCollectionExtensions
 		var command = string.Format(CultureInfo.InvariantCulture, createDatabaseQuery, databaseName);
 		await dataConnection.ExecuteAsync(command, cancellationToken);
 	}
+
+	private static DateTime UnspecifiedAsUtc(this DateTime dateTime) =>
+		dateTime.Kind == DateTimeKind.Unspecified
+			? DateTime.SpecifyKind(dateTime, DateTimeKind.Utc)
+			: dateTime;
 }

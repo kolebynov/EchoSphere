@@ -19,7 +19,7 @@ internal sealed class PostGrpcClient : IPostService
 		_grpcExecutor = grpcExecutor;
 	}
 
-	public Task<Either<PublishPostError, PostId>> PublishPost(string title, string body,
+	public Task<Either<PublishPostError, PostId>> PublishPost(string body,
 		CancellationToken cancellationToken) =>
 		_grpcExecutor
 			.ExecuteAsync<PostId, PublishPostErrorDto>(
@@ -28,7 +28,6 @@ internal sealed class PostGrpcClient : IPostService
 					var postId = await client.PublishPostAsync(
 						new PublishPostRequest
 						{
-							Title = title,
 							Body = body,
 						},
 						cancellationToken: cancellationToken);
@@ -50,10 +49,12 @@ internal sealed class PostGrpcClient : IPostService
 						.Select(x => new Post
 						{
 							Id = IdValueExtensions.Parse<PostId>(x.Id),
-							Title = x.Title,
+							PostedOn = x.PostedOn.ToDateTimeOffset(),
+							AuthorId = IdValueExtensions.Parse<UserId>(x.AuthorId),
 							Body = x.Body,
 							LikedByCurrentUser = x.LikedByCurrentUser,
 							LikesCount = x.LikesCount,
+							CommentsCount = x.CommentsCount,
 						})
 						.ToArray();
 				})

@@ -26,14 +26,13 @@ internal sealed class PostService : IPostService
 		_integrationEventService = integrationEventService;
 	}
 
-	public async Task<Either<PublishPostError, PostId>> PublishPost(string title, string body,
-		CancellationToken cancellationToken)
+	public async Task<Either<PublishPostError, PostId>> PublishPost(string body, CancellationToken cancellationToken)
 	{
 		var postId = new PostId(Guid.NewGuid());
 		await using var transaction = await _dataConnection.BeginTransactionAsync(cancellationToken);
 
 		await _dataConnection.InsertAsync(
-			new PostDb { Id = postId, UserId = _currentUserAccessor.CurrentUserId, Title = title, Body = body },
+			new PostDb { Id = postId, PostedOn = DateTimeOffset.UtcNow , AuthorId = _currentUserAccessor.CurrentUserId, Body = body },
 			token: cancellationToken);
 
 		await _integrationEventService.PublishEvent(
@@ -53,19 +52,23 @@ internal sealed class PostService : IPostService
 	{
 		var currentUserId = _currentUserAccessor.CurrentUserId;
 		var postLikeTable = _dataConnection.GetTable<PostLikeDb>();
+		var postCommentTable = _dataConnection.GetTable<PostCommentDb>();
 
 		return await _dataConnection.GetTable<PostDb>()
-			.Where(x => x.UserId == userId)
+			.Where(x => x.AuthorId == userId)
+			.OrderByDescending(x => x.PostedOn)
 			.LeftJoin(
 				postLikeTable,
 				(post, postLike) => post.Id == postLike.PostId && postLike.UserId == currentUserId,
 				(post, postLike) => new Post
 				{
 					Id = post.Id,
-					Title = post.Title,
+					PostedOn = post.PostedOn,
+					AuthorId = post.AuthorId,
 					Body = post.Body,
 					LikedByCurrentUser = postLike != null,
 					LikesCount = postLikeTable.Count(x => x.PostId == post.Id),
+					CommentsCount = postCommentTable.Count(x => x.PostId == post.Id),
 				})
 			.ToArrayAsync(cancellationToken);
 	}
@@ -122,7 +125,7 @@ internal sealed class PostService : IPostService
 					{
 						PostCommentId = postCommentId,
 						PostId = postId,
-						PostAuthorId = post.UserId,
+						PostAuthorId = post.AuthorId,
 						UserId = _currentUserAccessor.CurrentUserId,
 					}, cancellationToken);
 
@@ -151,7 +154,7 @@ internal sealed class PostService : IPostService
 			new PostLiked
 			{
 				PostId = post.Id,
-				PostAuthorId = post.UserId,
+				PostAuthorId = post.AuthorId,
 				UserId = _currentUserAccessor.CurrentUserId,
 			},
 			cancellationToken);

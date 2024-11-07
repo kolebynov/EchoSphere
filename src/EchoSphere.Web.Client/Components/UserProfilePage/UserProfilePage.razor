@@ -1,0 +1,59 @@
+@page "/profile/{UserId}"
+@using EchoSphere.ApiGateway.Client
+@using EchoSphere.ApiGateway.Contracts
+@using EchoSphere.BlazorShared
+
+@inject IUserProfileClient UserProfileClient;
+@inject LongOperationExecutor LongOperationExecutor;
+
+@if (_userProfile == null)
+{
+	return;
+}
+
+<div>
+	<div class="d-flex flex-row gap-10">
+		<MudImage Src="/images/avatar.jpg" Width="116" Height="116" Style="border-radius: 50%;"/>
+		<div class="d-flex flex-column gap-3">
+			<MudText Typo="Typo.h5">@_userProfile.FirstName @_userProfile.SecondName</MudText>
+			<MudText Typo="Typo.body2">Some bio Some bio Some bio Some bio Some bio Some bio Some bio Some bio Some bio Some bio Some bio Some bio Some bio Some bio Some bio Some bio </MudText>
+			<div class="d-flex flex-row gap-16">
+				<div>
+					<MudButton Variant="Variant.Filled" Color="Color.Secondary">Follow</MudButton>
+					<MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="ml-2">Add to friends</MudButton>
+				</div>
+				<div>
+					<MudChip T="string" Class="friends-chip">Friends: 150</MudChip>
+					<MudChip T="string" Class="followers-chip">Followers: 200</MudChip>
+				</div>
+			</div>
+		</div>
+	</div>
+	<MudTabs Elevation="0" Rounded="true" ApplyEffectsToContainer="true" Class="mt-10" MinimumTabWidth="120px" PanelClass="pt-4">
+		<MudTabPanel Text="Posts" Icon="@Icons.Material.Filled.Newspaper">
+			<div style="width: 80%; margin: auto;">
+				<AddPost OnPostPublished="() => _postList.LoadPosts()"/>
+			</div>
+			<PostList @ref="_postList" UserId="@UserId"/>
+		</MudTabPanel>
+	</MudTabs>
+</div>
+
+@code {
+	private UserProfileDtoV1? _userProfile;
+	private PostList _postList = null!;
+
+	[Parameter]
+	public string? UserId { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		if (UserId == null)
+		{
+			return;
+		}
+
+		_userProfile = await LongOperationExecutor.ExecuteLongOperationAndReturnDefaultIfError(
+			() => UserProfileClient.GetUserProfile(UserId, CancellationToken.None)!, null);
+	}
+}

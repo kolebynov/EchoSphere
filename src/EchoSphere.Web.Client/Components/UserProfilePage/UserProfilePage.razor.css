@@ -1,0 +1,9 @@
+::deep .friends-chip {
+	background-color: #f3f4f6;
+	color: #323842;
+}
+
+::deep .followers-chip {
+	background-color: #f2f2fd;
+	color: #636AE8;
+}

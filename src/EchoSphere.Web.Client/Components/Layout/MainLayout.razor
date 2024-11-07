@@ -1,4 +1,6 @@
-﻿@inherits LayoutComponentBase
+﻿@using MudBlazor.Utilities
+
+@inherits LayoutComponentBase
 
 <MudThemeProvider Theme="_theme"/>
 <MudDialogProvider/>
@@ -8,22 +10,68 @@
 
 <MudLayout>
 	<ErrorHandler>
-		<MudAppBar Color="Color.Primary">
-			<MudNavLink Href="users">Users</MudNavLink>
-			<MudNavLink Href="friendInvites">Invites</MudNavLink>
-			<MudNavLink Href="followers">Followers</MudNavLink>
-			<MudNavLink Href="friends">Friends</MudNavLink>
-			<MudNavLink Href="chats">Chats</MudNavLink>
-			<MudNavLink Href="posts/me">My posts</MudNavLink>
-			<MudNavLink Href="newPost">New post</MudNavLink>
-			<MudNavLink Href="notifications">Notifications</MudNavLink>
-		</MudAppBar>
-		<MudMainContent>
-			@Body
-		</MudMainContent>
+		<div class="d-flex flex-row">
+			<MudNavMenu Style="width: 96px;" Margin="Margin.None" Class="theme-nav-bar">
+				<div style="height: 80px; position: relative">
+					<MudImage Src="/images/Logo.png" Width="40" Style="position: absolute; inset: 0; margin: auto"/>
+				</div>
+				<NavItem Href="profile/me" Icon="@Icons.Material.Filled.Person" Name="Profile"/>
+				<NavItem Href="friends" Icon="@Icons.Material.Filled.Group" Name="Friends"/>
+				<NavItem Href="users" Icon="@Icons.Material.Filled.PersonAdd" Name="Find users"/>
+				<NavItem Href="followers" Icon="@Icons.Material.Filled.Groups" Name="Followers"/>
+				<NavItem Href="chats" Icon="@Icons.Material.Filled.Email" Name="Chats"/>
+				<NavItem Href="notifications" Icon="@Icons.Material.Filled.Notifications" Name="Notifications"/>
+			</MudNavMenu>
+			<div>
+				<MudAppBar Class="theme-nav-bar" ToolBarClass="px-6 py-3" Elevation="0" Gutters="false" Style="left: 96px; width: auto;">
+					<div class="d-flex flex-row gap-4 justify-end" style="width: 100%; height: 100%">
+						<MudIconButton Icon="@Icons.Material.Outlined.Notifications" Size="Size.Medium"/>
+						<MudImage Src="/images/avatar.jpg" ObjectFit="ObjectFit.Contain" Style="width: auto; height: 100%; border-radius: 50%;"/>
+					</div>
+				</MudAppBar>
+				<MudMainContent>
+					<div class="px-13 pt-8">@Body</div>
+				</MudMainContent>
+			</div>
+		</div>
 	</ErrorHandler>
 </MudLayout>
 
 @code {
-	private readonly MudTheme _theme = new();
+	private static readonly string[] HeadingFontFamily = ["Archivo" ,"Roboto", "Arial", "sans-serif"];
+	private static readonly string[] BodyFontFamily = ["Inter" ,"Roboto", "Arial", "sans-serif"];
+
+	private readonly MudTheme _theme = new()
+	{
+		LayoutProperties =
+		{
+			AppbarHeight = "56px",
+			DefaultBorderRadius = "8px",
+		},
+		PaletteLight =
+		{
+			Primary = new MudColor("#636AE8"),
+			PrimaryContrastText = new MudColor("#ffffff"),
+			TextPrimary = new MudColor("#000000"),
+			Secondary = new MudColor("#ADD8E6"),
+			SecondaryContrastText = new MudColor("#ffffff"),
+			Background = new MudColor("#ffffff"),
+			HoverOpacity = 0.16,
+		},
+		Typography =
+		{
+			Default = { FontFamily = BodyFontFamily },
+			H1 = { FontFamily = HeadingFontFamily },
+			H2 = { FontFamily = HeadingFontFamily },
+			H3 = { FontFamily = HeadingFontFamily },
+			H4 = { FontFamily = HeadingFontFamily },
+			H5 = { FontFamily = HeadingFontFamily },
+			H6 = { FontFamily = HeadingFontFamily },
+			Body1 = { FontFamily = BodyFontFamily },
+			Body2 = { FontFamily = BodyFontFamily },
+			Caption = { FontFamily = BodyFontFamily, FontSize = "12px" },
+			Button = { FontFamily = BodyFontFamily, TextTransform = "none", FontWeight = 400 },
+			Input = { FontFamily = BodyFontFamily, FontSize = "14px" },
+		}
+	};
 }

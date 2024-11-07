@@ -1,0 +1,29 @@
+@using EchoSphere.ApiGateway.Client
+@using EchoSphere.ApiGateway.Contracts
+@using EchoSphere.BlazorShared
+
+@inject IPostClient PostClient;
+@inject LongOperationExecutor LongOperationExecutor;
+
+<div class="d-flex flex-column align-end">
+	<MudTextField Label="What's on your mind?" @bind-Value="_body" Lines="2" AutoGrow="true" Variant="Variant.Outlined"
+	              FullWidth="true" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Edit"/>
+	<MudButton Disabled="string.IsNullOrEmpty(_body)" Color="Color.Secondary" Class="mt-3" OnClick="PublishPost" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Send">
+		Post
+	</MudButton>
+</div>
+
+@code {
+	private string? _body;
+
+	[Parameter]
+	public EventCallback OnPostPublished { get; set; }
+
+	private async Task PublishPost()
+	{
+		await LongOperationExecutor.ExecuteLongOperation(
+			() => PostClient.PublishPost(new PublishPostRequestV1 { Body = _body! }, CancellationToken.None));
+		_body = null;
+		await OnPostPublished.InvokeAsync();
+	}
+}

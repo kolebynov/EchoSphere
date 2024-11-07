@@ -1,0 +1,86 @@
+@using EchoSphere.ApiGateway.Client
+@using EchoSphere.ApiGateway.Contracts
+@using EchoSphere.BlazorShared
+
+@inject IPostClient PostClient;
+@inject LongOperationExecutor LongOperationExecutor;
+
+@if (Post == null)
+{
+	return;
+}
+
+<div class="d-flex flex-column gap-3 post-item">
+	<div class="d-flex flex-row gap-4" style="height: 60px">
+		<MudImage Src="/images/avatar.jpg" Style="width: auto; height: 100%; border-radius: 50%;"/>
+		<div>
+			<MudText Typo="Typo.h6">John Doe</MudText>
+			<MudText Typo="Typo.caption" Class="mud-text-secondary">@Post.PostedOn.ToLocalTime().ToString("G")</MudText>
+		</div>
+	</div>
+	<MudText Typo="Typo.body2">@Post.Body</MudText>
+	<div class="d-flex flex-row align-start gap-2 actions">
+		<MudChip T="string"
+		         Icon="@(Post.LikedByCurrentUser ? Icons.Material.Filled.Favorite : Icons.Material.Filled.FavoriteBorder)"
+		         Color="Color.Secondary" OnClick="TogglePostLike">
+			@Post.LikesCount
+		</MudChip>
+		<MudChip T="string" Icon="@Icons.Material.Filled.Comment" Color="Color.Secondary" OnClick="() => _showCommentSection = !_showCommentSection">
+			@Post.CommentsCount
+		</MudChip>
+	</div>
+	@if (_showCommentSection)
+	{
+		<div class="d-flex flex-row align-center gap-2">
+			<MudTextField Label="Add a comment" Variant="Variant.Outlined" @bind-Value="_commentText" FullWidth="true" AutoGrow="true"/>
+			<MudIconButton Icon="@Icons.Material.Filled.Send" OnClick="AddComment"/>
+		</div>
+		<CommentList PostId="Post.Id"/>
+	}
+</div>
+
+@code {
+	private bool _showCommentSection;
+	private string? _commentText;
+
+	[Parameter]
+	public PostDtoV1? Post { get; set; }
+
+	private async Task TogglePostLike()
+	{
+		if (await LongOperationExecutor.ExecuteLongOperation(
+			    () => PostClient.TogglePostLike(Post!.Id, CancellationToken.None)))
+		{
+			Post = new PostDtoV1
+			{
+				Id = Post!.Id,
+				PostedOn = Post.PostedOn,
+				AuthorId = Post.AuthorId,
+				Body = Post.Body,
+				LikedByCurrentUser = !Post.LikedByCurrentUser,
+				LikesCount = Post.LikedByCurrentUser ? Post.LikesCount - 1 : Post.LikesCount + 1,
+				CommentsCount = Post.CommentsCount,
+			};
+		}
+	}
+
+	private async Task AddComment()
+	{
+		if (await LongOperationExecutor.ExecuteLongOperation(
+			    () => PostClient.AddComment(Post!.Id, new AddPostCommentRequestV1 { Text = _commentText! }, CancellationToken.None)))
+		{
+			Post = new PostDtoV1
+			{
+				Id = Post!.Id,
+				PostedOn = Post.PostedOn,
+				AuthorId = Post.AuthorId,
+				Body = Post.Body,
+				LikedByCurrentUser = Post.LikedByCurrentUser,
+				LikesCount = Post.LikesCount,
+				CommentsCount = Post.CommentsCount + 1,
+			};
+		}
+
+		_commentText = null;
+	}
+}

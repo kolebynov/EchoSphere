@@ -1,0 +1,36 @@
+body {
+	--mud-palette-action-default-hover: rgba(var(--mud-palette-primary-rgb), 0.08);
+}
+
+.theme-nav-bar {
+	color: #565e6c;
+	background-color: white;
+}
+
+.mud-button-filled {
+	box-shadow: none !important;
+}
+
+.mud-tab {
+	text-transform: none;
+}
+
+.mud-button-root.mud-button {
+	min-width: 100px;
+}
+
+.mud-input > input.mud-input-root-outlined, div.mud-input-slot.mud-input-root-outlined {
+	padding: 12px;
+}
+
+.mud-input>textarea.mud-input-root-outlined {
+	margin: 12px;
+}
+
+.mud-input-control>.mud-input-control-input-container>.mud-input-label-inputcontrol {
+	font-size: 14px;
+}
+
+.mud-input-label-outlined {
+	transform: translate(12px, 12px) scale(1);
+}

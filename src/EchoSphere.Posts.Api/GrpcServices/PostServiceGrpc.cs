@@ -24,7 +24,7 @@ internal sealed class PostServiceGrpc : PostService.PostServiceBase
 
 	public override Task<PostIdDto> PublishPost(PublishPostRequest request, ServerCallContext context) =>
 		_postService
-			.PublishPost(request.Title, request.Body, context.CancellationToken)
+			.PublishPost(request.Body, context.CancellationToken)
 			.MapAsync(postId => postId.ToDto())
 			.IfLeft(err => throw err
 				.Match(() => new PublishPostErrorDto { CurrentUserNotFound = GrpcExtensions.EmptyInstance })
@@ -38,9 +38,13 @@ internal sealed class PostServiceGrpc : PostService.PostServiceBase
 				{
 					posts.Select(x => new PostDto
 					{
-						Id = x.Id.ToInnerString(), Title = x.Title, Body = x.Body,
+						Id = x.Id.ToInnerString(),
+						PostedOn = Timestamp.FromDateTimeOffset(x.PostedOn),
+						AuthorId = x.AuthorId.ToInnerString(),
+						Body = x.Body,
 						LikedByCurrentUser = x.LikedByCurrentUser,
 						LikesCount = x.LikesCount,
+						CommentsCount = x.CommentsCount,
 					}),
 				},
 			})

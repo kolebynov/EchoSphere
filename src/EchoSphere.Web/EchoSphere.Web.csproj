@@ -12,4 +12,8 @@
 		<PackageReference Include="Microsoft.Extensions.ServiceDiscovery.Yarp"/>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <_ContentIncludedByDefault Remove="wwwroot\images\avatar.avif" />
+	</ItemGroup>
+
 </Project>

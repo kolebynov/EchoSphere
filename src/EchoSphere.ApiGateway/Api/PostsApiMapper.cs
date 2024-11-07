@@ -22,7 +22,7 @@ public static class PostsApiMapper
 				CancellationToken cancellationToken) =>
 			{
 				return postService
-					.PublishPost(request.Title, request.Body, cancellationToken)
+					.PublishPost(request.Body, cancellationToken)
 					.MapAsync(postId => Results.Ok(postId.Value))
 					.IfLeft(err => err.Match(() => Results.Problem(statusCode: 400)));
 			});
@@ -54,10 +54,12 @@ public static class PostsApiMapper
 				.Select(x => new PostDtoV1
 				{
 					Id = x.Id.Value,
-					Title = x.Title,
+					PostedOn = x.PostedOn,
+					AuthorId = x.AuthorId.Value,
 					Body = x.Body,
 					LikedByCurrentUser = x.LikedByCurrentUser,
 					LikesCount = x.LikesCount,
+					CommentsCount = x.CommentsCount,
 				})).ToResults<Ok<IEnumerable<PostDtoV1>>, ProblemHttpResult>())
 			.IfNone(() => TypedResults.Problem(statusCode: 404));
 

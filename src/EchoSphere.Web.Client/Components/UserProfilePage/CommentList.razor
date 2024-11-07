@@ -1,0 +1,40 @@
+@using EchoSphere.ApiGateway.Client
+@using EchoSphere.ApiGateway.Contracts
+@using EchoSphere.BlazorShared
+
+@inject IPostClient PostClient;
+@inject LongOperationExecutor LongOperationExecutor;
+
+<div class="d-flex flex-column gap-2">
+	@foreach (var comment in _comments)
+	{
+		<div class="post-comment d-flex flex-column gap-2">
+			<div class="d-flex flex-row gap-4" style="height: 40px">
+				<MudImage Src="/images/avatar.jpg" Style="width: auto; height: 100%; border-radius: 50%;"/>
+				<div>
+					<MudText Typo="Typo.body1">John Doe</MudText>
+					<MudText Typo="Typo.caption" Class="mud-text-secondary">@DateTimeOffset.Now.ToString("G")</MudText>
+				</div>
+			</div>
+			<MudText Typo="Typo.body2">@comment.Text</MudText>
+		</div>
+	}
+</div>
+
+@code {
+	private IReadOnlyList<PostCommentDtoV1> _comments = [];
+
+	[Parameter]
+	public Guid PostId { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		if (PostId == Guid.Empty)
+		{
+			return;
+		}
+
+		_comments = await LongOperationExecutor.ExecuteLongOperationAndReturnDefaultIfError(
+			() => PostClient.GetPostComments(PostId, CancellationToken.None), []);
+	}
+}

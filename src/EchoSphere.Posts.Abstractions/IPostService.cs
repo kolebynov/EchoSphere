@@ -28,7 +28,7 @@ public partial struct AddCommentError
 
 public interface IPostService
 {
-	Task<Either<PublishPostError, PostId>> PublishPost(string title, string body,
+	Task<Either<PublishPostError, PostId>> PublishPost(string body,
 		CancellationToken cancellationToken);
 
 	Task<Option<IReadOnlyList<Post>>> GetUserPosts(UserId userId, CancellationToken cancellationToken);

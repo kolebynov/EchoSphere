@@ -6,9 +6,9 @@ public sealed class PostDb
 {
 	public required PostId Id { get; init; }
 
-	public required UserId UserId { get; init; }
+	public required DateTimeOffset PostedOn { get; init; }
 
-	public required string Title { get; init; }
+	public required UserId AuthorId { get; init; }
 
 	public required string Body { get; init; }
 }

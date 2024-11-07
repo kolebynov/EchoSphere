@@ -1,0 +1,8 @@
+::deep .mud-nav-link-text {
+	margin: 0;
+}
+
+::deep .mud-nav-link {
+	padding-left: 12px;
+	padding-right: 12px;
+}

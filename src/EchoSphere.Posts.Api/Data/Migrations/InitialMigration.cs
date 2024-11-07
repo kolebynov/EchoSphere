@@ -10,8 +10,8 @@ public sealed class InitialMigration : Migration
 	{
 		Create.Table(DataConstants.PostsTableName)
 			.WithColumn(nameof(PostDb.Id)).AsGuid().PrimaryKey().NotNullable()
-			.WithColumn(nameof(PostDb.UserId)).AsGuid().Indexed().NotNullable()
-			.WithColumn(nameof(PostDb.Title)).AsString(120).NotNullable()
+			.WithColumn(nameof(PostDb.PostedOn)).AsDateTime().Indexed().NotNullable()
+			.WithColumn(nameof(PostDb.AuthorId)).AsGuid().Indexed().NotNullable()
 			.WithColumn(nameof(PostDb.Body)).AsString(4000).NotNullable();
 
 		Create.Table(DataConstants.PostLikesTableName)

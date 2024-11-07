@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 import "SharedProtos/contracts.proto";
 
 package echo_sphere.posts.grpc;
@@ -18,8 +19,7 @@ service PostService {
 }
 
 message PublishPostRequest {
-	string title = 2;
-	string body = 3;
+	string body = 1;
 }
 
 message PublishPostErrorDto {
@@ -30,10 +30,12 @@ message PublishPostErrorDto {
 
 message PostDto {
 	string id = 1;
-	string title = 2;
-	string body = 3;
-	bool liked_by_current_user = 4;
-	int32 likes_count = 5;
+	google.protobuf.Timestamp posted_on = 2;
+	string author_id = 3;
+	string body = 4;
+	bool liked_by_current_user = 5;
+	int32 likes_count = 6;
+	int32 comments_count = 7;
 }
 
 message PostsDto {

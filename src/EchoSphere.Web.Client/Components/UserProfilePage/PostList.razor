@@ -1,0 +1,42 @@
+@using EchoSphere.ApiGateway.Client
+@using EchoSphere.ApiGateway.Contracts
+@using EchoSphere.BlazorShared
+
+@inject IPostClient PostClient;
+@inject LongOperationExecutor LongOperationExecutor;
+
+@if (_posts.Count == 0)
+{
+	return;
+}
+
+<div class="d-flex flex-column gap-5">
+	@foreach (var post in _posts)
+	{
+		<PostItem Post="post"/>
+	}
+</div>
+
+@code {
+	private List<PostDtoV1> _posts = [];
+
+	[Parameter]
+	public string? UserId { get; set; }
+
+	public async Task LoadPosts()
+	{
+		_posts = (await LongOperationExecutor.ExecuteLongOperationAndReturnDefaultIfError(
+			() => PostClient.GetUserPosts(UserId!, CancellationToken.None)!, [])).ToList();
+		await InvokeAsync(StateHasChanged);
+	}
+
+	protected override async Task OnInitializedAsync()
+	{
+		if (UserId == null)
+		{
+			return;
+		}
+
+		await LoadPosts();
+	}
+}
