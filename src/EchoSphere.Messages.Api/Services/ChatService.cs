@@ -79,7 +79,7 @@ internal sealed class ChatService : IChatService
 	public async Task<Either<CreateChatError, ChatId>> CreateChat(
 		IReadOnlyList<UserId> participants, CancellationToken cancellationToken)
 	{
-		var chatId = new ChatId(Guid.NewGuid());
+		var chatId = new ChatId(Guid.CreateVersion7());
 		participants = [..participants, _currentUserAccessor.CurrentUserId];
 		var invalidUserId = (await _userProfileService.CheckUsersExistence(participants, cancellationToken))
 			.FirstOrDefault(x => !x.Exists).UserId;

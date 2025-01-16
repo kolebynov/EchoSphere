@@ -28,7 +28,7 @@ internal sealed class PostService : IPostService
 
 	public async Task<Either<PublishPostError, PostId>> PublishPost(string body, CancellationToken cancellationToken)
 	{
-		var postId = new PostId(Guid.NewGuid());
+		var postId = new PostId(Guid.CreateVersion7());
 		await using var transaction = await _dataConnection.BeginTransactionAsync(cancellationToken);
 
 		await _dataConnection.InsertAsync(
@@ -110,7 +110,7 @@ internal sealed class PostService : IPostService
 			{
 				await using var transaction = await _dataConnection.BeginTransactionAsync(cancellationToken);
 
-				var postCommentId = new PostCommentId(Guid.NewGuid());
+				var postCommentId = new PostCommentId(Guid.CreateVersion7());
 				await _dataConnection.InsertAsync(
 					new PostCommentDb
 					{

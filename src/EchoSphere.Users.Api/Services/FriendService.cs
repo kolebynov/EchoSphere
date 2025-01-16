@@ -80,7 +80,7 @@ internal sealed class FriendService : IFriendService
 				return Unit.Default;
 			})
 			.DoAsync(_ => _dataConnection.InsertAsync(
-				new FriendInvitationDb { Id = new FriendInvitationId(Guid.NewGuid()), FromUserId = fromUserId, ToUserId = toUserId },
+				new FriendInvitationDb { Id = new FriendInvitationId(Guid.CreateVersion7()), FromUserId = fromUserId, ToUserId = toUserId },
 				token: cancellationToken));
 	}
 
