@@ -1,28 +1,21 @@
 using EchoSphere.Domain.Abstractions;
-using EchoSphere.Infrastructure.IntegrationEvents.Abstractions;
 using EchoSphere.Notifications.Abstractions;
 using EchoSphere.Notifications.Abstractions.Models;
+using EchoSphere.Notifications.Api.Abstractions;
 using EchoSphere.Notifications.Api.Data.Models;
-using EchoSphere.Posts.Abstractions.IntegrationEvents;
-using EchoSphere.Users.Abstractions;
 using LinqToDB;
 using LinqToDB.Data;
 
 namespace EchoSphere.Notifications.Api.Services;
 
-internal sealed class NotificationService : INotificationService, IIntegrationEventHandler<PostPublished>,
-	IIntegrationEventHandler<PostLiked>, IIntegrationEventHandler<PostCommentAdded>
+internal sealed class NotificationService : INotificationService, INotificationStorage
 {
-	private readonly IDataContext _dataConnection;
 	private readonly ITable<NotificationDb> _notificationsTable;
 	private readonly ICurrentUserAccessor _currentUserAccessor;
-	private readonly IFollowService _followService;
 
-	public NotificationService(IDataContext dataConnection, ICurrentUserAccessor currentUserAccessor, IFollowService followService)
+	public NotificationService(IDataContext dataConnection, ICurrentUserAccessor currentUserAccessor)
 	{
-		_dataConnection = dataConnection;
 		_currentUserAccessor = currentUserAccessor;
-		_followService = followService;
 		_notificationsTable = dataConnection.GetTable<NotificationDb>();
 	}
 
@@ -46,51 +39,15 @@ internal sealed class NotificationService : INotificationService, IIntegrationEv
 	public Task DeleteCurrentUserNotifications(CancellationToken cancellationToken) =>
 		_notificationsTable.DeleteAsync(x => x.UserId == _currentUserAccessor.CurrentUserId, cancellationToken);
 
-	public async ValueTask Handle(PostPublished @event, CancellationToken cancellationToken)
+	public Task AddNotifications(IEnumerable<AddNotificationData> notifications, CancellationToken cancellationToken)
 	{
-		var followers = (await _followService.GetFollowers(@event.UserId, cancellationToken)).IfNone([]);
-		if (followers.Count == 0)
+		var notificationsToAdd = notifications.Select(x => new NotificationDb
 		{
-			return;
-		}
+			UserId = x.UserId,
+			Text = x.NotificationBody,
+			IsRead = false,
+		});
 
-		var notificationText = $"Hey, {@event.UserId.Value} has just published post {@event.PostId.Value}";
-		await _notificationsTable.BulkCopyAsync(
-			followers.Select(f => new NotificationDb
-			{
-				Text = notificationText,
-				IsRead = false,
-				UserId = f,
-			}), cancellationToken);
-	}
-
-	public async ValueTask Handle(PostLiked @event, CancellationToken cancellationToken)
-	{
-		if (@event.UserId == @event.PostAuthorId)
-		{
-			return;
-		}
-
-		await _dataConnection.InsertAsync(
-			new NotificationDb
-			{
-				UserId = @event.PostAuthorId,
-				Text = $"User {@event.UserId.Value} has liked your post {@event.PostId.Value}",
-			}, token: cancellationToken);
-	}
-
-	public async ValueTask Handle(PostCommentAdded @event, CancellationToken cancellationToken)
-	{
-		if (@event.UserId == @event.PostAuthorId)
-		{
-			return;
-		}
-
-		await _dataConnection.InsertAsync(
-			new NotificationDb
-			{
-				UserId = @event.PostAuthorId,
-				Text = $"User {@event.UserId.Value} has added comment to your post {@event.PostId.Value}",
-			}, token: cancellationToken);
+		return _notificationsTable.BulkCopyAsync(notificationsToAdd, cancellationToken);
 	}
 }
