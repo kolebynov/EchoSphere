@@ -1,4 +1,5 @@
 using System.Reflection;
+using EchoSphere.Domain.Abstractions;
 using EchoSphere.Domain.Abstractions.Models;
 using EchoSphere.Domain.AspNetCore.Extensions;
 using EchoSphere.Domain.LinqToDb.Extensions;
@@ -11,6 +12,8 @@ using EchoSphere.Users.Api.Data;
 using EchoSphere.Users.Api.Data.Models;
 using EchoSphere.Users.Api.GrpcServices;
 using EchoSphere.Users.Api.Services;
+using LanguageExt.UnsafeValueAccess;
+using LinqToDB;
 using LinqToDB.Data;
 using LinqToDB.Mapping;
 
@@ -60,22 +63,37 @@ builder.Services.AddScoped<IFollowService, FollowService>();
 builder.Services.AddScopedAsyncInitializer(async (sp, ct) =>
 {
 	var dataContext = sp.GetRequiredService<DataConnection>();
-	await dataContext.BulkCopyAsync(
-		[
-			new UserProfile
-			{
-				Id = new UserId(new Guid("cd2ecf42-deb8-4381-9567-3754cea3465a")),
-				FirstName = "Test1",
-				SecondName = "Test1",
-			},
-			new UserProfile
-			{
-				Id = new UserId(new Guid("e6da2482-630f-4755-9b13-f4b4733c0ad5")),
-				FirstName = "Test2",
-				SecondName = "Test2",
-			},
-		],
-		ct);
+	var test1Id = new UserId(new Guid("cd2ecf42-deb8-4381-9567-3754cea3465a"));
+	var test2Id = new UserId(new Guid("e6da2482-630f-4755-9b13-f4b4733c0ad5"));
+	if (!await dataContext.GetTable<UserProfile>().AnyAsync(ct))
+	{
+		await dataContext.BulkCopyAsync(
+			[
+				new UserProfile
+				{
+					Id = test1Id,
+					FirstName = "Test1",
+					SecondName = "Test1",
+				},
+				new UserProfile
+				{
+					Id = test2Id,
+					FirstName = "Test2",
+					SecondName = "Test2",
+				},
+			],
+			ct);
+	}
+
+	var currentUserAccessor = new StubCurrentUserAccessor { CurrentUserId = test1Id };
+	var friendService = new FriendService(dataContext, sp.GetRequiredService<IFollowService>(),
+		sp.GetRequiredService<IUserProfileService>(), currentUserAccessor);
+	if ((await friendService.SendFriendInvite(test2Id, CancellationToken.None)).IsRight)
+	{
+		currentUserAccessor.CurrentUserId = test2Id;
+		var inviteId = (await friendService.GetCurrentUserFriendInvites(CancellationToken.None)).ValueUnsafe()[0].Id;
+		await friendService.AcceptFriendInvite(inviteId, CancellationToken.None);
+	}
 });
 
 var app = builder.Build();
@@ -88,3 +106,8 @@ app.MapGrpcService<FriendServiceGrpc>();
 app.MapGrpcService<FollowServiceGrpc>();
 
 await app.InitAndRunAsync();
+
+internal sealed class StubCurrentUserAccessor : ICurrentUserAccessor
+{
+	public UserId CurrentUserId { get; set; }
+}

@@ -16,21 +16,25 @@ var notificationsDb = postgres.AddDatabase("NotificationsDb");
 
 var usersApi = builder.AddProject<Projects.EchoSphere_Users_Api>("UsersApi")
 	.WithReference(usersDb)
-	.WithReference(kafka);
+	.WithReference(kafka)
+	.WaitFor(usersDb);
 
 var userMessageApi = builder.AddProject<Projects.EchoSphere_Messages_Api>("MessagesApi")
 	.WithReference(userMessagesDb)
 	.WithReference(usersApi)
-	.WithReference(kafka);
+	.WithReference(kafka)
+	.WaitFor(userMessagesDb);
 
 var postsApi = builder.AddProject<Projects.EchoSphere_Posts_Api>("PostsApi")
 	.WithReference(postsDb)
-	.WithReference(kafka);
+	.WithReference(kafka)
+	.WaitFor(postsDb);
 
 var notificationsApi = builder.AddProject<Projects.EchoSphere_Notifications_Api>("NotificationsApi")
 	.WithReference(usersApi)
 	.WithReference(notificationsDb)
-	.WithReference(kafka);
+	.WithReference(kafka)
+	.WaitFor(notificationsDb);
 
 var apiService = builder.AddProject<Projects.EchoSphere_ApiGateway>("ApiGateway")
 	.WithReference(userMessageApi)
@@ -40,7 +44,8 @@ var apiService = builder.AddProject<Projects.EchoSphere_ApiGateway>("ApiGateway"
 
 var accountsWebApp = builder.AddProject<Projects.EchoSphere_Accounts_WebApp>("AccountsWebApp")
 	.WithExternalHttpEndpoints()
-	.WithReference(accountsDb);
+	.WithReference(accountsDb)
+	.WaitFor(accountsDb);
 
 var accountsEndpoint = accountsWebApp.GetEndpoint(profileName);
 
