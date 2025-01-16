@@ -1,7 +1,9 @@
 var builder = DistributedApplication.CreateBuilder(args);
 var profileName = builder.Configuration["DOTNET_LAUNCH_PROFILE"] ?? "http";
+var postgresUserName = builder.AddParameter("postgresUserName", () => "postgres", secret: false);
+var postgresPassword = builder.AddParameter("postgresPassword", () => "postgres", secret: true);
 
-var postgres = builder.AddPostgres("postgres", port: 5433)
+var postgres = builder.AddPostgres("postgres", postgresUserName, postgresPassword, 5433)
 	.WithImageTag("latest");
 
 var kafka = builder.AddKafka("kafka")
