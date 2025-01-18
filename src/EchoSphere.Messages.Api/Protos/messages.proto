@@ -9,6 +9,8 @@ package echo_sphere.messages.grpc;
 service ChatService {
 	rpc GetCurrentUserChats (google.protobuf.Empty) returns (GetUserChatsResponse);
 
+	rpc GetChat (echo_sphere.grpc_shared.contracts.ChatIdDto) returns (ChatInfoDto);
+
 	rpc GetChatMessages (echo_sphere.grpc_shared.contracts.ChatIdDto) returns (GetChatMessagesResponse);
 
 	rpc CreateChat (CreateChatRequest) returns (echo_sphere.grpc_shared.contracts.ChatIdDto);

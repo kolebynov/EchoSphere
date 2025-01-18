@@ -9,6 +9,7 @@
 		</PackageVersion>
 		<PackageVersion Include="Grpc.AspNetCore" Version="2.67.0"/>
 		<PackageVersion Include="Grpc.StatusProto" Version="2.67.0"/>
+		<PackageVersion Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.1"/>
 		<PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.1"/>
 		<PackageVersion Include="Microsoft.Extensions.Http" Version="9.0.1"/>
 		<PackageVersion Include="Microsoft.Extensions.ServiceDiscovery.Yarp" Version="9.0.0"/>

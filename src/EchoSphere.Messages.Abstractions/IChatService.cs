@@ -23,6 +23,8 @@ public interface IChatService
 {
 	Task<Option<IReadOnlyList<ChatInfo>>> GetCurrentUserChats(CancellationToken cancellationToken);
 
+	Task<Option<ChatInfo>> GetChat(ChatId chatId, CancellationToken cancellationToken);
+
 	Task<Option<IReadOnlyList<ChatMessage>>> GetChatMessages(ChatId chatId, CancellationToken cancellationToken);
 
 	Task<Either<CreateChatError, ChatId>> CreateChat(

@@ -85,12 +85,12 @@ builder.Services.AddScopedAsyncInitializer(async (sp, ct) =>
 			ct);
 	}
 
-	var currentUserAccessor = new StubCurrentUserAccessor { CurrentUserId = test1Id };
 	var friendService = new FriendService(dataContext, sp.GetRequiredService<IFollowService>(),
-		sp.GetRequiredService<IUserProfileService>(), currentUserAccessor);
+		sp.GetRequiredService<IUserProfileService>(), new SpecificUserAccessor(test1Id));
 	if ((await friendService.SendFriendInvite(test2Id, CancellationToken.None)).IsRight)
 	{
-		currentUserAccessor.CurrentUserId = test2Id;
+		friendService = new FriendService(dataContext, sp.GetRequiredService<IFollowService>(),
+			sp.GetRequiredService<IUserProfileService>(), new SpecificUserAccessor(test2Id));
 		var inviteId = (await friendService.GetCurrentUserFriendInvites(CancellationToken.None)).ValueUnsafe()[0].Id;
 		await friendService.AcceptFriendInvite(inviteId, CancellationToken.None);
 	}
@@ -106,8 +106,3 @@ app.MapGrpcService<FriendServiceGrpc>();
 app.MapGrpcService<FollowServiceGrpc>();
 
 await app.InitAndRunAsync();
-
-internal sealed class StubCurrentUserAccessor : ICurrentUserAccessor
-{
-	public UserId CurrentUserId { get; set; }
-}

@@ -1,18 +1,18 @@
-using EchoSphere.ApiGateway.Api;
-using EchoSphere.Domain.Abstractions.Extensions;
 using EchoSphere.Domain.AspNetCore.Extensions;
+using EchoSphere.Infrastructure.IntegrationEvents.Abstractions;
+using EchoSphere.Infrastructure.IntegrationEvents.Extensions;
+using EchoSphere.Messages.Abstractions.IntegrationEvents;
 using EchoSphere.Messages.Client.Extensions;
-using EchoSphere.Notifications.Client.Extensions;
-using EchoSphere.Posts.Client.Extensions;
+using EchoSphere.RealtimeNotifications.Api;
 using EchoSphere.ServiceDefaults;
-using EchoSphere.Users.Client.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http.Json;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddServiceDefaults();
+builder.AddServiceDefaults().AddIntegrationEvents();
+
+builder.Services.AddAsyncInitialization();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 	.AddJwtBearer(opt =>
@@ -33,26 +33,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 	});
 builder.Services.AddAuthorization();
 
+builder.Services.AddSignalR();
+
 builder.Services.AddDomainServicesCore();
 
-builder.Services.AddProblemDetails();
-
-builder.Services.Configure<JsonOptions>(opt => opt.SerializerOptions.AddIdValueConverters());
-
-builder.Services.AddUsersGrpcClient(new Uri("https://UsersApi"));
 builder.Services.AddMessagesGrpcClient(new Uri("https://MessagesApi"));
-builder.Services.AddPostsGrpcClient(new Uri("https://PostsApi"));
-builder.Services.AddNotificationsGrpcClient(new Uri("https://NotificationsApi"));
+
+builder.Services.AddScoped<IIntegrationEventHandler<MessageSentEvent>, MessagesSentHandler>();
 
 var app = builder.Build();
-
-app.UseExceptionHandler();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapApi();
+app.MapHub<NotificationsHub>("/realtimeNotifications");
 
-app.MapDefaultEndpoints();
-
-app.Run();
+await app.InitAndRunAsync();

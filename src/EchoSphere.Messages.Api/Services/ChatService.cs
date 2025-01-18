@@ -17,6 +17,7 @@ internal sealed class ChatService : IChatService
 	private readonly IUserProfileService _userProfileService;
 	private readonly ICurrentUserAccessor _currentUserAccessor;
 	private readonly IIntegrationEventService _integrationEventService;
+	private readonly ITable<ChatParticipantDb> _chatParticipantsTable;
 
 	public ChatService(DataConnection dataConnection, IUserProfileService userProfileService,
 		ICurrentUserAccessor currentUserAccessor, IIntegrationEventService integrationEventService)
@@ -25,6 +26,7 @@ internal sealed class ChatService : IChatService
 		_userProfileService = userProfileService;
 		_currentUserAccessor = currentUserAccessor;
 		_integrationEventService = integrationEventService;
+		_chatParticipantsTable = _dataConnection.GetTable<ChatParticipantDb>();
 	}
 
 	public async Task<Option<IReadOnlyList<ChatInfo>>> GetCurrentUserChats(CancellationToken cancellationToken)
@@ -36,13 +38,11 @@ internal sealed class ChatService : IChatService
 			return None;
 		}
 
-		var chatParticipants = _dataConnection.GetTable<ChatParticipantDb>();
-
-		var chatIds = chatParticipants
+		var chatIds = _chatParticipantsTable
 			.Where(x => x.UserId == currentUserId)
 			.Select(x => x.ChatId);
 
-		var asyncEnumerable = chatParticipants
+		var asyncEnumerable = _chatParticipantsTable
 			.Where(x => chatIds.Contains(x.ChatId))
 			.AsAsyncEnumerable();
 
@@ -54,6 +54,18 @@ internal sealed class ChatService : IChatService
 				Participants = await groupedChat.Select(x => x.UserId).ToArrayAsync(cancellationToken),
 			})
 			.ToArrayAsync(cancellationToken);
+	}
+
+	public async Task<Option<ChatInfo>> GetChat(ChatId chatId, CancellationToken cancellationToken)
+	{
+		var chatParticipants = await _chatParticipantsTable
+			.Where(x => x.ChatId == chatId)
+			.Select(x => x.UserId)
+			.ToArrayAsync(cancellationToken);
+
+		return chatParticipants.Length > 0 && (_currentUserAccessor.IsSupervisor || chatParticipants.Contains(_currentUserAccessor.CurrentUserId))
+			? Some(new ChatInfo { Id = chatId, Participants = chatParticipants })
+			: None;
 	}
 
 	public async Task<Option<IReadOnlyList<ChatMessage>>> GetChatMessages(
@@ -88,7 +100,7 @@ internal sealed class ChatService : IChatService
 			return CreateChatError.ParticipantUserNotFound(invalidUserId);
 		}
 
-		await _dataConnection.GetTable<ChatParticipantDb>()
+		await _chatParticipantsTable
 			.BulkCopyAsync(
 				participants.Select(userId => new ChatParticipantDb
 				{
@@ -132,6 +144,6 @@ internal sealed class ChatService : IChatService
 	}
 
 	private Task<bool> IsChatExist(ChatId chatId, CancellationToken cancellationToken) =>
-		_dataConnection.GetTable<ChatParticipantDb>()
+		_chatParticipantsTable
 			.AnyAsync(x => x.ChatId == chatId && x.UserId == _currentUserAccessor.CurrentUserId, cancellationToken);
 }

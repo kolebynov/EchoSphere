@@ -41,7 +41,7 @@ internal sealed class ConsumeIntegrationEventHostedService : BaseHostedService
 			var consumeResults = batchConsumer.ConsumeBatch(stopCancellationToken);
 			_logger.LogInformation("Integration events consumed. [Count: {Count}]", consumeResults.Count);
 
-			using var scope = scopeServiceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope();
+			using var scope = scopeServiceProvider.CreateScope();
 
 			foreach (var consumeResult in consumeResults)
 			{

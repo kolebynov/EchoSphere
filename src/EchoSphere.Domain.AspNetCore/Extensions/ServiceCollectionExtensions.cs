@@ -13,9 +13,14 @@ public static class ServiceCollectionExtensions
 			.AddScheme<UserIdAuthenticationOptions, UserIdAuthenticationHandler>(UserIdAuthenticationDefaults.AuthenticationScheme, null);
 		services.AddAuthorization();
 
+		return services.AddDomainServicesCore();
+	}
+
+	public static IServiceCollection AddDomainServicesCore(this IServiceCollection services)
+	{
 		services.AddHttpContextAccessor();
 
-		services.TryAddScoped<ICurrentUserAccessor, CurrentUserAccessor>();
+		services.TryAddScoped<ICurrentUserAccessor, HttpContextUserAccessor>();
 
 		return services;
 	}

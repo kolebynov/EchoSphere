@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace EchoSphere.Domain.AspNetCore;
 
-public sealed class CurrentUserAccessor : ICurrentUserAccessor
+internal sealed class HttpContextUserAccessor : ICurrentUserAccessor
 {
 	private readonly IHttpContextAccessor _httpContextAccessor;
 	private UserId _currentUserId;
@@ -23,7 +23,7 @@ public sealed class CurrentUserAccessor : ICurrentUserAccessor
 			var httpContext = _httpContextAccessor.HttpContext;
 			if (httpContext == null)
 			{
-				throw new InvalidOperationException("No http context was found.");
+				return _currentUserId = ICurrentUserAccessor.SupervisorUserId;
 			}
 
 			var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier);
@@ -36,7 +36,7 @@ public sealed class CurrentUserAccessor : ICurrentUserAccessor
 		}
 	}
 
-	public CurrentUserAccessor(IHttpContextAccessor httpContextAccessor)
+	public HttpContextUserAccessor(IHttpContextAccessor httpContextAccessor)
 	{
 		_httpContextAccessor = httpContextAccessor;
 	}

@@ -40,6 +40,18 @@ internal sealed class ChatServiceGrpc : Grpc.ChatService.ChatServiceBase
 			})
 			.IfNone(() => throw NotFoundError.Instance.ToStatusRpcException());
 
+	public override Task<ChatInfoDto> GetChat(ChatIdDto request, ServerCallContext context) =>
+		_chatService.GetChat(request.ToModel(), context.CancellationToken)
+			.MapAsync(chat => new ChatInfoDto
+			{
+				Id = chat.Id.ToInnerString(),
+				Participants =
+				{
+					chat.Participants.Select(x => x.ToInnerString()),
+				},
+			})
+			.IfNone(() => throw NotFoundError.Instance.ToStatusRpcException());
+
 	public override Task<GetChatMessagesResponse> GetChatMessages(ChatIdDto request, ServerCallContext context) =>
 		_chatService.GetChatMessages(request.ToModel(), context.CancellationToken)
 			.MapAsync(messages => new GetChatMessagesResponse

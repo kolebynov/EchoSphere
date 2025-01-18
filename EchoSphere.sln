@@ -102,6 +102,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebApp", "WebApp", "{451C0B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.Web.Client", "src\EchoSphere.Web.Client\EchoSphere.Web.Client.csproj", "{56A4C38B-E645-4CE5-8449-E51BD6C2FF95}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RealtimeNotifications", "RealtimeNotifications", "{457CC010-7DEE-4CD5-9437-BAD1BA7508FF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.RealtimeNotifications.Api", "src\EchoSphere.RealtimeNotifications.Api\EchoSphere.RealtimeNotifications.Api.csproj", "{8B96B123-AA1D-4F33-A9C0-04CFE78A10AD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoSphere.RealtimeNotifications.Client", "src\EchoSphere.RealtimeNotifications.Client\EchoSphere.RealtimeNotifications.Client.csproj", "{46B186A0-1D87-46CF-BC80-958754A2DEC2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -236,6 +242,14 @@ Global
 		{56A4C38B-E645-4CE5-8449-E51BD6C2FF95}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56A4C38B-E645-4CE5-8449-E51BD6C2FF95}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56A4C38B-E645-4CE5-8449-E51BD6C2FF95}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B96B123-AA1D-4F33-A9C0-04CFE78A10AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B96B123-AA1D-4F33-A9C0-04CFE78A10AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B96B123-AA1D-4F33-A9C0-04CFE78A10AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B96B123-AA1D-4F33-A9C0-04CFE78A10AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46B186A0-1D87-46CF-BC80-958754A2DEC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46B186A0-1D87-46CF-BC80-958754A2DEC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46B186A0-1D87-46CF-BC80-958754A2DEC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46B186A0-1D87-46CF-BC80-958754A2DEC2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -286,5 +300,8 @@ Global
 		{451C0B30-34B6-48E1-9B7E-4EE45A4730D4} = {2B86BF74-1991-4852-A681-D3AD3F402161}
 		{604A3990-2DCE-4032-A3D4-6183925DD4B0} = {451C0B30-34B6-48E1-9B7E-4EE45A4730D4}
 		{56A4C38B-E645-4CE5-8449-E51BD6C2FF95} = {451C0B30-34B6-48E1-9B7E-4EE45A4730D4}
+		{457CC010-7DEE-4CD5-9437-BAD1BA7508FF} = {2B86BF74-1991-4852-A681-D3AD3F402161}
+		{8B96B123-AA1D-4F33-A9C0-04CFE78A10AD} = {457CC010-7DEE-4CD5-9437-BAD1BA7508FF}
+		{46B186A0-1D87-46CF-BC80-958754A2DEC2} = {457CC010-7DEE-4CD5-9437-BAD1BA7508FF}
 	EndGlobalSection
 EndGlobal

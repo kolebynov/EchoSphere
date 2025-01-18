@@ -3,7 +3,6 @@ using EchoSphere.Domain.Abstractions.Models;
 using EchoSphere.Domain.AspNetCore.Extensions;
 using EchoSphere.Domain.LinqToDb.Extensions;
 using EchoSphere.Infrastructure.Db.Extensions;
-using EchoSphere.Infrastructure.IntegrationEvents.Abstractions;
 using EchoSphere.Infrastructure.IntegrationEvents.Extensions;
 using EchoSphere.Notifications.Abstractions;
 using EchoSphere.Notifications.Abstractions.Models;

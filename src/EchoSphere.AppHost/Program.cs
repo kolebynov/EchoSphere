@@ -44,6 +44,12 @@ var apiService = builder.AddProject<Projects.EchoSphere_ApiGateway>("ApiGateway"
 	.WithReference(notificationsApi)
 	.WithReference(usersApi);
 
+var realtimeNotificationsApi = builder.AddProject<Projects.EchoSphere_RealtimeNotifications_Api>("RealtimeNotificationsApi")
+	.WithExternalHttpEndpoints()
+	.WithReference(kafka)
+	.WithReference(userMessageApi)
+	.WaitFor(kafka);
+
 var accountsWebApp = builder.AddProject<Projects.EchoSphere_Accounts_WebApp>("AccountsWebApp")
 	.WithExternalHttpEndpoints()
 	.WithReference(accountsDb)
@@ -54,8 +60,9 @@ var accountsEndpoint = accountsWebApp.GetEndpoint(profileName);
 var webApp = builder.AddProject<Projects.EchoSphere_Web>("webfrontend")
 	.WithExternalHttpEndpoints()
 	.WithReference(apiService)
-	.WithEnvironment("IdentityUrl", accountsEndpoint)
-	.WithReference(accountsWebApp);
+	.WithReference(accountsWebApp)
+	.WithReference(realtimeNotificationsApi)
+	.WithEnvironment("IdentityUrl", accountsEndpoint);
 
 var webAppEndpoint = webApp.GetEndpoint(profileName);
 accountsWebApp.WithEnvironment("WebAppClient", webAppEndpoint);

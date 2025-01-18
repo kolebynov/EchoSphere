@@ -20,6 +20,7 @@
 		<ProjectReference Include="..\EchoSphere.Messages.Api\EchoSphere.Messages.Api.csproj" />
 		<ProjectReference Include="..\EchoSphere.Notifications.Api\EchoSphere.Notifications.Api.csproj" />
 		<ProjectReference Include="..\EchoSphere.Posts.Api\EchoSphere.Posts.Api.csproj" />
+		<ProjectReference Include="..\EchoSphere.RealtimeNotifications.Api\EchoSphere.RealtimeNotifications.Api.csproj" />
 		<ProjectReference Include="..\EchoSphere.Users.Api\EchoSphere.Users.Api.csproj" />
 		<ProjectReference Include="..\EchoSphere.Web\EchoSphere.Web.csproj"/>
 	</ItemGroup>

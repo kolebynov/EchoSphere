@@ -39,6 +39,23 @@ internal sealed class ChatGrpcClient : IChatService
 				})
 			.IfLeft(_ => None);
 
+	public Task<Option<ChatInfo>> GetChat(ChatId chatId, CancellationToken cancellationToken) =>
+		_grpcExecutor
+			.ExecuteAsync<Option<ChatInfo>, NotFoundError>(
+				async client =>
+				{
+					var response = await client.GetChatAsync(chatId.ToDto(), cancellationToken: cancellationToken);
+
+					var chat = new ChatInfo
+					{
+						Id = chatId,
+						Participants = response.Participants.Select(IdValueExtensions.Parse<UserId>).ToArray(),
+					};
+
+					return Some(chat);
+				})
+			.IfLeft(_ => None);
+
 	public Task<Option<IReadOnlyList<ChatMessage>>> GetChatMessages(
 		ChatId chatId, CancellationToken cancellationToken) =>
 		_grpcExecutor

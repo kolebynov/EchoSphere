@@ -48,4 +48,13 @@ app.MapForwarder("/api/{**catch-all}", "https://ApiGateway", transformBuilder =>
 	});
 }).RequireAuthorization();
 
+app.MapForwarder("/realtimeNotifications/{**catch-all}", "https://RealtimeNotificationsApi", transformBuilder =>
+{
+	transformBuilder.AddRequestTransform(async transformContext =>
+	{
+		var accessToken = await transformContext.HttpContext.GetTokenAsync("access_token");
+		transformContext.ProxyRequest.Headers.Authorization = new("Bearer", accessToken);
+	});
+}).RequireAuthorization();
+
 await app.InitAndRunAsync();

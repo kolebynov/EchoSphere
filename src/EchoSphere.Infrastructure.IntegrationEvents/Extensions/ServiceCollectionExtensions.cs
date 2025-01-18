@@ -24,7 +24,10 @@ public static class ServiceCollectionExtensions
 	public static IHostApplicationBuilder AddIntegrationEvents(this IHostApplicationBuilder builder)
 	{
 		var integrationEventsSettings = new IntegrationEventsSettings();
-		builder.Configuration.GetSection(IntegrationEventsSectionName).Bind(integrationEventsSettings);
+		var configurationSection = builder.Configuration.GetSection(IntegrationEventsSectionName);
+		configurationSection.Bind(integrationEventsSettings);
+
+		builder.Services.Configure<IntegrationEventsSettings>(configurationSection);
 
 		if (!integrationEventsSettings.DisableProducer)
 		{
@@ -38,24 +41,6 @@ public static class ServiceCollectionExtensions
 				: throw new InvalidOperationException("Service name must be specified if consumer is enabled.");
 			AddConsumer(builder, serviceName);
 		}
-
-		builder.Services.AddOptions<DbSettings>()
-			.PostConfigure(dbSettings =>
-			{
-				dbSettings.MigrationAssemblies = [..dbSettings.MigrationAssemblies, Assembly.GetExecutingAssembly()];
-
-				var fluentMappingBuilder = new FluentMappingBuilder(dbSettings.MappingSchema);
-				fluentMappingBuilder.Entity<IntegrationEventDb>()
-					.HasTableName(DataConstants.EventsTableName)
-					.HasPrimaryKey(x => x.Id)
-					.HasIdentity(x => x.Id);
-
-				fluentMappingBuilder.Build();
-			});
-
-		builder.Services.Configure<IntegrationEventsSettings>(builder.Configuration.GetSection(IntegrationEventsSectionName));
-
-		builder.Services.TryAddScoped<IIntegrationEventService, IntegrationEventService>();
 
 		builder.Services.TryAddSingleton<IEventSerializer, EventSerializer>();
 
@@ -88,6 +73,22 @@ public static class ServiceCollectionExtensions
 				new TopicSpecification { Name = topicName, NumPartitions = 1, ReplicationFactor = 1 }
 			]);
 		});
+
+		builder.Services.AddOptions<DbSettings>()
+			.PostConfigure(dbSettings =>
+			{
+				dbSettings.MigrationAssemblies = [..dbSettings.MigrationAssemblies, Assembly.GetExecutingAssembly()];
+
+				var fluentMappingBuilder = new FluentMappingBuilder(dbSettings.MappingSchema);
+				fluentMappingBuilder.Entity<IntegrationEventDb>()
+					.HasTableName(DataConstants.EventsTableName)
+					.HasPrimaryKey(x => x.Id)
+					.HasIdentity(x => x.Id);
+
+				fluentMappingBuilder.Build();
+			});
+
+		builder.Services.TryAddScoped<IIntegrationEventService, IntegrationEventService>();
 	}
 
 	private static void AddConsumer(IHostApplicationBuilder builder, string serviceName)

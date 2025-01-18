@@ -20,6 +20,8 @@
 	<ItemGroup>
 		<ProjectReference Include="..\EchoSphere.ApiGateway.Client\EchoSphere.ApiGateway.Client.csproj" />
 		<ProjectReference Include="..\EchoSphere.BlazorShared\EchoSphere.BlazorShared.csproj"/>
+		<ProjectReference Include="..\EchoSphere.Messages.Abstractions\EchoSphere.Messages.Abstractions.csproj" />
+		<ProjectReference Include="..\EchoSphere.RealtimeNotifications.Client\EchoSphere.RealtimeNotifications.Client.csproj" />
 	</ItemGroup>
 
 </Project>

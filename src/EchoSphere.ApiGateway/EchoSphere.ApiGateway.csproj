@@ -6,6 +6,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\EchoSphere.ApiGateway.Contracts\EchoSphere.ApiGateway.Contracts.csproj"/>
+		<ProjectReference Include="..\EchoSphere.Domain.AspNetCore\EchoSphere.Domain.AspNetCore.csproj" />
 		<ProjectReference Include="..\EchoSphere.Notifications.Client\EchoSphere.Notifications.Client.csproj" />
 		<ProjectReference Include="..\EchoSphere.Posts.Client\EchoSphere.Posts.Client.csproj"/>
 		<ProjectReference Include="..\EchoSphere.ServiceDefaults\EchoSphere.ServiceDefaults.csproj"/>

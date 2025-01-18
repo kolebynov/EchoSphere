@@ -1,6 +1,11 @@
-﻿@using MudBlazor.Utilities
+﻿@using EchoSphere.Messages.Abstractions.IntegrationEvents
+@using Microsoft.AspNetCore.SignalR.Client
+@using MudBlazor.Utilities
 
 @inherits LayoutComponentBase
+@implements IAsyncDisposable
+
+@inject NavigationManager NavigationManager;
 
 <MudThemeProvider Theme="_theme"/>
 <MudDialogProvider/>
@@ -74,4 +79,27 @@
 			Input = { FontFamily = BodyFontFamily, FontSize = "14px" },
 		}
 	};
+
+	private HubConnection? _notificationsConnection;
+
+	public async ValueTask DisposeAsync()
+	{
+		if (_notificationsConnection != null)
+		{
+			await _notificationsConnection.DisposeAsync();
+		}
+	}
+
+	protected override async Task OnInitializedAsync()
+	{
+		_notificationsConnection = new HubConnectionBuilder()
+			.WithUrl(NavigationManager.ToAbsoluteUri("/realtimeNotifications"))
+			.Build();
+
+		_notificationsConnection.On<MessageSentEvent>(
+			"MessageSent",
+			e => Console.WriteLine($"Message from {e.SenderId} in chat {e.ChatId}"));
+
+		await _notificationsConnection.StartAsync();
+	}
 }

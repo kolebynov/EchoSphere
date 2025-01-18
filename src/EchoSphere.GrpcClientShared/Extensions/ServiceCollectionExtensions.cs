@@ -1,6 +1,6 @@
-using System.Security.Claims;
+using EchoSphere.Domain.Abstractions;
+using EchoSphere.Domain.Abstractions.Extensions;
 using Grpc.Net.ClientFactory;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -16,14 +16,8 @@ public static class ServiceCollectionExtensions
 			.AddGrpcClient<TClient>(configureClient)
 			.AddCallCredentials((_, metadata, serviceProvider) =>
 			{
-				var userIdClaim = serviceProvider.GetRequiredService<IHttpContextAccessor>().HttpContext?.User
-					.FindFirst(ClaimTypes.NameIdentifier);
-				if (userIdClaim == null)
-				{
-					return Task.CompletedTask;
-				}
-
-				metadata.Add("Authorization", userIdClaim.Value);
+				var currentUserId = serviceProvider.GetRequiredService<ICurrentUserAccessor>().CurrentUserId;
+				metadata.Add("Authorization", currentUserId.ToInnerString());
 				return Task.CompletedTask;
 			});
 		services.TryAddTransient<GrpcCallExecutor<TClient>>();
