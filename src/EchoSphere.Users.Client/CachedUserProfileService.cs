@@ -1,6 +1,7 @@
 using EchoSphere.Domain.Abstractions.Models;
 using EchoSphere.Users.Abstractions;
 using EchoSphere.Users.Abstractions.Models;
+using LanguageExt.UnsafeValueAccess;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace EchoSphere.Users.Client;
@@ -24,11 +25,14 @@ internal sealed class CachedUserProfileService : IUserProfileService
 	public Task<Option<UserProfile>> GetUserProfile(UserId userId, CancellationToken cancellationToken) =>
 		_inner.GetUserProfile(userId, cancellationToken);
 
-	public Task<Option<BasicUserProfile>> GetBasicUserProfile(UserId userId, CancellationToken cancellationToken) =>
-		_cache.GetOrSetAsync(
-			$"{CacheVersion}_UserProfileService_BasicUserProfile_{userId.Value}",
-			ct => _inner.GetBasicUserProfile(userId, ct),
-			token: cancellationToken).AsTask();
+	public async Task<Option<BasicUserProfile>> GetBasicUserProfile(UserId userId, CancellationToken cancellationToken)
+	{
+		var result = await _cache.GetOrSetAsync(
+			$"{CacheVersion}/UserProfileService/BasicUserProfile/{userId.Value}",
+			async ct => (await _inner.GetBasicUserProfile(userId, ct)).ValueUnsafe(),
+			token: cancellationToken);
+		return Optional(result);
+	}
 
 	public Task<IReadOnlyList<(UserId UserId, bool Exists)>> CheckUsersExistence(
 		IReadOnlyList<UserId> userIds, CancellationToken cancellationToken) =>

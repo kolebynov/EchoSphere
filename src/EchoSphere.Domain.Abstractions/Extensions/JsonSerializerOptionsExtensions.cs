@@ -8,7 +8,6 @@ public static class JsonSerializerOptionsExtensions
 	{
 		options.Converters.Add(new IdValueJsonConverter<long>());
 		options.Converters.Add(new IdValueJsonConverter<Guid>());
-		options.Converters.Add(new OptionJsonConverter());
 
 		return options;
 	}

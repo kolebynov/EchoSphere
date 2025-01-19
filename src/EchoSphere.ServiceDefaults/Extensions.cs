@@ -1,5 +1,6 @@
 using System.Text.Json;
 using EchoSphere.Domain.Abstractions.Extensions;
+using EchoSphere.Infrastructure.IntegrationEvents.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,7 +42,7 @@ public static class Extensions
 			.WithSystemTextJsonSerializer(new JsonSerializerOptions(JsonSerializerDefaults.General).AddDomainConverters())
 			.WithDefaultEntryOptions(opt => opt
 				.SetDuration(TimeSpan.FromSeconds(30))
-				.SetDistributedCacheDuration(TimeSpan.FromMinutes(1)))
+				.SetDistributedCacheDuration(TimeSpan.FromMinutes(5)))
 			.WithRegisteredDistributedCache()
 			.WithoutBackplane();
 
@@ -62,7 +63,11 @@ public static class Extensions
 				metrics.AddAspNetCoreInstrumentation()
 					.AddHttpClientInstrumentation()
 					.AddRuntimeInstrumentation()
-					.AddFusionCacheInstrumentation();
+					.AddFusionCacheInstrumentation(opt =>
+					{
+						opt.IncludeMemoryLevel = true;
+						opt.IncludeDistributedLevel = true;
+					});
 			})
 			.WithTracing(tracing =>
 			{
@@ -73,10 +78,10 @@ public static class Extensions
 				}
 
 				tracing.AddAspNetCoreInstrumentation()
-					// Uncomment the following line to enable gRPC instrumentation (requires the OpenTelemetry.Instrumentation.GrpcNetClient package)
-					// .AddGrpcClientInstrumentation()
+					.AddGrpcClientInstrumentation()
 					.AddHttpClientInstrumentation()
-					.AddFusionCacheInstrumentation();
+					.AddFusionCacheInstrumentation()
+					.AddIntegrationEventInstrumentation();
 			});
 
 		builder.AddOpenTelemetryExporters();

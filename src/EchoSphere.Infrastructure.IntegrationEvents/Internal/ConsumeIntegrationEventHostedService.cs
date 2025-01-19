@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 using Confluent.Kafka;
@@ -45,9 +46,14 @@ internal sealed class ConsumeIntegrationEventHostedService : BaseHostedService
 
 			foreach (var consumeResult in consumeResults)
 			{
-				var integrationEvent = _eventSerializer.Deserialize(consumeResult.Message.Value);
-				await GetEventHandler(integrationEvent.GetType())
-					.Handle(integrationEvent, scope.ServiceProvider, stopCancellationToken);
+				KeyValuePair<string, object?>[] activityTags = [new("IntegrationEventType", consumeResult.Message.Value.TypeName)];
+				using (var _ =
+				       ActivitySources.Source.StartActivity(ActivityKind.Consumer, name: "Handle integration event", tags: activityTags))
+				{
+					var integrationEvent = _eventSerializer.Deserialize(consumeResult.Message.Value);
+					await GetEventHandler(integrationEvent.GetType())
+						.Handle(integrationEvent, scope.ServiceProvider, stopCancellationToken);
+				}
 
 				_consumer.StoreOffset(consumeResult);
 			}
