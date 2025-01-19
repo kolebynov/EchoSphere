@@ -6,7 +6,7 @@ namespace EchoSphere.Infrastructure.IntegrationEvents.Internal;
 internal sealed class EventSerializer : IEventSerializer
 {
 	private readonly JsonSerializerOptions _serializerOptions =
-		new JsonSerializerOptions(JsonSerializerDefaults.General).AddIdValueConverters();
+		new JsonSerializerOptions(JsonSerializerDefaults.General).AddDomainConverters();
 
 	public SerializedIntegrationEvent Serialize<T>(T @event)
 		where T : class, IIntegrationEvent

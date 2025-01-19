@@ -1,3 +1,5 @@
+using System.Text.Json;
+using EchoSphere.Domain.Abstractions.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace EchoSphere.ServiceDefaults;
 
@@ -32,6 +35,16 @@ public static class Extensions
 			http.AddServiceDiscovery();
 		});
 
+		builder.AddRedisDistributedCache("cache");
+
+		builder.Services.AddFusionCache()
+			.WithSystemTextJsonSerializer(new JsonSerializerOptions(JsonSerializerDefaults.General).AddDomainConverters())
+			.WithDefaultEntryOptions(opt => opt
+				.SetDuration(TimeSpan.FromSeconds(30))
+				.SetDistributedCacheDuration(TimeSpan.FromMinutes(1)))
+			.WithRegisteredDistributedCache()
+			.WithoutBackplane();
+
 		return builder;
 	}
 
@@ -48,7 +61,8 @@ public static class Extensions
 			{
 				metrics.AddAspNetCoreInstrumentation()
 					.AddHttpClientInstrumentation()
-					.AddRuntimeInstrumentation();
+					.AddRuntimeInstrumentation()
+					.AddFusionCacheInstrumentation();
 			})
 			.WithTracing(tracing =>
 			{
@@ -61,7 +75,8 @@ public static class Extensions
 				tracing.AddAspNetCoreInstrumentation()
 					// Uncomment the following line to enable gRPC instrumentation (requires the OpenTelemetry.Instrumentation.GrpcNetClient package)
 					// .AddGrpcClientInstrumentation()
-					.AddHttpClientInstrumentation();
+					.AddHttpClientInstrumentation()
+					.AddFusionCacheInstrumentation();
 			});
 
 		builder.AddOpenTelemetryExporters();

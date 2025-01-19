@@ -2,6 +2,7 @@ using EchoSphere.Domain.Abstractions.Extensions;
 using EchoSphere.Infrastructure.IntegrationEvents.Abstractions;
 using EchoSphere.Messages.Abstractions;
 using EchoSphere.Messages.Abstractions.IntegrationEvents;
+using EchoSphere.Users.Abstractions;
 using Microsoft.AspNetCore.SignalR;
 
 namespace EchoSphere.RealtimeNotifications.Api;
@@ -10,15 +11,19 @@ internal sealed class MessagesSentHandler : IIntegrationEventHandler<MessageSent
 {
 	private readonly IHubContext<NotificationsHub> _hubContext;
 	private readonly IChatService _chatService;
+	private readonly IUserProfileService _userProfileService;
 
-	public MessagesSentHandler(IHubContext<NotificationsHub> hubContext, IChatService chatService)
+	public MessagesSentHandler(IHubContext<NotificationsHub> hubContext, IChatService chatService,
+		IUserProfileService userProfileService)
 	{
 		_hubContext = hubContext;
 		_chatService = chatService;
+		_userProfileService = userProfileService;
 	}
 
 	public async ValueTask Handle(MessageSentEvent @event, CancellationToken cancellationToken)
 	{
+		var sender = await _userProfileService.GetBasicUserProfile(@event.SenderId, cancellationToken);
 		var chatOption = await _chatService.GetChat(@event.ChatId, cancellationToken);
 		var task = chatOption
 			.Map(chat =>

@@ -9,6 +9,8 @@ public interface IUserProfileService
 
 	Task<Option<UserProfile>> GetUserProfile(UserId userId, CancellationToken cancellationToken);
 
+	Task<Option<BasicUserProfile>> GetBasicUserProfile(UserId userId, CancellationToken cancellationToken);
+
 	Task<IReadOnlyList<(UserId UserId, bool Exists)>> CheckUsersExistence(
 		IReadOnlyList<UserId> userIds, CancellationToken cancellationToken);
 }

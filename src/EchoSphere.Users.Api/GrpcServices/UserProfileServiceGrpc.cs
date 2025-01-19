@@ -33,6 +33,16 @@ internal sealed class UserProfileServiceGrpc : UserProfileService.UserProfileSer
 			})
 			.IfNone(() => throw NotFoundError.Instance.ToStatusRpcException());
 
+	public override Task<BasicUserProfileDto> GetBasicUserProfile(UserIdDto request, ServerCallContext context) =>
+		_userProfileService.GetBasicUserProfile(request.ToModel(), context.CancellationToken)
+			.MapAsync(userProfile => new BasicUserProfileDto
+			{
+				Id = userProfile.Id.ToInnerString(),
+				FirstName = userProfile.FirstName,
+				SecondName = userProfile.SecondName,
+			})
+			.IfNone(() => throw NotFoundError.Instance.ToStatusRpcException());
+
 	public override async Task<GetUserProfilesResponse> GetUserProfiles(Empty request, ServerCallContext context)
 	{
 		var userProfiles = await _userProfileService.GetUserProfiles(context.CancellationToken);

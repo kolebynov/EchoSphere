@@ -1,3 +1,4 @@
+using EchoSphere.Domain.Abstractions.Extensions;
 using EchoSphere.Domain.AspNetCore.Extensions;
 using EchoSphere.Infrastructure.IntegrationEvents.Abstractions;
 using EchoSphere.Infrastructure.IntegrationEvents.Extensions;
@@ -5,6 +6,7 @@ using EchoSphere.Messages.Abstractions.IntegrationEvents;
 using EchoSphere.Messages.Client.Extensions;
 using EchoSphere.RealtimeNotifications.Api;
 using EchoSphere.ServiceDefaults;
+using EchoSphere.Users.Client.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
@@ -33,11 +35,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 	});
 builder.Services.AddAuthorization();
 
-builder.Services.AddSignalR();
+builder.Services.AddSignalR()
+	.AddJsonProtocol(opt => opt.PayloadSerializerOptions.AddDomainConverters());
 
 builder.Services.AddDomainServicesCore();
 
 builder.Services.AddMessagesGrpcClient(new Uri("https://MessagesApi"));
+builder.Services.AddUsersGrpcClient(new Uri("https://UsersApi"));
 
 builder.Services.AddScoped<IIntegrationEventHandler<MessageSentEvent>, MessagesSentHandler>();
 

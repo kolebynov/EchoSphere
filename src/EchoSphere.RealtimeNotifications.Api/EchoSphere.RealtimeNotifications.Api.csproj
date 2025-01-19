@@ -3,6 +3,7 @@
 		<ProjectReference Include="..\EchoSphere.Domain.AspNetCore\EchoSphere.Domain.AspNetCore.csproj" />
 		<ProjectReference Include="..\EchoSphere.Messages.Client\EchoSphere.Messages.Client.csproj"/>
 		<ProjectReference Include="..\EchoSphere.ServiceDefaults\EchoSphere.ServiceDefaults.csproj"/>
+		<ProjectReference Include="..\EchoSphere.Users.Client\EchoSphere.Users.Client.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

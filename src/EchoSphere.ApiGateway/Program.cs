@@ -37,7 +37,7 @@ builder.Services.AddDomainServicesCore();
 
 builder.Services.AddProblemDetails();
 
-builder.Services.Configure<JsonOptions>(opt => opt.SerializerOptions.AddIdValueConverters());
+builder.Services.Configure<JsonOptions>(opt => opt.SerializerOptions.AddDomainConverters());
 
 builder.Services.AddUsersGrpcClient(new Uri("https://UsersApi"));
 builder.Services.AddMessagesGrpcClient(new Uri("https://MessagesApi"));

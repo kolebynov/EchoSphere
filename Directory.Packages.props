@@ -3,6 +3,8 @@
 		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
 	</PropertyGroup>
 	<ItemGroup>
+		<PackageVersion Include="Aspire.Hosting.Garnet" Version="9.0.0"/>
+		<PackageVersion Include="Aspire.StackExchange.Redis.DistributedCaching" Version="9.0.0"/>
 		<PackageVersion Include="Dusharp" Version="0.6.2">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -10,6 +12,7 @@
 		<PackageVersion Include="Grpc.AspNetCore" Version="2.67.0"/>
 		<PackageVersion Include="Grpc.StatusProto" Version="2.67.0"/>
 		<PackageVersion Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.1"/>
+		<PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.1"/>
 		<PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.1"/>
 		<PackageVersion Include="Microsoft.Extensions.Http" Version="9.0.1"/>
 		<PackageVersion Include="Microsoft.Extensions.ServiceDiscovery.Yarp" Version="9.0.0"/>
@@ -20,7 +23,7 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageVersion>
-		<PackageVersion Include="MudBlazor" Version="7.15.0"/>
+		<PackageVersion Include="MudBlazor" Version="7.16.0"/>
 		<PackageVersion Include="LanguageExt.Core" Version="4.4.9"/>
 		<PackageVersion Include="linq2db.AspNet" Version="5.4.1"/>
 		<PackageVersion Include="Grpc.AspNetCore.Server.ClientFactory" Version="2.67.0"/>
@@ -49,6 +52,9 @@
 		<PackageVersion Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="9.0.1"/>
 		<PackageVersion Include="Extensions.Hosting.AsyncInitialization" Version="3.0.1"/>
 		<PackageVersion Include="Microsoft.AspNetCore.Components.Authorization" Version="9.0.1"/>
+		<PackageVersion Include="ZiggyCreatures.FusionCache" Version="1.4.1"/>
+		<PackageVersion Include="ZiggyCreatures.FusionCache.OpenTelemetry" Version="1.4.1"/>
+		<PackageVersion Include="ZiggyCreatures.FusionCache.Serialization.SystemTextJson" Version="1.4.1"/>
 	</ItemGroup>
 	<!-- Tests packages -->
 	<ItemGroup>

@@ -49,6 +49,21 @@ internal sealed class UserProfileGrpcClient : IUserProfileService
 				})
 			.IfLeft(_ => None);
 
+	public Task<Option<BasicUserProfile>> GetBasicUserProfile(UserId userId, CancellationToken cancellationToken) =>
+		_grpcExecutor
+			.ExecuteAsync<Option<BasicUserProfile>, NotFoundError>(
+				async client =>
+				{
+					var profile = await client.GetBasicUserProfileAsync(userId.ToDto(), cancellationToken: cancellationToken);
+					return new BasicUserProfile
+					{
+						Id = IdValueExtensions.Parse<UserId>(profile.Id),
+						FirstName = profile.FirstName,
+						SecondName = profile.SecondName,
+					};
+				})
+			.IfLeft(_ => None);
+
 	public Task<IReadOnlyList<(UserId UserId, bool Exists)>> CheckUsersExistence(
 		IReadOnlyList<UserId> userIds, CancellationToken cancellationToken) =>
 		_grpcExecutor.ExecuteAsync<IReadOnlyList<(UserId UserId, bool Exists)>>(

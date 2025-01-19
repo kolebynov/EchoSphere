@@ -3,6 +3,7 @@ using EchoSphere.Users.Abstractions;
 using EchoSphere.Users.Grpc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace EchoSphere.Users.Client.Extensions;
 
@@ -17,7 +18,10 @@ public static class ServiceCollectionExtensions
 
 		services.TryAddScoped<IFriendService, FriendGrpcClient>();
 		services.TryAddScoped<IFollowService, FollowGrpcClient>();
-		services.TryAddScoped<IUserProfileService, UserProfileGrpcClient>();
+		services.TryAddTransient<UserProfileGrpcClient>();
+		services.TryAddScoped<IUserProfileService>(
+			sp => new CachedUserProfileService(
+				sp.GetRequiredService<UserProfileGrpcClient>(), sp.GetRequiredService<IFusionCache>()));
 
 		return services;
 	}

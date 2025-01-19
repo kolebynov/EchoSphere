@@ -10,6 +10,8 @@ service UserProfileService {
 
 	rpc GetUserProfile (echo_sphere.grpc_shared.contracts.UserIdDto) returns (UserProfileDto);
 
+	rpc GetBasicUserProfile (echo_sphere.grpc_shared.contracts.UserIdDto) returns (BasicUserProfileDto);
+
 	rpc CheckUsersExistence (UserIdsDto) returns (CheckUsersExistenceResponse);
 }
 
@@ -78,6 +80,12 @@ message GetFriendInvitesResponse {
 
 message GetUserProfilesResponse {
 	repeated UserProfileDto profiles = 1;
+}
+
+message BasicUserProfileDto {
+	string id = 1;
+	string first_name = 2;
+	string second_name = 3;
 }
 
 message UserProfileDto {

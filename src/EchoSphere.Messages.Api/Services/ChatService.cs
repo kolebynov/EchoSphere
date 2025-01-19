@@ -135,6 +135,7 @@ internal sealed class ChatService : IChatService
 			{
 				ChatId = chatId,
 				SenderId = _currentUserAccessor.CurrentUserId,
+				Text = text,
 			},
 			cancellationToken);
 
