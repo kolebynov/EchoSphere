@@ -10,4 +10,7 @@ public interface IUserProfileClient
 
 	[Get("/users/{userId}")]
 	Task<UserProfileDtoV1> GetUserProfile(string userId, CancellationToken cancellationToken);
+
+	[Get("/users/{userId}/basicProfile")]
+	Task<UserProfileDtoV1> GetBasicUserProfile(string userId, CancellationToken cancellationToken);
 }

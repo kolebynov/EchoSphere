@@ -1,4 +1,6 @@
-﻿@using EchoSphere.Messages.Abstractions.IntegrationEvents
+﻿@using EchoSphere.ApiGateway.Client
+@using EchoSphere.Domain.Abstractions.Extensions
+@using EchoSphere.Messages.Abstractions.IntegrationEvents
 @using Microsoft.AspNetCore.SignalR.Client
 @using MudBlazor.Utilities
 
@@ -6,6 +8,8 @@
 @implements IAsyncDisposable
 
 @inject NavigationManager NavigationManager;
+@inject ISnackbar Snackbar;
+@inject IUserProfileClient UserProfileClient;
 
 <MudThemeProvider Theme="_theme"/>
 <MudDialogProvider/>
@@ -97,8 +101,18 @@
 			.Build();
 
 		_notificationsConnection.On<MessageSentEvent>(
-			"MessageSent",
-			e => Console.WriteLine($"Message from {e.SenderId} in chat {e.ChatId}"));
+			nameof(MessageSentEvent),
+			async e =>
+			{
+				Console.WriteLine(e.SenderId);
+				var profile = await UserProfileClient.GetBasicUserProfile(e.SenderId.ToInnerString(), CancellationToken.None);
+				Snackbar.Add(
+					$"{profile.FirstName} {profile.SecondName} sent message {e.Text}", Severity.Info,
+					opt =>
+					{
+						opt.SnackbarVariant = Variant.Filled;
+					});
+			});
 
 		await _notificationsConnection.StartAsync();
 	}

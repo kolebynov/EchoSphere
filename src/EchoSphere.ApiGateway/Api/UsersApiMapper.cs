@@ -19,6 +19,7 @@ public static class UsersApiMapper
 
 		usersApi.MapGet("/", GetUserProfiles);
 		usersApi.MapGet("/{userId}", GetUserProfile);
+		usersApi.MapGet("/{userId}/basicProfile", GetBasicUserProfile);
 		usersApi.MapGet("/{userId}/friends", GetUserFriends);
 		usersApi.MapPost("/{toUserId:guid}/sendFriendInvite", SendFriendInvite);
 		usersApi.MapPost("/{followUserId:guid}/follow", Follow);
@@ -60,6 +61,18 @@ public static class UsersApiMapper
 				FirstName = profile.FirstName,
 				SecondName = profile.SecondName,
 			}).ToResults<Ok<UserProfileDtoV1>, ProblemHttpResult>())
+			.IfNone(() => TypedResults.Problem(statusCode: 404));
+
+	private static Task<Results<Ok<BasicUserProfileDtoV1>, ProblemHttpResult>> GetBasicUserProfile(
+		IUserProfileService userProfileService, ClaimsPrincipal currentUser, string userId,
+		CancellationToken cancellationToken) =>
+		userProfileService.GetBasicUserProfile(ParseUserId(userId, currentUser), cancellationToken)
+			.MapAsync(profile => TypedResults.Ok(new BasicUserProfileDtoV1
+			{
+				Id = profile.Id.Value,
+				FirstName = profile.FirstName,
+				SecondName = profile.SecondName,
+			}).ToResults<Ok<BasicUserProfileDtoV1>, ProblemHttpResult>())
 			.IfNone(() => TypedResults.Problem(statusCode: 404));
 
 	private static Task<Results<Ok<IEnumerable<Guid>>, ProblemHttpResult>> GetUserFriends(
