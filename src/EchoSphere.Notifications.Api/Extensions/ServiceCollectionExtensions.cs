@@ -8,13 +8,14 @@ namespace EchoSphere.Notifications.Api.Extensions;
 
 internal static class ServiceCollectionExtensions
 {
-	public static IServiceCollection AddEventToNotificationConverter<TEvent, TConverter>(
+	public static IServiceCollection AddEventToNotificationHandler<TEvent, TConverter>(
 		this IServiceCollection services)
 		where TEvent : IIntegrationEvent
 		where TConverter : class, IEventToNotificationsConverter<TEvent>
 	{
 		services.TryAddScoped<TConverter>();
-		services.AddScoped<IIntegrationEventHandler<TEvent>, EventToNotificationsHandler<TEvent, TConverter>>();
+		services.TryAddScoped<IIntegrationEventHandler<TEvent>, EventToNotificationsHandler<TEvent, TConverter>>();
+
 		return services;
 	}
 }

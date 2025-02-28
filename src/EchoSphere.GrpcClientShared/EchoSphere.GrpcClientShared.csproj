@@ -6,6 +6,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\EchoSphere.Domain.Abstractions\EchoSphere.Domain.Abstractions.csproj" />
+		<ProjectReference Include="..\EchoSphere.Domain.Abstractions\EchoSphere.Domain.Abstractions.csproj"/>
 	</ItemGroup>
 </Project>

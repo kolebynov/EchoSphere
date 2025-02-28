@@ -1,15 +1,16 @@
 ﻿@using EchoSphere.ApiGateway.Client
 @using EchoSphere.Domain.Abstractions.Extensions
 @using EchoSphere.Messages.Abstractions.IntegrationEvents
-@using Microsoft.AspNetCore.SignalR.Client
+@using EchoSphere.Posts.Abstractions.IntegrationEvents
+@using EchoSphere.RealtimeNotifications.Client
 @using MudBlazor.Utilities
+@using R3
 
 @inherits LayoutComponentBase
-@implements IAsyncDisposable
 
-@inject NavigationManager NavigationManager;
 @inject ISnackbar Snackbar;
 @inject IUserProfileClient UserProfileClient;
+@inject IRealtimeNotificationsClient RealtimeNotificationsClient;
 
 <MudThemeProvider Theme="_theme"/>
 <MudDialogProvider/>
@@ -79,33 +80,16 @@
 			Body1 = { FontFamily = BodyFontFamily },
 			Body2 = { FontFamily = BodyFontFamily },
 			Caption = { FontFamily = BodyFontFamily, FontSize = "12px" },
-			Button = { FontFamily = BodyFontFamily, TextTransform = "none", FontWeight = 400 },
-			Input = { FontFamily = BodyFontFamily, FontSize = "14px" },
+			Button = { FontFamily = BodyFontFamily, TextTransform = "none", FontWeight = "400" },
 		}
 	};
 
-	private HubConnection? _notificationsConnection;
-
-	public async ValueTask DisposeAsync()
+	protected override Task OnInitializedAsync()
 	{
-		if (_notificationsConnection != null)
-		{
-			await _notificationsConnection.DisposeAsync();
-		}
-	}
-
-	protected override async Task OnInitializedAsync()
-	{
-		_notificationsConnection = new HubConnectionBuilder()
-			.WithUrl(NavigationManager.ToAbsoluteUri("/realtimeNotifications"))
-			.Build();
-
-		_notificationsConnection.On<MessageSentEvent>(
-			nameof(MessageSentEvent),
-			async e =>
+		RealtimeNotificationsClient.GetEventObservable<MessageSentEvent>()
+			.SubscribeAwait(async (e, ct) =>
 			{
-				Console.WriteLine(e.SenderId);
-				var profile = await UserProfileClient.GetBasicUserProfile(e.SenderId.ToInnerString(), CancellationToken.None);
+				var profile = await UserProfileClient.GetBasicUserProfile(e.SenderId.ToInnerString(), ct);
 				Snackbar.Add(
 					$"{profile.FirstName} {profile.SecondName} sent message {e.Text}", Severity.Info,
 					opt =>
@@ -114,6 +98,30 @@
 					});
 			});
 
-		await _notificationsConnection.StartAsync();
+		RealtimeNotificationsClient.GetEventObservable<PostPublished>()
+			.SubscribeAwait(async (e, ct) =>
+			{
+				var profile = await UserProfileClient.GetBasicUserProfile(e.UserId.ToInnerString(), ct);
+				Snackbar.Add(
+					$"{profile.FirstName} {profile.SecondName} published a post {e.PostId.ToInnerString()}", Severity.Info,
+					opt =>
+					{
+						opt.SnackbarVariant = Variant.Filled;
+					});
+			});
+
+		RealtimeNotificationsClient.GetEventObservable<PostCommentAdded>()
+			.SubscribeAwait(async (e, ct) =>
+			{
+				var profile = await UserProfileClient.GetBasicUserProfile(e.UserId.ToInnerString(), ct);
+				Snackbar.Add(
+					$"{profile.FirstName} {profile.SecondName} added a comment {e.PostCommentId.ToInnerString()} to your post {e.PostId.ToInnerString()}", Severity.Info,
+					opt =>
+					{
+						opt.SnackbarVariant = Variant.Filled;
+					});
+			});
+
+		return Task.CompletedTask;
 	}
 }

@@ -12,6 +12,7 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly"/>
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer"/>
+		<PackageReference Include="R3Extensions.BlazorWebAssembly" />
 		<PackageReference Include="System.Linq.Async"/>
 		<PackageReference Include="Microsoft.AspNetCore.Components.Authorization"/>
 		<PackageReference Include="Microsoft.Extensions.Http.Resilience"/>
@@ -21,6 +22,7 @@
 		<ProjectReference Include="..\EchoSphere.ApiGateway.Client\EchoSphere.ApiGateway.Client.csproj" />
 		<ProjectReference Include="..\EchoSphere.BlazorShared\EchoSphere.BlazorShared.csproj"/>
 		<ProjectReference Include="..\EchoSphere.Messages.Abstractions\EchoSphere.Messages.Abstractions.csproj" />
+		<ProjectReference Include="..\EchoSphere.Posts.Abstractions\EchoSphere.Posts.Abstractions.csproj" />
 		<ProjectReference Include="..\EchoSphere.RealtimeNotifications.Client\EchoSphere.RealtimeNotifications.Client.csproj" />
 	</ItemGroup>
 

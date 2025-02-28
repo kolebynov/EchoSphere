@@ -1,10 +1,13 @@
 using EchoSphere.ApiGateway.Client;
 using EchoSphere.BlazorShared.Extensions;
+using EchoSphere.RealtimeNotifications.Client.Extensions;
+using EchoSphere.RealtimeNotifications.Client.Settings;
 using EchoSphere.Web.Client;
 using EchoSphere.Web.Client.Extensions;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Http.Resilience;
+using R3;
 using Refit;
 
 if (!OperatingSystem.IsBrowser())
@@ -25,9 +28,10 @@ builder.Services.ConfigureHttpClientDefaults(http =>
 
 builder.Services.AddCommonClientAndServerServices();
 builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddBlazorWebAssemblyR3();
+builder.Services.AddRealtimeNotificationsClient();
 
 var apiUri = new Uri(new Uri(builder.HostEnvironment.BaseAddress), "api");
-Console.WriteLine(apiUri);
 builder.Services.AddRefitClient<IChatClient>()
 	.ConfigureHttpClient(client => client.BaseAddress = apiUri)
 	.IncludeBrowserCredentials();
@@ -46,6 +50,11 @@ builder.Services.AddRefitClient<IPostClient>()
 builder.Services.AddRefitClient<INotificationClient>()
 	.ConfigureHttpClient(client => client.BaseAddress = apiUri)
 	.IncludeBrowserCredentials();
+
+builder.Services.Configure<RealtimeNotificationsClientSettings>(settings =>
+{
+	settings.Url = new Uri(new Uri(builder.HostEnvironment.BaseAddress), "realtimeNotifications");
+});
 
 builder.Services.AddScoped<AuthenticationStateProvider, UserProfileAuthenticationStateProvider>();
 

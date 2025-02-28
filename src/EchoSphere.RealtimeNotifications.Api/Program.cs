@@ -1,10 +1,12 @@
 using EchoSphere.Domain.Abstractions.Extensions;
 using EchoSphere.Domain.AspNetCore.Extensions;
-using EchoSphere.Infrastructure.IntegrationEvents.Abstractions;
 using EchoSphere.Infrastructure.IntegrationEvents.Extensions;
 using EchoSphere.Messages.Abstractions.IntegrationEvents;
 using EchoSphere.Messages.Client.Extensions;
+using EchoSphere.Posts.Abstractions.IntegrationEvents;
 using EchoSphere.RealtimeNotifications.Api;
+using EchoSphere.RealtimeNotifications.Api.EventUsersProviders;
+using EchoSphere.RealtimeNotifications.Api.Extensions;
 using EchoSphere.ServiceDefaults;
 using EchoSphere.Users.Client.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -43,7 +45,9 @@ builder.Services.AddDomainServicesCore();
 builder.Services.AddMessagesGrpcClient(new Uri("https://MessagesApi"));
 builder.Services.AddUsersGrpcClient(new Uri("https://UsersApi"));
 
-builder.Services.AddScoped<IIntegrationEventHandler<MessageSentEvent>, MessagesSentHandler>();
+builder.Services.AddEventToUsersSender<MessageSentEvent, MessageSentEventUsersProvider>();
+builder.Services.AddEventToUsersSender<PostPublished, PostPublishedEventUsersProvider>();
+builder.Services.AddEventToUsersSender<PostCommentAdded, PostCommentEventUsersProvider>();
 
 var app = builder.Build();
 

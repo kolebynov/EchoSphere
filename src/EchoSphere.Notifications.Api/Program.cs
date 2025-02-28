@@ -52,9 +52,9 @@ builder.Services.AddScoped<NotificationService>();
 builder.Services.AddTransient<INotificationService>(sp => sp.GetRequiredService<NotificationService>());
 builder.Services.AddTransient<INotificationStorage>(sp => sp.GetRequiredService<NotificationService>());
 
-builder.Services.AddEventToNotificationConverter<PostPublished, PostPublishedConverter>();
-builder.Services.AddEventToNotificationConverter<PostLiked, PostLikedConverter>();
-builder.Services.AddEventToNotificationConverter<PostCommentAdded, PostCommentAddedConverter>();
+builder.Services.AddEventToNotificationHandler<PostPublished, PostPublishedConverter>();
+builder.Services.AddEventToNotificationHandler<PostLiked, PostLikedConverter>();
+builder.Services.AddEventToNotificationHandler<PostCommentAdded, PostCommentAddedConverter>();
 
 var app = builder.Build();
 

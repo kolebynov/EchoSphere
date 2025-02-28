@@ -1,4 +1,3 @@
-using System.Runtime.Versioning;
 using Microsoft.Extensions.Configuration;
 
 namespace EchoSphere.BlazorShared.Extensions;
@@ -21,12 +20,5 @@ public static class ConfigurationExtensions
 				}
 			}
 		}
-	}
-
-	[SupportedOSPlatform("browser")]
-	public static void AddWebAssemblyEnvironmentVariables(this IConfigurationBuilder configurationBuilder)
-	{
-		EnvironmentVariablesLoader.LoadEnvironmentVariables();
-		configurationBuilder.AddEnvironmentVariables();
 	}
 }

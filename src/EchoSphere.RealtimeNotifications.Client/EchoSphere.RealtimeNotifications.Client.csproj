@@ -1,5 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client"/>
+		<PackageReference Include="R3"/>
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\EchoSphere.Domain.Abstractions\EchoSphere.Domain.Abstractions.csproj" />
 	</ItemGroup>
 </Project>
